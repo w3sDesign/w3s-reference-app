@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "crud-reference-app": {
+    "w3s-reference-app": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/crud-reference-app",
+            "outputPath": "dist/w3s-reference-app",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -27,6 +27,7 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
             ],
             "scripts": []
@@ -61,18 +62,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "crud-reference-app:build"
+            "browserTarget": "w3s-reference-app:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "crud-reference-app:build:production"
+              "browserTarget": "w3s-reference-app:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "crud-reference-app:build"
+            "browserTarget": "w3s-reference-app:build"
           }
         },
         "test": {
@@ -83,6 +84,7 @@
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
             ],
             "scripts": [],
@@ -106,7 +108,7 @@
         }
       }
     },
-    "crud-reference-app-e2e": {
+    "w3s-reference-app-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "prefix": "",
@@ -115,11 +117,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "crud-reference-app:serve"
+            "devServerTarget": "w3s-reference-app:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "crud-reference-app:serve:production"
+              "devServerTarget": "w3s-reference-app:serve:production"
             }
           }
         },
@@ -135,5 +137,5 @@
       }
     }
   },
-  "defaultProject": "crud-reference-app"
+  "defaultProject": "w3s-reference-app"
 }

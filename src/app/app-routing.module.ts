@@ -1,10 +1,33 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
 
-const routes: Routes = [];
+import { HomeComponent } from './home/home.component';
+
+
+const routes: Routes = [
+ {
+    path: 'customers',
+    loadChildren: './customer/customer.module#CustomerModule'
+  },
+  {
+    path: '', component: HomeComponent
+  },
+  {
+    path: 'home', redirectTo: '', pathMatch: 'full'
+  },
+  {
+    path: '**', component: HomeComponent
+    // { path: '**', component: PageNotFoundComponent }
+  }
+];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(
+    routes,
+    {
+      enableTracing: true,
+      preloadingStrategy: PreloadAllModules
+    })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

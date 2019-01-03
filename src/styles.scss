@@ -1,1 +1,115 @@
-/* You can add global styles to this file, and also import other style files */
+/* @import '~@angular/material/prebuilt-themes/indigo-pink.css'; */
+/* @import './w3s-custom-theme.scss';  */
+
+html,
+body {
+  height: 100%;
+}
+
+// /* everywhere else */
+// * {
+//   font-family: Arial, Helvetica, sans-serif;
+// }
+body {
+  margin: 0;
+  // font-family: 'Roboto', sans-serif;
+}
+
+
+
+// Must be global!
+.w3s-dialog-panel {
+  // margin-top: 400px;
+  // height: 200px;
+  overflow-y: auto;
+}
+
+.w3s-snack-bar {
+  width: 100%;
+  background-color: blue;
+  // pointer-events: none;
+  // position: absolute;
+  // top: 500px;
+  // left: 0;
+  // height: 100%;
+  // width: 100%;
+  // z-index: 1000;
+}
+
+
+// /* Master Styles */
+// h1 {
+//   color: #369;
+//   font-family: Arial, Helvetica, sans-serif;
+//   font-size: 250%;
+// }
+
+// h2,
+// h3 {
+//   color: #444;
+//   font-family: Arial, Helvetica, sans-serif;
+//   font-weight: lighter;
+// }
+
+// body {
+//   margin: 2em;
+// }
+
+// body,
+// input[text],
+// button {
+//   color: #888;
+//   font-family: Cambria, Georgia;
+// }
+
+// a {
+//   cursor: pointer;
+//   cursor: hand;
+// }
+
+// button {
+//   font-family: Arial;
+//   background-color: #eee;
+//   border: none;
+//   padding: 5px 10px;
+//   border-radius: 4px;
+//   cursor: pointer;
+//   cursor: hand;
+// }
+
+// button:hover {
+//   background-color: #cfd8dc;
+// }
+
+// button:disabled {
+//   background-color: #eee;
+//   color: #aaa;
+//   cursor: auto;
+// }
+
+// /* Navigation link styles */
+// nav a {
+//   padding: 5px 10px;
+//   text-decoration: none;
+//   margin-right: 10px;
+//   margin-top: 10px;
+//   display: inline-block;
+//   background-color: #eee;
+//   border-radius: 4px;
+// }
+
+// nav a:visited,
+// a:link {
+//   color: #607D8B;
+// }
+
+// nav a:hover {
+//   color: #039be5;
+//   background-color: #CFD8DC;
+// }
+
+// nav a.active {
+//   color: #039be5;
+// }
+
+

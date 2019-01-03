@@ -1,4 +1,24 @@
-# CrudReferenceApp
+# W3S REFERENCE APP
+
+<app-root>
+  ######## Toolbar ...
+  <router-outlet>
+
+      <app-customer-root>
+        ########## CUSTOMER ...
+        <router-outlet>
+
+          <app-customer-list>
+              ######### CUSTOMER Data Table ...
+          </app-customer-list>
+          
+        </router-outlet>
+      </app-customer-root>
+
+  </router-outlet>
+</app-root>
+
+
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.0.3.
 
