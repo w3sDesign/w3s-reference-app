@@ -1,0 +1,15 @@
+.snack-bar-container {
+
+  // flex-direction: row;
+  align-items: center; // vertical
+  justify-content: center; // horizontal
+  // flex-wrap: wrap; // default = nowrap
+
+
+  text-align: center;
+  // width: 100%;
+  // min-width: 10px;
+  // background-color:green; // #fafafa;
+  color: rgba(0, 0, 0, .87);
+  font-weight: 500;
+}

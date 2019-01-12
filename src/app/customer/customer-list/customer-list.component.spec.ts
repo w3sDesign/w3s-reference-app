@@ -11,7 +11,8 @@ import { CustomerModule } from '../customer.module';
 import { CustomerListComponent } from './customer-list.component';
 import { CustomerRoutingModule } from '../customer-routing.module';
 
-import { HttpCustomerService as CustomerService } from '../model/http-customer.service';
+import { CustomerService, HttpCustomerService } from '../model/http-customer.service';
+import { HttpErrorHandler } from '../../shared/http-error-handler.service';
 
 import { mockCustomers } from '../model/mock-customers';
 
@@ -40,8 +41,9 @@ describe('CustomerListComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRoute },
         { provide: Router, useValue: routerSpy },
 
-        // { provide: CustomerService, useValue: heroes }
-        // { provide: CustomerService, useClass: TestCustomerService }
+        { provide: CustomerService, useClass: HttpCustomerService },
+        // { provide: HttpErrorHandler, useValue: {} }
+        { provide: HttpErrorHandler, useClass: HttpErrorHandler }
       ]
     })
       .compileComponents();

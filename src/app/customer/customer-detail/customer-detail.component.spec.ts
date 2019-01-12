@@ -11,6 +11,9 @@ import { CustomerModule } from '../customer.module';
 import { CustomerRoutingModule } from '../customer-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { CustomerService, HttpCustomerService } from '../model/http-customer.service';
+import { HttpErrorHandler } from 'src/app/shared/http-error-handler.service';
+
 
 /** Testing Vars */
 let component: CustomerDetailComponent;
@@ -32,8 +35,9 @@ describe('CustomerDetailComponent', () => {
       providers: [
         { provide: ActivatedRoute, useValue: activatedRoute },
         { provide: Router, useValue: routerSpy },
-        // HeroDetailService at this level is IRRELEVANT!
-        // { provide: CustomerService, useValue: {} }
+
+        { provide: CustomerService, useClass: HttpCustomerService },
+        { provide: HttpErrorHandler, useValue: {} }
       ]
     })
       .compileComponents();

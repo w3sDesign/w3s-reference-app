@@ -14,7 +14,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { SharedMaterialModule } from './shared/shared-material.module';
+
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
+import { MessageSnackBarComponent } from './shared/message-snack-bar/message-snack-bar.component';
+
+import { HttpErrorHandler } from './shared/http-error-handler.service';
+import { HttpUtilsService } from './shared/http-utils.service';
+import { MessageService } from './shared/message.service';
 
 @NgModule({
   imports: [
@@ -23,36 +29,26 @@ import { MessageDialogComponent } from './shared/message-dialog/message-dialog.c
     FormsModule,
     ReactiveFormsModule,
     LayoutModule,
-
-    // HttpClientModule,
-
-    //////////////////////////////////////////////////////////////////////
-    //  The HttpClientInMemoryWebApiModule module intercepts HTTP requests
-    //  and returns simulated server responses.
-    //  Remove it when a real server is ready to receive requests.
-    // environment.production
-    //   ? []
-    //   : HttpClientInMemoryWebApiModule.forRoot(CustomerInMemoryDataService, {
-    //     delay: 350,
-    //     dataEncapsulation: false
-    //   }),
-    // https://github.com/angular/in-memory-web-api/blob/master/CHANGELOG.md#050-2017-10-05
-    //////////////////////////////////////////////////////////////////////
-
     SharedMaterialModule,
-    // CustomerModule, = lazy loaded
     AppRoutingModule,
-  ],
-  entryComponents: [
-    MessageDialogComponent
   ],
   declarations: [
     AppComponent,
     HomeComponent,
-    MessageDialogComponent
+    MessageDialogComponent,
+    MessageSnackBarComponent,
+  ],
+  entryComponents: [
+    MessageDialogComponent,
+    MessageSnackBarComponent,
+  ],
+  providers: [
+    HttpErrorHandler,
+    HttpUtilsService,
+    MessageService,
   ],
   exports: [
-    MessageDialogComponent
+    // MessageDialogComponent, SharedMaterialModule,
   ],
   bootstrap: [AppComponent]
 })

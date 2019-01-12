@@ -14,9 +14,12 @@ import { Customer } from '../model/customer';
 import { QueryParams } from '../../shared/query-params';
 
 import { CustomerService } from '../model/http-customer.service';
+import { HttpErrorHandler } from '../../shared/http-error-handler.service';
 
 import { CustomerDetailDialogComponent } from '../customer-detail/customer-detail.component';
 import { Router } from '@angular/router';
+
+import { MessageSnackBarComponent } from '../../shared/message-snack-bar/message-snack-bar.component';
 
 
 ////////////// tests ////////////////
@@ -25,6 +28,11 @@ import { Router } from '@angular/router';
 // numbers.subscribe(x => console.log(x));
 ///////////////////////////////////////
 
+/**
+ * ####################################################################
+ * CustomerListComponent
+ * ####################################################################
+ */
 @Component({
   selector: 'app-customer-list',
   templateUrl: './customer-list.component.html',
@@ -78,9 +86,11 @@ export class CustomerListComponent implements OnInit {
   constructor(
     private router: Router,
     private customerService: CustomerService,
+    // private httpErrorHandler: HttpErrorHandler,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    // private snackBar: MatSnackBar
   ) { }
+
 
   ngOnInit() {
     // If the user changes the sort order, reset back to the first page.
@@ -111,25 +121,28 @@ export class CustomerListComponent implements OnInit {
       .subscribe();
 
     // Init DataSource
-    const queryParams = new QueryParams(this.filterConfiguration(false));
+    const queryParams = new QueryParams();
+    queryParams.filter = this.filterConfiguration(false);
     this.dataSource = new CustomerDataSource(this.customerService);
     // Initial Data Load /////////////////////
     this.dataSource.loadCustomers(queryParams);
+    //////////////////////////////////////////
     this.dataSource.customers$$.subscribe(res => (this.customersToDisplay = res));
   }
 
   loadCustomers() {
-    const queryParams = new QueryParams(
-      this.filterConfiguration(true),
-      this.sort.direction /** asc/desc */,
-      this.sort.active /** The id of the column being sorted. */,
-      this.paginator.pageIndex,
-      this.paginator.pageSize
-    );
+    const queryParams = new QueryParams();
+    queryParams.filter = this.filterConfiguration(true);
+    queryParams.sortOrder = this.sort.direction;
+    queryParams.sortField = this.sort.active; /** The id of the column being sorted. */
+    queryParams.pageNumber = this.paginator.pageIndex;
+    queryParams.pageSize = this.paginator.pageSize;
+    //////////////////////////////////////////
     this.dataSource.loadCustomers(queryParams);
     //////////////////////////////////////////
     this.selection.clear();
   }
+
 
   /** FILTRATION */
   filterConfiguration(isGeneralSearch: boolean = true): any {
@@ -236,7 +249,9 @@ export class CustomerListComponent implements OnInit {
 
 
   /**
+   * ##################################################################
    * Delete selected customer(s).
+   * ##################################################################
    */
   deleteCustomers() {
     if (this.selection.isEmpty()) {
@@ -251,7 +266,7 @@ export class CustomerListComponent implements OnInit {
     }
 
     const numberOfSelections = this.selection.selected.length;
-    const customer_s = numberOfSelections === 1 ? 'customer' : `${numberOfSelections} customers`;
+    const customer_s = numberOfSelections <= 1 ? 'customer' : `${numberOfSelections} customers`;
 
     const dialogRef = this.dialog.open(MessageDialogComponent, {
       data: {
@@ -277,28 +292,13 @@ export class CustomerListComponent implements OnInit {
       // Delete identified (selected) customers.
       this.customerService.deleteCustomers(ids).subscribe(
         () => {
-          this.openSnackBar(`${customer_s} deleted.`, 'Action');
-          // this.layoutUtilsService.showActionNotification(
-          //   _deleteMessage,
-          //   MessageType.Delete
-          // );
           this.loadCustomers();
           this.selection.clear();
         },
-        err => { }
+        // err => { } handled in customerService
       );
     });
   }
 
-
-
-  openSnackBar(message: string, action: string) {
-    this.snackBar.open(message, action, {
-      duration: 3000,
-      verticalPosition: 'top',
-      panelClass: 'w3s-snack-bar', /* adds to snack-bar-container */
-      viewContainerRef: this.crudButtons.nativeElement
-    });
-  }
 
 }

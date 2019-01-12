@@ -11,6 +11,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { HttpCustomerService } from '../model/http-customer.service';
+import { HttpErrorHandler } from '../../shared/http-error-handler.service';
 
 import { TypesUtilsService } from '../../shared/types-utils.service';
 import { Customer } from '../model/customer';
@@ -50,6 +51,7 @@ export class CustomerDetailComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private customerService: HttpCustomerService,
+    private httpErrorHandler: HttpErrorHandler,
     private typesUtilsService: TypesUtilsService
   ) {
     // this.isDialogComponent = false;
@@ -248,9 +250,10 @@ export class CustomerDetailDialogComponent extends CustomerDetailComponent imple
     router: Router,
     route: ActivatedRoute,
     customerService: HttpCustomerService,
+    httpErrorHandler: HttpErrorHandler,
     typesUtilsService: TypesUtilsService
   ) {
-    super(formBuilder, router, route, customerService, typesUtilsService);
+    super(formBuilder, router, route, customerService, httpErrorHandler, typesUtilsService);
     // this.isDialogComponent = true;
   }
 

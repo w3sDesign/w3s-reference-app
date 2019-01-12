@@ -8,8 +8,11 @@ import { of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { QueryParams } from '../../shared/query-params';
 import { QueryResult } from '../../shared/query-result';
-import { HttpCustomerService } from './http-customer.service';
+
 import { Customer } from './customer';
+import { CustomerService } from './http-customer.service';
+import { HttpErrorHandler } from '../../shared/http-error-handler.service';
+
 
 
 
@@ -35,7 +38,7 @@ export class CustomerDataSource implements DataSource<any> {
   /** Stream accepting and emitting the total number of customers. */
   totalNumberOfItems = new BehaviorSubject<number>(0);
 
-  constructor(private customerService: HttpCustomerService) {
+  constructor(private customerService: CustomerService) {
     this.totalNumberOfItems.subscribe(nr => (this.hasItems = nr > 0));
   }
 
@@ -53,13 +56,6 @@ export class CustomerDataSource implements DataSource<any> {
     this.isLoading.complete();
     this.totalNumberOfItems.complete();
   }
-
-
-
-
-
-
-
 
   /**
    * The customer data source implements the loadCustomer() method by delegating
@@ -84,7 +80,7 @@ export class CustomerDataSource implements DataSource<any> {
 
           this.totalNumberOfItems.next(res.totalCount);
         }),
-        catchError(err => of(new QueryResult([], err))),
+        catchError(err => of(new QueryResult())), // TODO
         finalize(() => this.isLoading.next(false))
       )
       .subscribe();

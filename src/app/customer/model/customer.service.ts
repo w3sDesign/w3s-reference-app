@@ -20,5 +20,5 @@ export abstract class CustomerService {
 
   abstract updateCustomer (customer: Customer): Observable<Customer>;
 
-  abstract deleteCustomer (customer: Customer | number): Observable<Customer>;
+  abstract deleteCustomer (id: number): Observable<{}>;
 }

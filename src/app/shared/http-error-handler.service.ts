@@ -1,7 +1,12 @@
+/**
+ *  Based on angular docu
+ *  angular/aio/content/examples/http/src/app/http-error-handler.service.ts
+ */
+
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 
 import { MessageService } from './message.service';
 
@@ -9,14 +14,23 @@ import { MessageService } from './message.service';
 export type HandleError =
   <T> (operation?: string, result?: T) => (error: HttpErrorResponse) => Observable<T>;
 
-/** Handles HttpClient errors */
+/**
+ * ####################################################################
+ * Handles HttpClient errors
+ * ####################################################################
+ */
 @Injectable()
 export class HttpErrorHandler {
+
   constructor(private messageService: MessageService) { }
 
-  /** Create curried handleError function that already knows the service name */
+  /** Create curried handleError function that already knows the service name.
+   * @param operation - name of the operation that failed
+   * @param result - optional value to return as the observable
+   */
   createHandleError = (serviceName = '') => <T>
-    (operation = 'operation', result = {} as T) => this.handleError(serviceName, operation, result);
+    (operation = 'operation', result = {} as T) => this.handleError(serviceName, operation, result)
+
 
   /**
    * Returns a function that handles Http operation failures.
@@ -25,7 +39,7 @@ export class HttpErrorHandler {
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  handleError<T> (serviceName = '', operation = 'operation', result = {} as T) {
+  handleError<T>(serviceName = '', operation = 'operation', result = {} as T) {
 
     return (error: HttpErrorResponse): Observable<T> => {
       // TODO: send the error to remote logging infrastructure
@@ -33,13 +47,16 @@ export class HttpErrorHandler {
 
       const message = (error.error instanceof ErrorEvent) ?
         error.error.message :
-       `server returned code ${error.status} with body "${error.error}"`;
+        `server returned code ${error.status} with body "${error.error}"`;
 
       // TODO: better job of transforming error for user consumption
+      // openSnackBar ########################
+      // User message  try again
       this.messageService.add(`${serviceName}: ${operation} failed: ${message}`);
 
-      // Let the app keep running by returning a safe result.
-      return of( result );
+      // Let the app keep running by returning a safe (empty) result.
+      return of(result);
+      // return throwError(error);
     };
 
   }

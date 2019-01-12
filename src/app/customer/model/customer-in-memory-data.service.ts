@@ -5,10 +5,12 @@ import { InMemoryDbService } from 'angular-in-memory-web-api';
 import { Customer } from './customer';
 import { mockCustomers } from './mock-customers';
 
-// @Injectable({ providedIn: 'root' })
 @Injectable()
 export class CustomerInMemoryDataService implements InMemoryDbService {
   createDb() {
+
+    const customers: Customer[] = mockCustomers;
+
     const heroes = [
       { id: 11, name: 'Mr. Nice' },
       { id: 12, name: 'Narco' },
@@ -22,9 +24,7 @@ export class CustomerInMemoryDataService implements InMemoryDbService {
       { id: 20, name: 'Tornado' }
     ];
 
-    const customers: Customer[] = mockCustomers;
-
-    return { heroes, customers };
+    return { customers, heroes };
   }
 
   // Overrides the genId method to ensure that a hero always has an id.

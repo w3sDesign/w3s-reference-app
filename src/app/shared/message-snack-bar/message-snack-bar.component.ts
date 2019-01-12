@@ -1,17 +1,23 @@
-import { Component } from '@angular/core';
-import { MatSnackBar } from '@angular/material';
+import { Component, Inject } from '@angular/core';
+import { MatSnackBarRef, MAT_SNACK_BAR_DATA } from '@angular/material';
 
 @Component({
-  selector: 'app-message-snack-bar-component',
+  selector: 'app-message-snack-bar',
   templateUrl: './message-snack-bar.component.html',
-  styleUrls: ['./message-snack-bar.component.css']
+  styleUrls: ['./message-snack-bar.component.scss']
 })
 export class MessageSnackBarComponent {
-  constructor(public snackBar: MatSnackBar) {}
 
-  openSnackBar(message: string, action: string) {
-    this.snackBar.open(message, action, {
-      duration: 500
-    });
+  constructor(
+
+    public snackBarRef: MatSnackBarRef<MessageSnackBarComponent>,
+
+    // data object from open.snackBar(): data = { xx }
+    @Inject(MAT_SNACK_BAR_DATA) public data: any
+
+  ) { }
+
+  onClick(): void {
+    this.snackBarRef.dismiss();
   }
 }
