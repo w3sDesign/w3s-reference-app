@@ -1,9 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MessageSnackBarComponent } from './message-snack-bar.component';
-import { SharedMaterialModule } from '../../shared/shared-material.module';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar, MatSnackBarRef, MAT_SNACK_BAR_DATA } from '@angular/material';
 
 describe('MessageSnackBarComponent', () => {
   let component: MessageSnackBarComponent;
@@ -11,13 +9,11 @@ describe('MessageSnackBarComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        BrowserAnimationsModule,
-        SharedMaterialModule,
-      ],
       declarations: [MessageSnackBarComponent],
       providers: [
         { provide: MatSnackBar, useValue: {} },
+        { provide: MatSnackBarRef, useValue: {} },
+        { provide: MAT_SNACK_BAR_DATA, useValue: {} },
       ]
     })
       .compileComponents();

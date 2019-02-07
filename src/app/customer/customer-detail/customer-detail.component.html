@@ -1,6 +1,7 @@
 <h5>{{title}}</h5>
 
 <!-- <form *ngIf="customer$ | async as customer" -->
+
 <form *ngIf="customer" [formGroup]="customerForm">
 
   <mat-spinner [diameter]="20" *ngIf="isLoading">

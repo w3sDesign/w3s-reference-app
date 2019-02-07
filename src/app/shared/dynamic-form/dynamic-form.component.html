@@ -1,0 +1,23 @@
+<div>
+  <form (ngSubmit)="onSubmit()" [formGroup]="form" class="w3s-flex-box">
+
+    <div *ngFor="let dynFormField of dynFormFields" class="form-row">
+
+      <!-- ################################################ -->
+
+      <w3s-dynamic-form-field [dynFormField]="dynFormField" [form]="form">
+      </w3s-dynamic-form-field>
+
+      <!-- ################################################ -->
+
+    </div>
+
+    <div class="form-row">
+      <button type="submit" [disabled]="!form.valid">Save</button>
+    </div>
+  </form>
+
+  <div *ngIf="payLoad" class="form-row">
+    <strong>Saved the following values</strong><br>{{payLoad}}
+  </div>
+</div>

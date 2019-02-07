@@ -19,11 +19,12 @@ import { QueryResult } from '../../shared/query-result';
 
 import { MatSnackBar } from '@angular/material';
 import { MessageSnackBarComponent } from '../../shared/message-snack-bar/message-snack-bar.component';
+import { Overlay } from '@angular/cdk/overlay';
 
 /**
  * Re-exporting HttpCustomerService as CustomerService,
  * making client code independent of a concrete implementation
- * (by importing CustomerService from xxx-customer.service).
+ * (by importing CustomerService from http-customer.service).
  */
 export { HttpCustomerService as CustomerService };
 
@@ -33,7 +34,7 @@ const cudOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/jso
 
 /**
  * ####################################################################
- * Injectable customer data access service via HTTP REST API.
+ * Injectable http data access service (via HTTP REST API).
  *
  * See also angular/in-memory-web-api/src/app/http-client-hero.service.ts
  * ####################################################################
@@ -41,7 +42,7 @@ const cudOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/jso
 @Injectable()
 export class HttpCustomerService extends CustomerService {
 
-  private handleError2: HandleError;
+  private handleError: HandleError;
 
   constructor(
     private http: HttpClient,
@@ -50,10 +51,11 @@ export class HttpCustomerService extends CustomerService {
     private httpUtils: HttpUtilsService,
     private messageService: MessageService,
     private snackBar: MatSnackBar,
-    // private messageSnackBar: MessageSnackBarComponent
+    // private overlay: Overlay,
   ) {
     super();
-    this.handleError2 = httpErrorHandler.createHandleError('HttpCustomerService');
+    /** Create a convenience handleError function that already knows the service name.*/
+    this.handleError = httpErrorHandler.createHandleError('HttpCustomerService');
   }
 
 
@@ -63,10 +65,9 @@ export class HttpCustomerService extends CustomerService {
    * ##################################################################
    */
   getCustomer(id: number): Observable<Customer> {
-    return this.http
-      .get<Customer>(this.customersUrl + `/${id}`)
+    return this.http.get<Customer>(this.customersUrl + `/${id}`)
       .pipe(
-        catchError(this.handleError2<Customer>(`Get customer id=${id}`))
+        catchError(this.handleError<Customer>(`Get customer id=${id}`))
       );
   }
 
@@ -75,9 +76,8 @@ export class HttpCustomerService extends CustomerService {
    * ##################################################################
    * Get customers from the remote http data server.
    *
-   * This code emulates real server response
-   * (by getting all customers and performing
-   * client-side filtering, sorting, and pagination).
+   * This code emulates real server response (by getting all customers
+   * and performing client-side filtering, sorting, and pagination).
    *
    * If no params specified, all customers are returned.
    *
@@ -87,34 +87,34 @@ export class HttpCustomerService extends CustomerService {
    */
   getCustomers(queryParams?: QueryParams): Observable<QueryResult> {
     if (queryParams) {
-      return this.http.get<Customer[]>(this.customersUrl).pipe(
-        catchError(this.handleError2('getCustomers with queryParams', [])),
-        mergeMap(res => {
-          const queryResult = this.httpUtils.baseFilter(res, queryParams, [
-            'status',
-            'type'
-          ]);
-          return of(queryResult);
-        })
-      );
+      return this.http.get<Customer[]>(this.customersUrl)
+        .pipe(
+          mergeMap(res => {
+            const queryResult = this.httpUtils
+              .baseFilter(res, queryParams, ['status', 'type']);
+            return of(queryResult);
+          }),
+          catchError(this.handleError('getCustomers with queryParams', new QueryResult()))
+        );
     }
-    // getCustomers() = no queryParams, all customers returned.
+
+    // No queryParams, all customers returned.
     return this.http.get<Customer[]>(this.customersUrl)
       .pipe(
-        catchError(this.handleError2('getCustomers', [])),
         mergeMap(res => {
           const queryResult = new QueryResult();
           queryResult.items = res;
           queryResult.totalCount = queryResult.items.length;
           return of(queryResult);
-        })
+        }),
+        catchError(this.handleError('getCustomers', new QueryResult()))
       );
   }
 
 
   /**
    * ##################################################################
-   * Experimental
+   * TODO
    * ##################################################################
    */
   searchCustomers(term: string): Observable<Customer[]> {
@@ -123,9 +123,10 @@ export class HttpCustomerService extends CustomerService {
     const options = term ?
       { params: new HttpParams().set('name', term) } : {};
 
-    return this.http.get<Customer[]>(this.customersUrl, options).pipe(
-      catchError(this.handleError2<Customer[]>('Search customers'))
-    );
+    return this.http.get<Customer[]>(this.customersUrl, options)
+      .pipe(
+        catchError(this.handleError<Customer[]>('Search customers'))
+      );
   }
 
 
@@ -139,7 +140,7 @@ export class HttpCustomerService extends CustomerService {
   createCustomer(customer: Customer): Observable<Customer> {
     return this.http.post<Customer>(this.customersUrl, customer, cudOptions)
       .pipe(
-        catchError(this.handleError2<Customer>('Create customer')),
+        catchError(this.handleError<Customer>('Create customer')),
         // tap((cust: Customer) => this.log(`Create customer id=${cust.id}`))
       );
   }
@@ -158,9 +159,9 @@ export class HttpCustomerService extends CustomerService {
     const message = `Customer ${customer.id} updated.`;
     return this.http.put<Customer>(this.customersUrl, customer, cudOptions)
       .pipe(
-        catchError(this.handleError2('updateCustomer', customer)),
         tap(() => this.openSnackBar(message)),
         tap(() => this.log(message)),
+        catchError(this.handleError('updateCustomer', customer)),
       );
   }
 
@@ -179,9 +180,9 @@ export class HttpCustomerService extends CustomerService {
     const message = `Customer ${id} deleted.`;
     return this.http.delete(this.customersUrl + `/${id}`, cudOptions)
       .pipe(
-        catchError(this.handleError2('deleteCustomer')),
         tap(() => this.openSnackBar(message)),
         tap(() => this.log(message)),
+        catchError(this.handleError('deleteCustomer')),
       );
   }
 
@@ -201,13 +202,14 @@ export class HttpCustomerService extends CustomerService {
     }
     return forkJoin(tasks$)
       .pipe(
-        catchError(this.handleError2('deleteCustomers')),
-        tap(() => this.openSnackBar(message))
+        tap(() => this.openSnackBar(message)),
+        tap(() => this.log(message)),
+        catchError(this.handleError('deleteCustomers')),
       );
 
   }
 
-  deleteOneCustomer(id: number): Observable<any> {
+  private deleteOneCustomer(id: number): Observable<any> {
     return this.http.delete(this.customersUrl + `/${id}`, cudOptions);
   }
 
@@ -220,7 +222,7 @@ export class HttpCustomerService extends CustomerService {
    * Helper functions
    * ##################################################################
    */
-  openSnackBar(message: string) {
+  private openSnackBar(message: string) {
     this.snackBar.openFromComponent(MessageSnackBarComponent, {
       data: message,
       duration: 3000,
@@ -229,7 +231,7 @@ export class HttpCustomerService extends CustomerService {
     });
   }
 
-  openSnackBarSimple(message: string, action: string) {
+  private openSnackBarSimple(message: string, action: string) {
     this.snackBar.open(message, action, {
       duration: 2000,
       verticalPosition: 'top',
@@ -240,11 +242,11 @@ export class HttpCustomerService extends CustomerService {
 
   /** Log a CustomerService message */
   private log(message: string) {
-    this.messageService.add('CustomerService: ' + message);
-    console.log('CustomerService: ' + message); // test
+    this.messageService.add('HttpCustomerService: ' + message);
+    // console.log('CustomerService: ' + message);
   }
 
-  // }
+
 
 
   // UPDATE Status

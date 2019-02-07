@@ -1,70 +1,116 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+
 import { Router } from '@angular/router';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {
   ActivatedRoute, ActivatedRouteStub, asyncData, click, newEvent
 } from '../../../testing';
 
-import { Customer } from '../model/customer';
 import { CustomerModule } from '../customer.module';
 import { CustomerListComponent } from './customer-list.component';
-import { CustomerRoutingModule } from '../customer-routing.module';
-
-import { CustomerService, HttpCustomerService } from '../model/http-customer.service';
-import { HttpErrorHandler } from '../../shared/http-error-handler.service';
+import { CustomerService } from '../model/customer.service';
 
 import { mockCustomers } from '../model/mock-customers';
+import { MockCustomerService } from '../model/mock-customer.service';
 
-// ?  import { TestCustomerService } from '../model/testing/test-customer.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-const heroes = mockCustomers;
+
 
 /** Testing Vars */
+const customers = mockCustomers;
 let component: CustomerListComponent;
 let fixture: ComponentFixture<CustomerListComponent>;
-let activatedRoute: ActivatedRouteStub;
-// let page: Page;
+let page: Page;
+
 
 
 describe('CustomerListComponent', () => {
 
   beforeEach(async(() => {
-    const routerSpy = createRouterSpy();
-    TestBed.configureTestingModule({
-      imports: [
-        CustomerModule,
-        CustomerRoutingModule,
-        BrowserAnimationsModule
-      ],
-      providers: [
-        { provide: ActivatedRoute, useValue: activatedRoute },
-        { provide: Router, useValue: routerSpy },
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
-        { provide: CustomerService, useClass: HttpCustomerService },
-        // { provide: HttpErrorHandler, useValue: {} }
-        { provide: HttpErrorHandler, useClass: HttpErrorHandler }
+    TestBed.configureTestingModule({
+      imports: [CustomerModule, BrowserAnimationsModule],
+      providers: [
+        { provide: CustomerService, useClass: MockCustomerService },
+        { provide: Router, useValue: routerSpy },
       ]
     })
-      .compileComponents();
+      .compileComponents()
+      .then(createComponent);
   }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(CustomerListComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
+  it('1st customer should match 1st mock customer', () => {
+    const expectedCustomer = customers[0];
+    const actualCustomer = page.customerRows[0].textContent;
+    expect(actualCustomer).toContain(expectedCustomer.id.toString(), 'customer.id');
+    expect(actualCustomer).toContain(expectedCustomer.name, 'customer.name');
+  });
+
+  it('should select customer on click', fakeAsync(() => {
+    const expectedCustomer = customers[1];
+    const row = page.customerRows[1];
+    row.dispatchEvent(newEvent('click'));
+    tick();
+    expect(component.selectedCustomer).toEqual(expectedCustomer);
+  }));
+
+  it('should navigate to the select customer detail on click', fakeAsync(() => {
+    const expectedCustomer = customers[1];
+    const row = page.customerRows[1];
+    row.dispatchEvent(newEvent('click'));
+    tick();
+
+    // The navigation spy has been called at least once.
+    expect(page.navSpy.calls.any()).toBe(true, 'navigate spy called');
+
+    const navArgs = page.navSpy.calls.first().args[0];
+    expect(navArgs[0])
+
+  }));
+
+
 });
 
 
-/** Helpers */
-function createRouterSpy() {
-  return jasmine.createSpyObj('Router', ['navigate']);
+
+/**
+ * ####################################################################
+ * Helpers
+ * ####################################################################
+ */
+
+function createComponent() {
+  fixture = TestBed.createComponent(CustomerListComponent);
+  component = fixture.componentInstance;
+  fixture.detectChanges();
+  return fixture.whenStable().then(() => {
+    fixture.detectChanges();
+    page = new Page();
+  });
 }
 
+class Page {
+
+  customerRows: HTMLTableRowElement[];
+
+  navSpy: jasmine.Spy;
+
+  constructor() {
+
+    const rowNodes = fixture.nativeElement.querySelector('tbody')
+      .querySelectorAll('tr');
+    this.customerRows = Array.from(rowNodes);
+
+    const routerSpy = fixture.debugElement.injector.get(Router);
+    this.navSpy = routerSpy.navigate as jasmine.Spy;
+  }
+
+}
 

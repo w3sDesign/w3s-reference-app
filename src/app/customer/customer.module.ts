@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
+
 // CommonModule instead of BrowserModule
 // (BrowserModule only in the root AppModule).
 import { CommonModule } from '@angular/common';
 // import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LayoutModule } from '@angular/cdk/layout';
-
 
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
@@ -23,13 +24,27 @@ import { CustomerRoutingModule } from './customer-routing.module';
 
 import { SharedMaterialModule } from '../shared/shared-material.module';
 
+// import { MatSnackBarModule } from '@angular/material';
+
+// import { MatSnackBarContainer } from '@angular/material';
+
+import { DynamicFormComponent } from '../shared/dynamic-form/dynamic-form.component';
+import { DynamicFormFieldComponent } from '../shared/dynamic-form/dynamic-form-field.component';
+
+import { HighlightDirective } from '../shared/directives/highlight.directive';
+
+import { CustomerFilterDynamicFormService } from './dynamic-form/customer-filter-dynamic-form.service';
+
+
 @NgModule({
   imports: [
     CommonModule,
+    // BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
     LayoutModule,
     SharedMaterialModule,
+    // MatSnackBarModule,
     CustomerRoutingModule,
 
     HttpClientModule,
@@ -38,22 +53,29 @@ import { SharedMaterialModule } from '../shared/shared-material.module';
     //  Remove it when a real server is ready to receive requests.
     environment.production
       ? []
-      : HttpClientInMemoryWebApiModule.forFeature(CustomerInMemoryDataService, {
-        delay: 350,
-        dataEncapsulation: false
-      }),
+      : HttpClientInMemoryWebApiModule
+        .forFeature(CustomerInMemoryDataService, {
+          delay: 350,
+          dataEncapsulation: false
+        }),
   ],
   declarations: [
     CustomerRootComponent,
     CustomerListComponent,
     CustomerDetailComponent,
     CustomerDetailDialogComponent,
+
+    DynamicFormComponent,
+    DynamicFormFieldComponent,
+    HighlightDirective,
   ],
   entryComponents: [
     CustomerDetailDialogComponent,
+    // MatSnackBarContainer
   ],
   providers: [
     HttpCustomerService,
+    CustomerFilterDynamicFormService,
     CustomerInMemoryDataService,
   ],
   exports: [

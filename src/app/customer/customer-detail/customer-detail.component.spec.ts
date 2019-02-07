@@ -37,7 +37,7 @@ describe('CustomerDetailComponent', () => {
         { provide: Router, useValue: routerSpy },
 
         { provide: CustomerService, useClass: HttpCustomerService },
-        { provide: HttpErrorHandler, useValue: {} }
+        { provide: HttpErrorHandler, useClass: HttpErrorHandler }
       ]
     })
       .compileComponents();

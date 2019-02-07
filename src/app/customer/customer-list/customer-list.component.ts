@@ -3,7 +3,9 @@
  */
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, ElementRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+
 import { MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort } from '@angular/material';
+
 import { fromEvent, merge } from 'rxjs';
 //
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
@@ -20,6 +22,10 @@ import { CustomerDetailDialogComponent } from '../customer-detail/customer-detai
 import { Router } from '@angular/router';
 
 import { MessageSnackBarComponent } from '../../shared/message-snack-bar/message-snack-bar.component';
+
+import { DynamicFormComponent } from '../../shared/dynamic-form/dynamic-form.component';
+import { CustomerFilterDynamicFormService } from '../dynamic-form/customer-filter-dynamic-form.service';
+
 
 
 ////////////// tests ////////////////
@@ -39,78 +45,90 @@ import { MessageSnackBarComponent } from '../../shared/message-snack-bar/message
   styleUrls: ['./customer-list.component.scss']
 })
 export class CustomerListComponent implements OnInit {
-  // CustomerDataSource connects the data table with a data stream
-  // that emmits the Customers to display.
+
+  /** Retrieves and emits the customers to display */
   dataSource: CustomerDataSource;
 
-  private customersToDisplay: Customer[] = [];
+  customers: Customer[] = [];
+  selectedCustomer: Customer;
 
-  columnsToDefine = [
-    'id',
-    'name',
-    'type',
-    'status',
-    'comment',
-    'creationDate',
-    'country',
-    'postalCode',
-    'city',
-    'street',
-    'phone',
-    'email'
+  columns = [
+    'id', 'name', 'type', 'status', 'comment', 'creationDate', 'country', 'postalCode', 'city', 'street', 'phone', 'email'
   ];
+
   columnsToDisplay = [
-    'select',
-    'id',
-    'name',
-    'country',
-    'postalCode',
-    'city',
-    'phone',
-    'email'
+    'select', 'id', 'name', 'country', 'postalCode', 'city', 'phone', 'email'
   ];
+
   // Paging
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator)
+  paginator: MatPaginator;
+
   // Sorting
-  @ViewChild(MatSort) sort: MatSort;
-  // Filtering
-  @ViewChild('searchInput') searchInput: ElementRef;
-  @ViewChild('crudButtons', { read: ViewContainerRef }) crudButtons;
-  filterStatus = '';
-  filterType = '';
-  // Selection (allow multiple selections = true, initiallySelectedValues = [])
+  @ViewChild(MatSort)
+  sort: MatSort;
+
+  // Filters
+  @ViewChild('searchInput')
+  searchInput: ElementRef;
+
+  filterByStatus = '';
+  filterByType = '';
+
+  filterById: number;
+  filterByName = '';
+
+  filterByCountry = '';
+  filterByPostalCode = '';
+  filterByCity = '';
+  filterByStreet = '';
+
+  @ViewChild('crudButtons', { read: ViewContainerRef })
+  crudButtons;
+
   selection = new SelectionModel<Customer>(true, []);
   //
 
-  // Injecting customer service
+  filterDynFormFields: any[];
+
+
+
+  // Injecting services.
+  // #################################################
   constructor(
     private router: Router,
     private customerService: CustomerService,
     // private httpErrorHandler: HttpErrorHandler,
     private dialog: MatDialog,
     // private snackBar: MatSnackBar
-  ) { }
+    dynFormService: CustomerFilterDynamicFormService,
+  ) {
+    this.filterDynFormFields = dynFormService.getDynamicFormFields();
+  }
 
 
   ngOnInit() {
-    // If the user changes the sort order, reset back to the first page.
-    this.sort.sortChange.subscribe(() => (this.paginator.pageIndex = 0));
 
-    // Data load will be triggered in two cases:
-    // - when a pagination event occurs => this.paginator.page (MatPaginator)
-    // - when a sort event occurs => this.sort.sortChange (MatSort)
+    // If the user changes the sort order, reset back to the first page.
+    this.sort.sortChange
+      .subscribe(
+        () => this.paginator.pageIndex = 0
+      );
+
+    /**
+     * Data load will be triggered in two cases:
+     * a pagination event occurs (this.paginator.page)
+     * a sort event occurs (this.sort.sortChange).
+     */
     merge(this.sort.sortChange, this.paginator.page)
       .pipe(
-        tap(() => {
-          this.loadCustomers();
-        })
+        tap(() => this.loadCustomers())
       )
       .subscribe();
 
     // Filtration, bind to searchInput element
     fromEvent(this.searchInput.nativeElement, 'keyup')
       .pipe(
-        // tslint:disable-next-line:max-line-length
         debounceTime(150), // limiting server requests to one every 150ms
         distinctUntilChanged(), // eliminating duplicate values
         tap(() => {
@@ -120,83 +138,120 @@ export class CustomerListComponent implements OnInit {
       )
       .subscribe();
 
+
     // Init DataSource
     const queryParams = new QueryParams();
-    queryParams.filter = this.filterConfiguration(false);
+    queryParams.filter = this.filterConfig(false);
+
+    // Initial data load.
+    // ########################################
     this.dataSource = new CustomerDataSource(this.customerService);
-    // Initial Data Load /////////////////////
     this.dataSource.loadCustomers(queryParams);
-    //////////////////////////////////////////
-    this.dataSource.customers$$.subscribe(res => (this.customersToDisplay = res));
+
+    this.dataSource.customers
+      .subscribe(
+        res => this.customers = res
+      );
   }
 
+
+  /**
+   * ##################################################################
+   * Load customers.
+   * ##################################################################
+   */
   loadCustomers() {
+
     const queryParams = new QueryParams();
-    queryParams.filter = this.filterConfiguration(true);
+    queryParams.filter = this.filterConfig(true);
     queryParams.sortOrder = this.sort.direction;
     queryParams.sortField = this.sort.active; /** The id of the column being sorted. */
     queryParams.pageNumber = this.paginator.pageIndex;
     queryParams.pageSize = this.paginator.pageSize;
-    //////////////////////////////////////////
+
     this.dataSource.loadCustomers(queryParams);
-    //////////////////////////////////////////
+
     this.selection.clear();
   }
 
 
-  /** FILTRATION */
-  filterConfiguration(isGeneralSearch: boolean = true): any {
+  /**
+   * ##################################################################
+   * Filter configuration.
+   * ##################################################################
+   */
+  filterConfig(isGeneralSearch: boolean = true): any {
     const filter: any = {};
     const searchText: string = this.searchInput.nativeElement.value;
 
-    if (this.filterStatus && this.filterStatus.length > 0) {
-      filter.status = +this.filterStatus;
+    if (this.filterByStatus && this.filterByStatus.length > 0) {
+      filter.status = +this.filterByStatus;
     }
 
-    // if (this.filterType && this.filterType.length > 0) {
-    //   filter.type = +this.filterType;
+    if (this.filterByType && this.filterByType.length > 0) {
+      filter.type = +this.filterByType;
+    }
+
+    filter.id = this.filterById ? this.filterById : searchText;
+    filter.name = this.filterByName ? this.filterByName : searchText;
+    filter.country = this.filterByCountry ? this.filterByCountry : searchText;
+    filter.postalCode = this.filterByPostalCode ? this.filterByPostalCode : searchText;
+
+    // if (!isGeneralSearch) {
+    //   return filter;
     // }
 
-    // filter.lastName = searchText;
-    filter.name = searchText;
-    if (!isGeneralSearch) {
-      return filter;
-    }
+    filter.city = this.filterByCity ? this.filterByCity : searchText;
 
-    // filter.firstName = searchText;
-    // filter.email = searchText;
-    // filter.ipAddress = searchText;
+
     return filter;
   }
 
+
+  /**
+   * ##################################################################
+   * Helpers
+   * ##################################################################
+   */
+
   /** Whether number of selected rows matches total number of rows. */
   isAllSelected(): boolean {
-    const numSelected = this.selection.selected.length;
-    const numRows = this.customersToDisplay.length; // this.dataSource.data.length;
-    return numSelected === numRows;
+    // const numSelected = this.selection.selected.length;
+    // const numRows = this.customers.length;
+    return this.selection.selected.length === this.customers.length;
   }
 
   /** Selects all rows if not all selected; otherwise clears selection. */
   masterToggle() {
     this.isAllSelected()
       ? this.selection.clear()
-      : this.customersToDisplay.forEach(customer =>
+      : this.customers.forEach(customer =>
         this.selection.select(customer)
       );
   }
 
+
+
+
+
   /**
-   * Create Customer
+   * ##################################################################
+   * Create a customer (by updating a new customer).
+   * ##################################################################
    */
   createCustomer() {
+    // Create a new customer with defaults.
     const customer = new Customer();
-    // customer.clear(); // Set all defaults fields
+    // Update the customer.
     this.updateCustomer(customer);
   }
 
+
   /**
-   * Update selected customers.
+   * ##################################################################
+   * Update selected customers (by opening a modal dialog.
    * TODO: multiple selections
+   * ##################################################################
    */
   updateCustomer(customer?: Customer) {
     if (!customer) {
@@ -223,27 +278,25 @@ export class CustomerListComponent implements OnInit {
     dialogConfig.panelClass = 'w3s-dialog-panel'; // in global styles.scss
     dialogConfig.data = { customer };
 
+    // Open modal dialog and load CustomerDetailDialogComponent.
+    // #########################################################
     const dialogRef = this.dialog.open(CustomerDetailDialogComponent, dialogConfig);
 
-    dialogRef.afterClosed().subscribe(res => {
-      if (!res) {
-        return;
-      }
-      this.loadCustomers();
-    });
+    dialogRef.afterClosed()
+      .subscribe(
+        res => {
+          if (!res) { return; }
+          this.loadCustomers();
+        }
+      );
   }
 
-  /**
-   * Goto
-   */
-  gotoDetail(row: Customer) {
-    // row = customer object
-    // TODO customersToDisplay = dataSource.customers!
-    // console.log('row.id = ' + row.id);
-    // console.log('customersToDisplay[0].id = ' + this.customersToDisplay[0].id);
-    // console.log('dataSource.customers[0].id = ' + this.dataSource.customers[0].id);
-    // this.router.navigate(['/customers', {id: row.id}]);
 
+  /**
+   * Navigate to customer detail.
+   */
+  onSelect(row: Customer) {
+    this.selectedCustomer = row;
     this.router.navigate(['/customers', row.id]);
   }
 
@@ -255,7 +308,7 @@ export class CustomerListComponent implements OnInit {
    */
   deleteCustomers() {
     if (this.selection.isEmpty()) {
-      const dialogRef = this.dialog.open(MessageDialogComponent, {
+      this.dialog.open(MessageDialogComponent, {
         data: {
           title: 'Delete Customers',
           message: `Please select the customer(s) to delete.`,
@@ -276,28 +329,29 @@ export class CustomerListComponent implements OnInit {
       }
     });
 
-    dialogRef.afterClosed().subscribe(ok => {
-      if (!ok) {
-        return;
-      }
+    dialogRef.afterClosed()
+      .subscribe(
+        ok => {
+          if (!ok) { return; }
 
-      // Identify selected customers.
-      const ids: number[] = [];
-      for (let i = 0; i < numberOfSelections; i++) {
-        ids.push(this.selection.selected[i].id);
-      }
-      // test id NOT FOUND
-      // ids[0] = 1;
+          // Start deleting. Identify selected customers.
+          const ids: number[] = [];
+          for (let i = 0; i < numberOfSelections; i++) {
+            ids.push(this.selection.selected[i].id);
+          }
 
-      // Delete identified (selected) customers.
-      this.customerService.deleteCustomers(ids).subscribe(
-        () => {
-          this.loadCustomers();
-          this.selection.clear();
-        },
-        // err => { } handled in customerService
+          // Delete identified (selected) customers.
+          // #######################################
+          this.customerService.deleteCustomers(ids)
+            .subscribe(
+              () => {
+                this.loadCustomers();
+                this.selection.clear();
+              },
+              // err handled in customerService
+            );
+        }
       );
-    });
   }
 
 

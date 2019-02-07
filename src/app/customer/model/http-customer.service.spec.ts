@@ -12,39 +12,51 @@ import { MessageService } from '../../shared/message.service';
 
 import { mockCustomers } from '../model/mock-customers';
 import { QueryResult } from '../../shared/query-result';
+import { MatSnackBar } from '@angular/material';
+import { Overlay } from '@angular/cdk/overlay';
 
 // const customers = mockCustomers;
 
 /**
  * ####################################################################
- * Test HttpCustomerService
+ * HttpCustomerService
  * ####################################################################
  */
-describe('#HttpCustomerService', () => {
+describe('HttpCustomerService:', () => {
 
 
   let httpClient: HttpClient;
   let httpTestingController: HttpTestingController;
   let customerService: HttpCustomerService;
+  let snackBarSpy: jasmine.SpyObj<MatSnackBar>;
+
   let testUrl: string;
 
 
   beforeEach(() => {
+    const spy = jasmine.createSpyObj('MatSnackBar', ['openFromComponent']);
+
     TestBed.configureTestingModule({
       // Import the HttpClient mocking services.
       imports: [HttpClientTestingModule],
-      // Provide the service-under-test and its dependencies.
+      // Provide both the service-under-test and its (spy) dependencies.
       providers: [
         HttpCustomerService,
-        HttpErrorHandler,
-        MessageService
+        { provide: MatSnackBar, useValue: spy }
+        // HttpErrorHandler,
+        // MessageService,
+        // MatSnackBar,
+        // Overlay
       ]
     });
 
-    // Inject the http, test controller, and service-under-test.
+    // Inject the http and test controller.
     httpClient = TestBed.get(HttpClient);
     httpTestingController = TestBed.get(HttpTestingController);
+
+    // Inject both the service-under-test and its (spy) dependencies.
     customerService = TestBed.get(HttpCustomerService);
+    snackBarSpy = TestBed.get(MatSnackBar);
 
     testUrl = customerService.customersUrl;
   });
@@ -59,21 +71,21 @@ describe('#HttpCustomerService', () => {
 
   /**
    * ##################################################################
-   * Test HttpCustomerService - getCustomer(id)
+   * HttpCustomerService: Get customer by id:
    * ##################################################################
    */
-   describe('#get customer by ID', () => {
+  describe('Get customer by id: ', () => {
 
-   });
+  });
 
 
 
   /**
    * ##################################################################
-   * Test HttpCustomerService - getCustomers()
+   * HttpCustomerServiceSpec: Get all customers (no QueryParams):
    * ##################################################################
    */
-  describe('#get all customers - No QueryParams', () => {
+  describe('Get all customers (no QueryParams):', () => {
     // let expectedQueryResult: QueryResult;
 
     const expectedQueryResult = {
@@ -82,7 +94,7 @@ describe('#HttpCustomerService', () => {
       errorMessage: ''
     } as QueryResult;
 
-    const noQueryResult = {
+    const emptyQueryResult = {
       items: [],
       totalCount: 0,
       errorMessage: ''
@@ -101,11 +113,11 @@ describe('#HttpCustomerService', () => {
     } as QueryResult;
 
     // beforeEach(() => {
-       // });
+    // });
 
 
-    // it('#should return expected query result (called once)', () => {
-    it('#should return expected customers (called once)', () => {
+    // it('Should return expected query result (called once)', () => {
+    it('Should return expected customers (called once).', () => {
 
       customerService.getCustomers().subscribe(
         res => expect(res.items).toEqual(expectedQueryResult.items, 'should return expected customers'),
@@ -119,7 +131,7 @@ describe('#HttpCustomerService', () => {
     });
 
 
-    it('#should be OK returning no customers', () => {
+    it('Should be OK returning no customers.', () => {
 
       customerService.getCustomers().subscribe(
         res => expect(res.items.length).toEqual(0, 'should have empty customers array'),
@@ -127,15 +139,15 @@ describe('#HttpCustomerService', () => {
       );
       const req = httpTestingController.expectOne(testUrl);
       // Respond with no customers.
-      req.flush(noQueryResult.items);
+      req.flush(emptyQueryResult.items);
     });
 
 
-    it('#should turn 404 http error into empty customer array', () => {
+    it('Should turn 404 http error into empty QueryResult.', () => {
 
       const emsg = '404 Page Not Found error';
       customerService.getCustomers().subscribe(
-        res => expect(res.items.length).toEqual(0, 'should return empty customer array'),
+        res => expect(res.items.length).toEqual(0, 'should return empty QueryResult'),
         fail
         // res => fail('should have failed'),
         // error => expect(error.message).toContain(emsg)
@@ -147,7 +159,7 @@ describe('#HttpCustomerService', () => {
     });
 
 
-    it('#should return expected customers (called multiple times)', () => {
+    it('Should return expected customers (called multiple times).', () => {
       customerService.getCustomers().subscribe();
       customerService.getCustomers().subscribe();
       customerService.getCustomers().subscribe(
@@ -157,7 +169,7 @@ describe('#HttpCustomerService', () => {
       const requests = httpTestingController.match(testUrl);
       expect(requests.length).toEqual(3, 'calls to getCustomers()');
       // Respond to each request with different expected customer results
-      requests[0].flush(noQueryResult.items);
+      requests[0].flush(emptyQueryResult.items);
       requests[1].flush(expectedQueryResult1.items);
       requests[2].flush(expectedQueryResult.items);
     });
@@ -166,10 +178,10 @@ describe('#HttpCustomerService', () => {
 
   /**
    * ##################################################################
-   * Test HttpCustomerService - updateCustomer()
+   * HttpCustomerServiceSpec: Update customer:
    * ##################################################################
    */
-  describe('#updateCustomer', () => {
+  describe('UpdateCustomer:', () => {
 
 
     // Expecting the query form of URL so should not 404 when id not found
@@ -177,10 +189,10 @@ describe('#HttpCustomerService', () => {
     const customer: Customer = mockCustomers[0]; // { id: 1, name: 'A' };
 
 
-    it('#should update a customer and return it', () => {
+    it('Should update a customer and return it.', () => {
 
       customerService.updateCustomer(customer).subscribe(
-        res => expect(res).toEqual(customer, 'should return the customer'),
+        res => expect(res).toEqual(jasmine.objectContaining({ id: res.id }), 'should return the customer'),
         fail
       );
       // CustomerService should have made one request to PUT customer
@@ -195,7 +207,7 @@ describe('#HttpCustomerService', () => {
     });
 
 
-    it('#should turn 404 error into return of the updated customer', () => {
+    it('Should turn 404 error into return of the updated customer.', () => {
 
       const emsg = '404 Page Not Found error';
       customerService.updateCustomer(customer).subscribe(

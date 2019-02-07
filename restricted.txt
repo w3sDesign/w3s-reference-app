@@ -1,0 +1,4 @@
+Google Cloud Platform https://console.cloud.google.com/apis/dashboard?authuser=0&project=test-229415
+
+key=API_KEY
+AIzaSyCROUQLeAQa0LBYKZLtKfq7coyjiRO47sg

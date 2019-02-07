@@ -13,6 +13,7 @@ import { LayoutModule } from '@angular/cdk/layout';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
+
 import { SharedMaterialModule } from './shared/shared-material.module';
 
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
@@ -21,6 +22,13 @@ import { MessageSnackBarComponent } from './shared/message-snack-bar/message-sna
 import { HttpErrorHandler } from './shared/http-error-handler.service';
 import { HttpUtilsService } from './shared/http-utils.service';
 import { MessageService } from './shared/message.service';
+// import { MatSnackBarModule } from '@angular/material';
+// import { MatSnackBarContainer } from '@angular/material';
+
+// import { MatSnackBar, MatSnackBarContainer } from '@angular/material';
+
+// import { DynamicFormComponent } from './shared/dynamic-form/dynamic-form.component';
+// import { DynamicFormQuestionComponent } from './shared/dynamic-form/dynamic-form-question.component';
 
 @NgModule({
   imports: [
@@ -30,6 +38,7 @@ import { MessageService } from './shared/message.service';
     ReactiveFormsModule,
     LayoutModule,
     SharedMaterialModule,
+    // MatSnackBarModule,
     AppRoutingModule,
   ],
   declarations: [
@@ -37,18 +46,29 @@ import { MessageService } from './shared/message.service';
     HomeComponent,
     MessageDialogComponent,
     MessageSnackBarComponent,
+    // DynamicFormComponent,
+    // DynamicFormQuestionComponent,
   ],
   entryComponents: [
     MessageDialogComponent,
     MessageSnackBarComponent,
+    // MatSnackBarContainer
   ],
   providers: [
     HttpErrorHandler,
     HttpUtilsService,
     MessageService,
+    // MatSnackBar,
+    // MatSnackBarContainer
   ],
   exports: [
+    MessageDialogComponent,
+    MessageSnackBarComponent,
+    // MatSnackBarContainer
     // MessageDialogComponent, SharedMaterialModule,
+    // HttpErrorHandler,
+    // HttpUtilsService,
+    // MessageService,
   ],
   bootstrap: [AppComponent]
 })
