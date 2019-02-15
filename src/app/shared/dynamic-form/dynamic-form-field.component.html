@@ -1,41 +1,23 @@
-<!-- <div [formGroup]="form">
-    <label [attr.for]="dynFormField.id">{{dynFormField.label}}</label>
-
-    <div [ngSwitch]="dynFormField.controlType">
-
-      <input *ngSwitchCase="'textbox'" [formControlName]="dynFormField.id"
-      [id]="dynFormField.id" [type]="dynFormField.type">
-
-      <select [id]="dynFormField.id" *ngSwitchCase="'dropdown'" [formControlName]="dynFormField.id">
-        <option *ngFor="let opt of dynFormField.options" [value]="opt.key">{{opt.value}}</option>
-      </select>
-
-    </div>
-
-    <div class="errorMessage" *ngIf="!isValid">{{dynFormField.label}} is required</div>
-  </div> -->
-
-
 <div [formGroup]="form">
 
 
-  <div [ngSwitch]="dynFormField.controlType">
+  <div [ngSwitch]="dynamicFormField.controlType">
 
     <mat-form-field>
 
-      <input *ngSwitchCase="'textbox'"   matInput [formControlName]="dynFormField.id" [id]="dynFormField.id" [type]="dynFormField.inputType" #ref [w3sHighlight]="'yellow'">
+      <input *ngSwitchCase="'textbox'"   matInput [formControlName]="dynamicFormField.id" [id]="dynamicFormField.id" [type]="dynamicFormField.inputType" [w3sHighlight]="'yellow'">
 
 
-      <mat-select *ngSwitchCase="'dropdown'" [formControlName]="dynFormField.id" [id]="dynFormField.id">
-        <mat-option *ngFor="let option of dynFormField.selectOptions" [value]="option.key">{{option.value}}</mat-option>
+      <mat-select *ngSwitchCase="'dropdown'" [formControlName]="dynamicFormField.id" [id]="dynamicFormField.id">
+        <mat-option *ngFor="let option of dynamicFormField.selectOptions" [value]="option.key">{{option.value}}</mat-option>
       </mat-select>
 
 
-      <mat-hint align="start">{{dynFormField.label}}</mat-hint>
+      <mat-hint align="start">{{dynamicFormField.label}}</mat-hint>
 
       <!-- <mat-error *ngIf="!isValid"> -->
 
-      <mat-error>{{dynFormField.label}} is required</mat-error>
+      <mat-error>{{dynamicFormField.label}} is required</mat-error>
 
     </mat-form-field>
 

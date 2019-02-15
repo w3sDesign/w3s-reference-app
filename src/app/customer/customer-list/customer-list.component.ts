@@ -24,7 +24,8 @@ import { Router } from '@angular/router';
 import { MessageSnackBarComponent } from '../../shared/message-snack-bar/message-snack-bar.component';
 
 import { DynamicFormComponent } from '../../shared/dynamic-form/dynamic-form.component';
-import { CustomerFilterDynamicFormService } from '../dynamic-form/customer-filter-dynamic-form.service';
+import { DynamicFilterFormFieldService } from '../dynamic-form/dynamic-filter-form-field.service';
+import { FormGroup } from '@angular/forms';
 
 
 
@@ -72,16 +73,19 @@ export class CustomerListComponent implements OnInit {
   @ViewChild('searchInput')
   searchInput: ElementRef;
 
-  filterByStatus = '';
-  filterByType = '';
+  // filterByStatus = '';
+  // filterByType = '';
 
-  filterById: number;
-  filterByName = '';
+  filterFormValue: any = {};
 
-  filterByCountry = '';
-  filterByPostalCode = '';
-  filterByCity = '';
-  filterByStreet = '';
+
+  // filterById: number;
+  // filterByName = '';
+
+  // filterByCountry = '';
+  // filterByPostalCode = '';
+  // filterByCity = '';
+  // filterByStreet = '';
 
   @ViewChild('crudButtons', { read: ViewContainerRef })
   crudButtons;
@@ -89,7 +93,7 @@ export class CustomerListComponent implements OnInit {
   selection = new SelectionModel<Customer>(true, []);
   //
 
-  filterDynFormFields: any[];
+  dynamicFilterFormFields: any[];
 
 
 
@@ -101,9 +105,9 @@ export class CustomerListComponent implements OnInit {
     // private httpErrorHandler: HttpErrorHandler,
     private dialog: MatDialog,
     // private snackBar: MatSnackBar
-    dynFormService: CustomerFilterDynamicFormService,
+    dynamicService: DynamicFilterFormFieldService,
   ) {
-    this.filterDynFormFields = dynFormService.getDynamicFormFields();
+    this.dynamicFilterFormFields = dynamicService.getFields();
   }
 
 
@@ -126,17 +130,17 @@ export class CustomerListComponent implements OnInit {
       )
       .subscribe();
 
-    // Filtration, bind to searchInput element
-    fromEvent(this.searchInput.nativeElement, 'keyup')
-      .pipe(
-        debounceTime(150), // limiting server requests to one every 150ms
-        distinctUntilChanged(), // eliminating duplicate values
-        tap(() => {
-          this.paginator.pageIndex = 0;
-          this.loadCustomers();
-        })
-      )
-      .subscribe();
+    // // Filtration, bind to searchInput element
+    // fromEvent(this.searchInput.nativeElement, 'keyup')
+    //   .pipe(
+    //     debounceTime(150), // limiting server requests to one every 150ms
+    //     distinctUntilChanged(), // eliminating duplicate values
+    //     tap(() => {
+    //       this.paginator.pageIndex = 0;
+    //       this.loadCustomers();
+    //     })
+    //   )
+    //   .subscribe();
 
 
     // Init DataSource
@@ -160,20 +164,31 @@ export class CustomerListComponent implements OnInit {
    * Load customers.
    * ##################################################################
    */
+  onDynamicFilterFormSubmit(value) {
+    this.filterFormValue = value;
+    this.loadCustomers();
+  }
+
   loadCustomers() {
 
     const queryParams = new QueryParams();
-    queryParams.filter = this.filterConfig(true);
+
+    /** Setting filters based on search criteria */
+    // queryParams.filter = this.filterConfig(true);
+    queryParams.filter = this.filterFormValue;
+
     queryParams.sortOrder = this.sort.direction;
     queryParams.sortField = this.sort.active; /** The id of the column being sorted. */
     queryParams.pageNumber = this.paginator.pageIndex;
     queryParams.pageSize = this.paginator.pageSize;
 
+    /** Delegating to customer data source.
+     * #######################################
+     */
     this.dataSource.loadCustomers(queryParams);
 
     this.selection.clear();
   }
-
 
   /**
    * ##################################################################
@@ -184,24 +199,24 @@ export class CustomerListComponent implements OnInit {
     const filter: any = {};
     const searchText: string = this.searchInput.nativeElement.value;
 
-    if (this.filterByStatus && this.filterByStatus.length > 0) {
-      filter.status = +this.filterByStatus;
-    }
+    // if (this.filterByStatus && this.filterByStatus.length > 0) {
+    //   filter.status = +this.filterByStatus;
+    // }
 
-    if (this.filterByType && this.filterByType.length > 0) {
-      filter.type = +this.filterByType;
-    }
+    // if (this.filterByType && this.filterByType.length > 0) {
+    //   filter.type = +this.filterByType;
+    // }
 
-    filter.id = this.filterById ? this.filterById : searchText;
-    filter.name = this.filterByName ? this.filterByName : searchText;
-    filter.country = this.filterByCountry ? this.filterByCountry : searchText;
-    filter.postalCode = this.filterByPostalCode ? this.filterByPostalCode : searchText;
+    // filter = this.filterForm.value;
+    // filter.name = this.filterByName ? this.filterByName : searchText;
+    // filter.country = this.filterByCountry ? this.filterByCountry : searchText;
+    // filter.postalCode = this.filterByPostalCode ? this.filterByPostalCode : searchText;
 
     // if (!isGeneralSearch) {
     //   return filter;
     // }
 
-    filter.city = this.filterByCity ? this.filterByCity : searchText;
+    // filter.city = this.filterByCity ? this.filterByCity : searchText;
 
 
     return filter;

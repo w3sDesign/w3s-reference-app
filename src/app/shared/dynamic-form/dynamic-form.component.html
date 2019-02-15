@@ -1,23 +1,26 @@
-<div>
-  <form (ngSubmit)="onSubmit()" [formGroup]="form" class="w3s-flex-box">
+<!-- <div> -->
+  <form (ngSubmit)="onSubmit()" [formGroup]="form">
 
-    <div *ngFor="let dynFormField of dynFormFields" class="form-row">
+    <div *ngFor="let dynamicFormField of dynamicFormFields">
 
       <!-- ################################################ -->
 
-      <w3s-dynamic-form-field [dynFormField]="dynFormField" [form]="form">
+      <w3s-dynamic-form-field [dynamicFormField]="dynamicFormField" [form]="form">
+
       </w3s-dynamic-form-field>
 
       <!-- ################################################ -->
 
     </div>
 
-    <div class="form-row">
-      <button type="submit" [disabled]="!form.valid">Save</button>
-    </div>
+
+        <button type="submit" mat-raised-button matTooltip="Start Searching" [disabled]="!form.valid">Search</button>
+
+
   </form>
 
-  <div *ngIf="payLoad" class="form-row">
+  <!-- <div *ngIf="payLoad">
     <strong>Saved the following values</strong><br>{{payLoad}}
-  </div>
-</div>
+  </div> -->
+
+<!-- </div> -->

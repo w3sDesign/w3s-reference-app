@@ -1,4 +1,74 @@
-.flex-box {
+//  HTML structure
+//  ##############
+
+//  <mat-expansion-panel> // filters
+
+//    <mat-expansion-panel-header>; // render active filters
+//    <mat-form-field> <input #searchInput>;
+
+//    <w3s-dynamic-form> // filter form
+//      <form class="w3s-flex-box">
+//        <w3s-dynamic-form-field>s <mat-form-field>s
+//        <button type="submit"
+//      </form>
+//    </w3s-dynamic-form>
+
+//    <div id="filterButtons">
+//      <buttons Add Filters / Clear Filters /Save Filters
+//    </div>
+
+//  </mat-expansion-panel>
+
+
+//  <div class="flex-box" #crudButtons>
+//    <buttons Create/Update/Delete customers
+//  </div>
+
+//  <table mat-table>; // main data table
+
+//  <mat-action-row>
+//    <mat-spinner>;
+//    <mat-paginator>;
+//  </mat-action-row>
+
+
+
+mat-expansion-panel {
+  // @extend %flex-box;
+  // padding: 0 8px 16px 0;
+  width: 100%;
+  align-items: xbaseline;
+}
+
+#filterButtons {
+  @extend %flex-box;
+  padding: 30px 8px 16px 0px;
+}
+
+#crudButtons {
+  @extend %flex-box;
+  padding: 16px 8px 16px 24px;
+  width: 100%;
+}
+
+// form {
+//   display: flex !important;
+
+//   flex-direction: row;
+//   align-items: center; // vertical
+//   justify-content: flex-start; // horizontal
+//   flex-wrap: wrap; // default = nowrap
+
+//   font-size: 14px;
+//   padding: 16px 8px 16px 24px;
+
+//   .mat-form-field,
+//   button {
+//     margin-right: 30px;
+//   }
+// }
+
+%flex-box {
 
   display: flex;
 
@@ -8,24 +78,18 @@
   flex-wrap: wrap; // default = nowrap
 
   font-size: 14px;
-  padding: 16px 8px 16px 24px;
+  // padding: 16px 8px 16px 24px;
 
   .mat-form-field,
   button {
-    margin-right: 10px;
+    margin-right: 20px;
   }
 }
 
-.mat-form-field {
-  margin-right: 10px;
-}
+// .mat-form-field {
+//   margin-right: 30px;
+// }
 
-.mat-expansion-panel {
-  .flex-box {
-    // padding: 0 8px 16px 0;
-    align-items: baseline;
-  }
-}
 
 table {
   width: 100%;
@@ -190,5 +254,3 @@ and so the block is pushed into the middle. */
 // 	padding: 0 !important;
 // 	border-bottom:0 !important;
 // }
-
-

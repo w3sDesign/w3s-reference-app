@@ -30,19 +30,24 @@ import { ActivatedRoute, Router, NavigationEnd, RouterEvent } from '@angular/rou
 })
 export class AppComponent implements OnInit {
   title = 'w3sDesign';
-  navEnd: Observable<NavigationEnd>;
-  openSideNav = false; // TODO
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
+  isSmallScreen: Observable<boolean> = this.breakpointObserver.observe(
+    // [Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
+    // ['(max-width: 599px)']) //xsmall
+    ['(max-width: 1023px)']) // small; 1024 = medium
     .pipe(
       map(result => result.matches)
     );
+
+  navEnd: Observable<NavigationEnd>;
+  openSideNav = false; // TODO
 
   constructor(
     private breakpointObserver: BreakpointObserver,
     private activatedRoute: ActivatedRoute,
     private router: Router) {
-    // Create a new Observable that publishes only the NavigationEnd event.
+
+    // Create a new Observable that emits only the NavigationEnd event.
     this.navEnd = router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ) as Observable<NavigationEnd>;

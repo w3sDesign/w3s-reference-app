@@ -17,80 +17,81 @@ import { HttpErrorHandler } from '../../shared/http-error-handler.service';
 
 
 /**
- * The CustomerDataSource class provides the data for the CustomerListComponent.
+ * The CustomerDataSource class provides the data for the data table
+ * in the CustomerListComponent.
  *
- * The list component listens (subscribes) to the data stream emitted by the data source
- * and automatically triggers an update every time a new data is emitted.
+ * The data table listens (subscribes) to the customers data stream
+ * and automatically triggers an update every time new data is emitted.
  */
 export class CustomerDataSource implements DataSource<any> {
 
   // customers: Customer[];
   // customers$: Observable<Customer[]>;
 
-  /** Subject emitting customer arrays. */
-customers = new BehaviorSubject<Customer[]>([]);
+  /** Subject accepting and emitting customer arrays. */
+  customers = new BehaviorSubject<Customer[]>([]);
 
-hasItems = false; // Need to show message: 'No customers found'
+  /**
+   * Subject accepting and emitting loading true/false
+   * (the progress bar will listen to this stream).
+   */
+  isLoading = new BehaviorSubject<boolean>(false);
 
-/**
- * Subject emitting loading in progress boolen
- * (the progress bar will listen to this stream)
- * Stream accepting and emitting true/false (needed for progress bar).
- *
-*/
-isLoading = new BehaviorSubject<boolean>(false);
+  /** Subject accepting and emitting the total number of queried customers. */
+  totalNumberOfItems = new BehaviorSubject<number>(0);
 
-/** Stream accepting and emitting the total number of customers. */
-totalNumberOfItems = new BehaviorSubject<number>(0);
+  hasItems = false; // Need to show message: 'No customers found'
 
 
-constructor(private customerService: CustomerService) {
-  this.totalNumberOfItems.subscribe(nr => (this.hasItems = nr > 0));
-}
+  constructor(private customerService: CustomerService) {
+    this.totalNumberOfItems.subscribe(nr => (this.hasItems = nr > 0));
+  }
 
 
-/**
- * The data table calls the connect method to receive the customers to be displayed.
- * The data table renders a row for each object in the data array.
- */
-connect(collectionViewer: CollectionViewer): Observable < any[] > {
-  return this.customers.asObservable();
-}
+  /**
+   * Connecting the data table to receive the customers to be displayed.
+   * The data table renders a row for each object in the data array.
+   */
+  connect(collectionViewer: CollectionViewer): Observable<any[]> {
+    return this.customers.asObservable();
+  }
 
-// Disonnecting the data table.
-disconnect(collectionViewer: CollectionViewer): void {
-  this.customers.complete();
-  this.isLoading.complete();
-  this.totalNumberOfItems.complete();
-}
+  /** Disconnecting the data table. */
+  disconnect(collectionViewer: CollectionViewer): void {
+    this.customers.complete();
+    this.isLoading.complete();
+    this.totalNumberOfItems.complete();
+  }
 
 
-/**
- * The customer data source implements the loadCustomer() method by delegating
- * to the customerService to get the customer data from the HTTP REST server.
- * If the data arrives successfully, it is passed to the data stream
- * (by calling next(data) on the data stream).
- */
+  /**
+   * loadCustomer() is implemented by delegating to the customer service.
+   * If the data arrives successfully, it is passed to the customers
+   * subject (by calling next(res.items)), which in turn emits the data
+   * to the connected data table for rendering.
+   */
+  loadCustomers(queryParams: QueryParams) {
+    this.isLoading.next(true);
 
-loadCustomers(queryParams: QueryParams) {
-  this.isLoading.next(true);
+    /**
+     * Delegating to customer service.
+     * Returns Observable QueryResult.
+     * ###########################################
+     */
+    this.customerService.getCustomers(queryParams)
+      .pipe(
+        tap((res: QueryResult) => {
+          /**
+           * Passing the queryResult.items to the customers subject,
+           * which emits the data to the connected data table for rendering.
+           */
+          this.customers.next(res.items);
 
-  this.customerService.getCustomers(queryParams)
-    .pipe(
-      tap((res: QueryResult) => {
-        /**
-         * Passing the queryResult.items (= customer arry) to the data
-         * stream (customers). This causes the data stream to emit the data
-         * to the connected data table, which redisplays.
-         */
-        this.customers.next(res.items);
-        // this.customers = res.items;
-
-        this.totalNumberOfItems.next(res.totalCount);
-      }),
-      catchError(err => of(new QueryResult())), // TODO
-      finalize(() => this.isLoading.next(false))
-    )
-    .subscribe();
-}
+          this.totalNumberOfItems.next(res.totalCount);
+        }),
+        catchError(err => of(new QueryResult())), // TODO
+        finalize(() => this.isLoading.next(false))
+      )
+      .subscribe();
+  }
 }

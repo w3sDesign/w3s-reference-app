@@ -33,7 +33,7 @@ import { DynamicFormFieldComponent } from '../shared/dynamic-form/dynamic-form-f
 
 import { HighlightDirective } from '../shared/directives/highlight.directive';
 
-import { CustomerFilterDynamicFormService } from './dynamic-form/customer-filter-dynamic-form.service';
+import { DynamicFilterFormFieldService } from './dynamic-form/dynamic-filter-form-field.service';
 
 
 @NgModule({
@@ -75,7 +75,7 @@ import { CustomerFilterDynamicFormService } from './dynamic-form/customer-filter
   ],
   providers: [
     HttpCustomerService,
-    CustomerFilterDynamicFormService,
+    DynamicFilterFormFieldService,
     CustomerInMemoryDataService,
   ],
   exports: [

@@ -1,57 +1,49 @@
 import { Injectable } from '@angular/core';
 
 import { DynamicFormField } from '../../shared/dynamic-form/dynamic-form-field';
-import { DynamicFormService } from '../../shared/dynamic-form/dynamic-form.service';
+import { DynamicFormFieldService } from '../../shared/dynamic-form/dynamic-form-field-.service';
 
 
 // @Injectable({ providedIn: 'root' })
 @Injectable()
-export class CustomerFilterDynamicFormService extends DynamicFormService {
+export class DynamicFilterFormFieldService extends DynamicFormFieldService {
 
-  getDynamicFormFields() {
+  getFields() {
 
-    const dynamicFormFields: DynamicFormField[] = [
+    const dynamicFilterFormFields: DynamicFormField[] = [
 
       {
         controlType: 'textbox',
-        id: 'searchInput',
-        templateRefVar: '#searchInput',
-        label: 'Search in all fields',
-        inputType: 'text',
-        order: 1
-      },
-      {
-        controlType: 'textbox',
-        id: 'id',
-        label: 'Filter by Name',
+        id: 'filterById',
+        label: 'Filter by Id',
         inputType: 'text',
         order: 2
       },
       {
         controlType: 'textbox',
-        id: 'name',
+        id: 'filterByName',
         label: 'Filter by Name',
         inputType: 'text',
         order: 3
       },
       {
         controlType: 'textbox',
-        id: 'city',
+        id: 'filterByCity',
         label: 'Filter by City',
         inputType: 'text',
         order: 4
       },
       {
         controlType: 'textbox',
-        id: 'email',
-        label: 'Filter by City',
+        id: 'filterByEmail',
+        label: 'Filter by Email',
         inputType: 'text',
         order: 10
       },
       {
         controlType: 'dropdown',
-        id: 'brave',
-        label: 'Bravery Rating',
+        id: 'filterByStatus',
+        label: 'Filter by status',
         selectOptions: [
           { key: 'solid', value: 'Solid' },
           { key: 'great', value: 'Great' },
@@ -63,7 +55,7 @@ export class CustomerFilterDynamicFormService extends DynamicFormService {
 
       }];
 
-    return dynamicFormFields.sort((a, b) => a.order - b.order);
+    return dynamicFilterFormFields.sort((a, b) => a.order - b.order);
 
   }
 }

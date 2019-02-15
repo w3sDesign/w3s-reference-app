@@ -10,7 +10,7 @@ import { map } from 'rxjs/operators';
 })
 export class NavtestComponent {
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
+  isSmallScreen: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
       map(result => result.matches)
     );

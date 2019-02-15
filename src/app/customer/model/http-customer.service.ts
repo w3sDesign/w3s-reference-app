@@ -90,8 +90,7 @@ export class HttpCustomerService extends CustomerService {
       return this.http.get<Customer[]>(this.customersUrl)
         .pipe(
           mergeMap(res => {
-            const queryResult = this.httpUtils
-              .baseFilter(res, queryParams, ['status', 'type']);
+            const queryResult = this.httpUtils.query(res, queryParams);
             return of(queryResult);
           }),
           catchError(this.handleError('getCustomers with queryParams', new QueryResult()))
@@ -149,7 +148,7 @@ export class HttpCustomerService extends CustomerService {
   /**
    * ##################################################################
    * Update the customer on the remote data server.
-   * Returns the updated customerupon success.
+   * Returns the updated customer upon success.
    *
    * PUT - Null response expected.
    * ##################################################################

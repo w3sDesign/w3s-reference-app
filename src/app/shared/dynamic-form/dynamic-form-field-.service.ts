@@ -3,8 +3,8 @@ import { DynamicFormField } from './dynamic-form-field';
 /**
  * Interface - Getting the form fields for building a form dynamically.
  */
-export abstract class DynamicFormService {
+export abstract class DynamicFormFieldService {
 
-  abstract getDynamicFormFields(): DynamicFormField[];
+  abstract getFields(): DynamicFormField[];
 
 }

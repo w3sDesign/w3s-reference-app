@@ -34,33 +34,52 @@
     <!-- Expansion Content: All Filter input fields -->
     <!-- ################################################ -->
 
-    <div class="flex-box" style="padding:0">
 
-      <!-- ################################################ -->
+    <!-- ################################################ -->
 
-      <w3s-dynamic-form [dynFormFields]="filterDynFormFields">
+    <mat-form-field style="padding-bottom: 16px">
+      <input matInput #searchInput placeholder="Search">
+      <mat-hint align="start">
+        Search in all fields
+      </mat-hint>
+    </mat-form-field>
 
-      </w3s-dynamic-form>
+    <!-- ################################################ -->
 
-      <!-- ################################################ -->
+    <w3s-dynamic-form [dynamicFormFields]="dynamicFilterFormFields" (dynamicFormSubmit)="onDynamicFilterFormSubmit($event)">
+
+    </w3s-dynamic-form>
+
+    <!-- ################################################ -->
+
+    <div id="filterButtons">
+      <button mat-raised-button matTooltip="Add / Remove Filters" (click)="TODO()">
+        Add Filters
+      </button>
+
+      <button mat-raised-button matTooltip="Clear all filters" (click)="TODO()">
+        Clear Filters
+      </button>
+
+      <button mat-raised-button matTooltip="Save filters as template" (click)="TODO()">
+        Save Filters
+      </button>
 
     </div>
+    <!-- </div> -->
 
 
 
-    <div class="flex-box" style="padding:0">
-
-      <mat-form-field style="padding-bottom: 16px">
-        <input matInput #searchInput xplaceholder="Search">
-        <mat-hint align="start">
-          Search in all fields
-        </mat-hint>
-      </mat-form-field>
 
 
-      <!-- #####NEU########################################### -->
 
-      <mat-form-field>
+
+
+
+
+    <!-- #####NEU########################################### -->
+
+    <!-- <mat-form-field>
         <input matInput [(ngModel)]="filterById" (change)="loadCustomers()">
         <mat-error></mat-error>
         <mat-hint align="start">
@@ -106,11 +125,11 @@
         <mat-hint align="start">
           Street
         </mat-hint>
-      </mat-form-field>
+      </mat-form-field> -->
 
-      <!-- ################################################ -->
+    <!-- ################################################ -->
 
-
+    <!--
       <mat-form-field>
         <mat-select [(value)]="filterByStatus" (selectionChange)="loadCustomers()">
           <mat-option value=""></mat-option>
@@ -134,24 +153,8 @@
         </mat-hint>
       </mat-form-field>
 
-    </div>
+    </div> -->
 
-
-    <div class="flex-box" style="padding-left:0; padding-top:24px">
-      <button mat-raised-button matTooltip="Start Searching" (click)="loadCustomers()">
-        Start Searching
-      </button>
-
-      <button mat-raised-button matTooltip="Add / Remove Filters" (click)="TODO()">
-        Add Filters
-      </button>
-
-      <button mat-raised-button matTooltip="Clear all Filters" (click)="clearFilters()">
-        Clear Filters
-      </button>
-
-
-    </div>
 
   </mat-expansion-panel>
 
@@ -161,7 +164,7 @@
   <!-- ################################################# -->
 
   <!-- <mat-action-row #crudButtons style="align-items: center; font-size:14px;"> -->
-  <div class="flex-box" #crudButtons>
+  <div id="crudButtons" #crudButtons>
 
     <div class="special-font">
       {{dataSource.totalNumberOfItems | async}} customers selected.

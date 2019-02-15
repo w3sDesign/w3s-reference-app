@@ -1,13 +1,17 @@
+/**
+ * Form field meta data
+ * for generating form fields dynamically.
+ */
 export class DynamicFormField {
   controlType = '';
   id = ''; // key
   value?: any;
-  label? = '';
-  required? = false;
-  inputType? = '';
+  label?= '';
+  required?= false;
+  inputType?= '';
   selectOptions?: { key: string, value: string }[] = [];
-  templateRefVar? = '';
-  order? = 0;
+  templateRefVar?= '';
+  order?= 0;
 }
 
 

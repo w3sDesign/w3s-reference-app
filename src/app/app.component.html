@@ -3,7 +3,7 @@
 <!-- ################################################ -->
 
 <mat-toolbar color="primary">
-  <!-- *nixngIf="isHandset$ | async" -->
+  <!-- *nixngIf="isSmallScreen | async" -->
   <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="sidenavRef.toggle()">
     <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
   </button>
@@ -22,7 +22,7 @@
   <!-- left sidenav -->
   <!-- ################################################ -->
 
-  <mat-sidenav #sidenavRef class="sidenav" fixedInViewport="true" [attr.role]="(isHandset$ | async) ? 'dialog':'navigation'" [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="openSideNav ? !(isHandset$ | async) : false">
+  <mat-sidenav #sidenavRef class="sidenav" fixedInViewport="true" [attr.role]="(isSmallScreen | async) ? 'dialog':'navigation'" [mode]="(isSmallScreen | async) ? 'side' : 'side'" [opened]="openSideNav ? !(isSmallScreen | async) : false">
 
     <mat-toolbar>Menu</mat-toolbar>
 

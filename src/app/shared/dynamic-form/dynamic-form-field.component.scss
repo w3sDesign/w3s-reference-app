@@ -1,0 +1,20 @@
+//  HTML structure
+//  ##############
+
+//  <mat-form-field>
+
+//    <input matInput ;
+
+//    <mat-select *ngSwitchCase="'dropdown'"
+//       <mat-option {{option.value}}
+//    </mat-select>
+
+//    <mat-error>{{dynamicFormField.label}} is required</mat-error>
+
+//  </mat-form-field>
+
+
+
+.mat-form-field {
+  margin-right: 30px;
+}

@@ -1,27 +1,31 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { DynamicFormField } from './dynamic-form-field';
-import { DynamicFormControlService } from './dynamic-form-control.service';
+import { DynamicFormGroupService } from './dynamic-form-group.service';
 
 @Component({
   selector: 'w3s-dynamic-form',
   templateUrl: './dynamic-form.component.html',
-  providers: [DynamicFormControlService]
+  styleUrls: ['./dynamic-form.component.scss'],
+  providers: [DynamicFormGroupService]
 })
 export class DynamicFormComponent implements OnInit {
 
-  @Input() dynFormFields: DynamicFormField[] = [];
+  @Input() dynamicFormFields: DynamicFormField[] = [];
+  @Output() dynamicFormSubmit: EventEmitter<any> = new EventEmitter<any>();
   form: FormGroup;
   payLoad = '';
 
-  constructor(private dynFormControlService: DynamicFormControlService) { }
+  constructor(private dynamicFormGroupService: DynamicFormGroupService) { }
 
   ngOnInit() {
-    this.form = this.dynFormControlService.toFormGroup(this.dynFormFields);
+    this.form = this.dynamicFormGroupService.createFormGroup(this.dynamicFormFields);
   }
 
   onSubmit() {
+    this.dynamicFormSubmit.emit(this.form.value);
+    // this.payLoad = this.form.value;
     this.payLoad = JSON.stringify(this.form.value);
   }
 }

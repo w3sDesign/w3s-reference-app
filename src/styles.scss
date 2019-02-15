@@ -16,7 +16,8 @@ body {
 }
 
 
-// global TO VERIFY from customer-list for dynamic form
+// global!?
+// used in customer-list, dynamic form
 
 .w3s-flex-box {
 
@@ -28,11 +29,11 @@ body {
   flex-wrap: wrap; // default = nowrap
 
   font-size: 14px;
-  padding: 16px 8px 16px 24px;
+  // padding: 16px 8px 16px 24px;
 
   .mat-form-field,
   button {
-    margin-right: 10px;
+    margin-right: 30px;
   }
 }
 
