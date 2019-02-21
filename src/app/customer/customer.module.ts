@@ -29,11 +29,12 @@ import { SharedMaterialModule } from '../shared/shared-material.module';
 // import { MatSnackBarContainer } from '@angular/material';
 
 import { DynamicFormComponent } from '../shared/dynamic-form/dynamic-form.component';
-import { DynamicFormFieldComponent } from '../shared/dynamic-form/dynamic-form-field.component';
+import { DynamicFieldComponent } from '../shared/dynamic-form/dynamic-field.component';
 
 import { HighlightDirective } from '../shared/directives/highlight.directive';
 
-import { DynamicFilterFormFieldService } from './dynamic-form/dynamic-filter-form-field.service';
+import { DynamicFilterFieldService } from './dynamic-form/dynamic-filter-field.service';
+import { FilterDetailComponent } from './filter-detail/filter-detail.component';
 
 
 @NgModule({
@@ -66,8 +67,9 @@ import { DynamicFilterFormFieldService } from './dynamic-form/dynamic-filter-for
     CustomerDetailDialogComponent,
 
     DynamicFormComponent,
-    DynamicFormFieldComponent,
+    DynamicFieldComponent,
     HighlightDirective,
+    FilterDetailComponent,
   ],
   entryComponents: [
     CustomerDetailDialogComponent,
@@ -75,7 +77,7 @@ import { DynamicFilterFormFieldService } from './dynamic-form/dynamic-filter-for
   ],
   providers: [
     HttpCustomerService,
-    DynamicFilterFormFieldService,
+    DynamicFilterFieldService,
     CustomerInMemoryDataService,
   ],
   exports: [

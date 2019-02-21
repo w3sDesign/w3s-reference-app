@@ -46,23 +46,23 @@
 
     <!-- ################################################ -->
 
-    <w3s-dynamic-form [dynamicFormFields]="dynamicFilterFormFields" (dynamicFormSubmit)="onDynamicFilterFormSubmit($event)">
+    <w3s-dynamic-form [dynamicFields]="dynamicFilterFields" (dynamicFormSubmit)="onDynamicFilterFormSubmit($event)">
 
     </w3s-dynamic-form>
 
     <!-- ################################################ -->
 
+      <button mat-raised-button matTooltip="Save filters as template" (click)="TODO()">
+        Save Filters
+      </button>
+
     <div id="filterButtons">
       <button mat-raised-button matTooltip="Add / Remove Filters" (click)="TODO()">
-        Add Filters
+        Maintain Filters
       </button>
 
       <button mat-raised-button matTooltip="Clear all filters" (click)="TODO()">
         Clear Filters
-      </button>
-
-      <button mat-raised-button matTooltip="Save filters as template" (click)="TODO()">
-        Save Filters
       </button>
 
     </div>
@@ -77,7 +77,7 @@
 
 
 
-    <!-- #####NEU########################################### -->
+    <!-- #####OLD:########################################### -->
 
     <!-- <mat-form-field>
         <input matInput [(ngModel)]="filterById" (change)="loadCustomers()">

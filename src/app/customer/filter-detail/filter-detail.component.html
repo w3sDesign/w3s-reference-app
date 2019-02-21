@@ -1,0 +1,51 @@
+<p>
+  filter-detail works!
+</p>
+
+
+
+<!-- ################################################ -->
+
+<w3s-dynamic-form [dynamicFields]="dynFields" (dynamicFormSubmit)="onDynamicFilterFormSubmit($event)">
+
+</w3s-dynamic-form>
+
+<!-- ################################################ -->
+
+
+
+<form (ngSubmit)="onSubmit()" [formGroup]="form">
+
+  <div *ngFor="let dynField of dynFields">
+
+    <!-- ################################################ -->
+
+
+    <!-- ################################################ -->
+    <!-- ################################################ -->
+
+    <mat-form-field>
+
+      <input matInput [formControlName]="dynField.id" [id]="dynField.id" value={{dynField.label}}>
+
+      <!-- <mat-hint align="start">{{dynField.label}}</mat-hint> -->
+
+      <!-- <mat-error *ngIf="!isValid"> -->
+
+      <mat-error>{{dynField.label}} is required</mat-error>
+
+    </mat-form-field>
+
+    <!-- ################################################ -->
+
+  </div>
+
+
+  <button type="submit" mat-raised-button matTooltip="Start Searching" [disabled]="!form.valid">Save</button>
+
+
+</form>
+
+<div *ngIf="payLoad">
+    <strong>Saved the following values</strong><br>{{payLoad}}
+  </div>

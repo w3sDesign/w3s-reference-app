@@ -1,13 +1,13 @@
 <!-- <div> -->
   <form (ngSubmit)="onSubmit()" [formGroup]="form">
 
-    <div *ngFor="let dynamicFormField of dynamicFormFields">
+    <div *ngFor="let dynamicField of dynamicFields">
 
       <!-- ################################################ -->
 
-      <w3s-dynamic-form-field [dynamicFormField]="dynamicFormField" [form]="form">
+      <w3s-dynamic-field [dynamicField]="dynamicField" [form]="form">
 
-      </w3s-dynamic-form-field>
+      </w3s-dynamic-field>
 
       <!-- ################################################ -->
 

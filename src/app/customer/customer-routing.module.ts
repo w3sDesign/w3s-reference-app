@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { CustomerRootComponent } from './customer-root/customer-root.component';
 import { CustomerListComponent } from './customer-list/customer-list.component';
 import { CustomerDetailComponent } from './customer-detail/customer-detail.component';
+import { FilterDetailComponent } from './filter-detail/filter-detail.component';
 
 const customerRoutes: Routes = [
   {
@@ -25,9 +26,13 @@ const customerRoutes: Routes = [
         // ]
       },
       {
+        path: 'filters',
+        component: FilterDetailComponent
+      },
+      {
         path: ':id',
         component: CustomerDetailComponent
-      }
+      },
     ]
   }
 ];

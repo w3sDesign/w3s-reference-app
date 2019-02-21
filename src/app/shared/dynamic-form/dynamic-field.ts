@@ -2,7 +2,7 @@
  * Form field meta data
  * for generating form fields dynamically.
  */
-export class DynamicFormField {
+export class DynamicField {
   controlType = '';
   id = ''; // key
   value?: any;
@@ -15,7 +15,7 @@ export class DynamicFormField {
 }
 
 
-// export class FormFieldBase<T> {
+// export class FieldBase<T> {
 //   value: T;
 //   key: string;
 //   label: string;
