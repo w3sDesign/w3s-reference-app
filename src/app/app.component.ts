@@ -30,6 +30,7 @@ import { ActivatedRoute, Router, NavigationEnd, RouterEvent } from '@angular/rou
 })
 export class AppComponent implements OnInit {
   title = 'w3sDesign';
+  description = '';
 
   isSmallScreen: Observable<boolean> = this.breakpointObserver.observe(
     // [Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
@@ -64,6 +65,7 @@ export class AppComponent implements OnInit {
 
     this.navEnd.subscribe(event => {
       console.log('navigation end = ' + event.url);
+      // Home page has no side nav.
       this.openSideNav = !(event.url === '/home' || event.url === '/');
     });
 
@@ -76,6 +78,12 @@ export class AppComponent implements OnInit {
 
     // const url: Observable<string> = this.route.url.map(segments => segments.join(''));
     // url.subscribe(url2 => console.log(url2));
+
+    this.isSmallScreen.subscribe(event => {
+      event ? this.description = 'Data Entry & Maintenance Components'
+        : this.description = 'High Performance Data Entry & Maintenance Applications';
+    });
+
   }
 
 }

@@ -2,14 +2,32 @@
 <!-- Fixed toolbar -->
 <!-- ################################################ -->
 
+<!-- mat-toolbar = flex-box -->
 <mat-toolbar color="primary">
-  <!-- *nixngIf="isSmallScreen | async" -->
+
+  <!-- *ngIf="isSmallScreen | async" -->
   <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="sidenavRef.toggle()">
     <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
   </button>
-  <span mat-list-item routerLink="/" class="mat-button"> w3sDesign </span>
-  <span mat-list-item routerLink="/customers" class="mat-button"> Components </span>
+
+  <div routerLink="/" class="title"> {{title}} </div>
+
+  <div routerLink="/customers" class="description">{{description}}</div>
+
+  <div class="description">
+    <a href="https://w3sdesign.com">Design Patterns</a>
+  </div>
+
+  <div>
+    <a class="github" href="https://github.com/w3sdesign/w3s-reference-app">
+      <img alt="w3sDesign" src="../../../assets/img/github-mark-32px.png">
+      <span>GitHub</span>
+    </a>
+  </div>
+
 </mat-toolbar>
+
+
 
 <!-- ################################################ -->
 <!-- sidenav container -->
@@ -22,27 +40,104 @@
   <!-- left sidenav -->
   <!-- ################################################ -->
 
-  <mat-sidenav #sidenavRef class="sidenav" fixedInViewport="true" [attr.role]="(isSmallScreen | async) ? 'dialog':'navigation'" [mode]="(isSmallScreen | async) ? 'side' : 'side'" [opened]="openSideNav ? !(isSmallScreen | async) : false">
+  <!-- mat-sidenav mode: over (=default) | push | side (=side by side with main content) -->
+  <!-- [mode]="(isSmallScreen | async) ? 'side' : 'side'" -->
+  <!-- Open side nav only if not small screen (small = max-width: 1023px). -->
+  <mat-sidenav id="sidenav" #sidenavRef class="sidenav" fixedInViewport="true" mode="side" [opened]="openSideNav ? !(isSmallScreen | async) : false" [attr.role]="(isSmallScreen | async) ? 'dialog':'navigation'">
 
-    <mat-toolbar>Menu</mat-toolbar>
+    <!-- <mat-toolbar>Menu</mat-toolbar> -->
 
-    <mat-nav-list>
-      <h6>Data Maintenance</h6>
-      <hr>
+    <br>
+    <h6>MASTER DATA</h6>
 
-      <a mat-list-item routerLink="/customers">Customers</a>
-      <a mat-list-item routerLink="/customers">Product</a>
+    <mat-expansion-panel>
 
-      <hr>
-      <h6>ERP / E-Commerce</h6>
-      <hr>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Customers
+        </mat-panel-title>
+      </mat-expansion-panel-header>
 
-      <a mat-list-item routerLink="/customers">Sales Order</a>
-      <a mat-list-item routerLink="/customers">Purchase Order</a>
+      <mat-nav-list>
+        <a mat-list-item routerLink="/customers">Customer</a>
+        <a mat-list-item routerLink="/customers">Address</a>
+        <a mat-list-item routerLink="/customers">Contact</a>
+        <a mat-list-item routerLink="/filter-templates">Filter</a>
+      </mat-nav-list>
 
-    </mat-nav-list>
+    </mat-expansion-panel>
+
+
+    <mat-expansion-panel>
+
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Suppliers
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <mat-nav-list>
+        <a mat-list-item routerLink="/customers">Supplier</a>
+        <a mat-list-item routerLink="/filter-templates">Filter Template</a>
+      </mat-nav-list>
+
+    </mat-expansion-panel>
+
+
+    <mat-expansion-panel>
+
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Products
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <mat-nav-list>
+        <a mat-list-item routerLink="/customers">Product</a>
+        <a mat-list-item routerLink="/filter-templates">Filter Template</a>
+      </mat-nav-list>
+
+    </mat-expansion-panel>
+
+
+    <br><br>
+
+    <h6>ERP / E-COMMERCE</h6>
+
+    <mat-expansion-panel>
+
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Sales Order
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <mat-nav-list>
+        <a mat-list-item routerLink="/customers">Sales Order</a>
+        <a mat-list-item routerLink="/filter-templates">Line Items</a>
+      </mat-nav-list>
+
+    </mat-expansion-panel>
+
+
+    <mat-expansion-panel>
+
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Purchase Order
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <mat-nav-list>
+        <a mat-list-item routerLink="/customers">Purchase Order</a>
+        <a mat-list-item routerLink="/filter-templates">Line Items</a>
+      </mat-nav-list>
+
+    </mat-expansion-panel>
+
 
   </mat-sidenav>
+
 
 
   <!-- ################################################ -->

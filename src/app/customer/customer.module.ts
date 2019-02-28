@@ -18,7 +18,7 @@ import { CustomerListComponent } from './customer-list/customer-list.component';
 import { CustomerDetailComponent, CustomerDetailDialogComponent } from './customer-detail/customer-detail.component';
 import { HttpCustomerService } from './model/http-customer.service';
 import { CustomerRoutingModule } from './customer-routing.module';
-
+  
 // import { HttpUtilsService } from '../common/http-utils.service';
 // import { TypesUtilsService } from '../common/types-utils.service';
 
@@ -29,12 +29,14 @@ import { SharedMaterialModule } from '../shared/shared-material.module';
 // import { MatSnackBarContainer } from '@angular/material';
 
 import { DynamicFormComponent } from '../shared/dynamic-form/dynamic-form.component';
-import { DynamicFieldComponent } from '../shared/dynamic-form/dynamic-field.component';
+import { DynamicFormQuestionComponent } from '../shared/dynamic-form/dynamic-form-question.component';
 
 import { HighlightDirective } from '../shared/directives/highlight.directive';
 
-import { DynamicFilterFieldService } from './dynamic-form/dynamic-filter-field.service';
+import { FilterService } from './model/filter.service';
 import { FilterDetailComponent } from './filter-detail/filter-detail.component';
+import { FilterTemplateDetailComponent } from './filter-template-detail/filter-template-detail.component';
+import { FilterTemplateQuestionService } from './model/filter-template-question.service';
 
 
 @NgModule({
@@ -67,9 +69,10 @@ import { FilterDetailComponent } from './filter-detail/filter-detail.component';
     CustomerDetailDialogComponent,
 
     DynamicFormComponent,
-    DynamicFieldComponent,
+    DynamicFormQuestionComponent,
     HighlightDirective,
     FilterDetailComponent,
+    FilterTemplateDetailComponent,
   ],
   entryComponents: [
     CustomerDetailDialogComponent,
@@ -77,8 +80,10 @@ import { FilterDetailComponent } from './filter-detail/filter-detail.component';
   ],
   providers: [
     HttpCustomerService,
-    DynamicFilterFieldService,
+    // {provide: CustomerService, useClass: HttpCustomerService},
+    FilterService,
     CustomerInMemoryDataService,
+    FilterTemplateQuestionService
   ],
   exports: [
     // CustomerListComponent,

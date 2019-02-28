@@ -24,7 +24,7 @@ import { Router } from '@angular/router';
 import { MessageSnackBarComponent } from '../../shared/message-snack-bar/message-snack-bar.component';
 
 import { DynamicFormComponent } from '../../shared/dynamic-form/dynamic-form.component';
-import { DynamicFilterFieldService } from '../dynamic-form/dynamic-filter-field.service';
+import { FilterService } from '../model/filter.service';
 import { FormGroup } from '@angular/forms';
 
 
@@ -93,7 +93,7 @@ export class CustomerListComponent implements OnInit {
   selection = new SelectionModel<Customer>(true, []);
   //
 
-  dynamicFilterFields: any[];
+  filterQuestions: any[];
 
 
 
@@ -105,9 +105,9 @@ export class CustomerListComponent implements OnInit {
     // private httpErrorHandler: HttpErrorHandler,
     private dialog: MatDialog,
     // private snackBar: MatSnackBar
-    dynamicService: DynamicFilterFieldService,
+    filterQuestionService: FilterService,
   ) {
-    this.dynamicFilterFields = dynamicService.getFields();
+    this.filterQuestions = filterQuestionService.getFilters();
   }
 
 

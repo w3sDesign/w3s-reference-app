@@ -5,11 +5,7 @@
 .sidenav {
   margin-top: 64px;
   padding: 20px;
-  width: 200px;
-}
-
-.sidenav .mat-toolbar {
-  background: inherit;
+  width: 220px;
 }
 
 .mat-toolbar.mat-primary {
@@ -18,4 +14,90 @@
   z-index: 10;
 }
 
+.mat-expansion-panel {
+  margin-top: 3px;
+}
 
+.mat-expansion-panel-header {
+  // height: 48px !important; //64
+  max-height: 48px;
+  padding-left: 16px;
+}
+
+// .mat-expansion-panel-body {
+//   padding-left: 16px !important;
+// }
+
+.mat-nav-list {
+  padding: 0; //orig: padding-top:8px
+}
+
+.sidenav .mat-list-item {
+  font-size: 14px; //orig: 16
+  height: 35px !important; //orig: 48
+  margin-left: -8px !important; // padding isn't recognized
+}
+
+
+
+.title {
+  font-size: 16px;
+  // margin-left: 15px;
+  margin-right: 40px;
+  cursor: pointer;
+  padding: 0 22px;
+}
+
+.description {
+  flex: 1 1 auto;
+  // justify-content: center; //  items justified toward the center of the container
+  text-align: center; // item content aligned horizontally
+  font-size: 18px;
+  margin-right: 15px;
+  cursor: pointer;
+  padding: 0 10px;
+
+  a {
+    color: white;
+    text-decoration: none;
+  }
+}
+
+.github img {
+  padding: 0 0 4px 10px;
+}
+
+.github span {
+  font-size: 15px;
+  color: white;
+  padding: 0 30px 0 10px
+}
+
+
+
+// .flex-box {
+//   // width: 100%;
+//   margin:auto;
+
+//   display: flex;
+//   flex-direction: row;
+//   align-items: center; // vertical
+//   justify-content: flex-start; // horizontal
+//   flex-wrap: wrap; // default = nowrap
+
+//   // font-size: 14px;
+//   // padding: 16px 8px 16px 24px;
+
+//   div {
+//     margin-left: 30px;
+//     margin-right: 230px;
+//     flex: 1 1 auto;
+//   }
+// }
+
+
+// .fill-remaining-space {
+//   /* This fills the remaining space, by using flexbox.
+//      Every toolbar row uses a flexbox row layout. */
+//   flex: 1 1 auto;
+// }

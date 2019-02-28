@@ -1,4 +1,4 @@
-export class Customer {
+ export class Customer {
   // Basic Data
   id = 0;
   name = ''; // 'A' || 'B';

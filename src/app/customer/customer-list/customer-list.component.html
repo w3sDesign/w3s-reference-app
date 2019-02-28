@@ -46,23 +46,24 @@
 
     <!-- ################################################ -->
 
-    <w3s-dynamic-form [dynamicFields]="dynamicFilterFields" (dynamicFormSubmit)="onDynamicFilterFormSubmit($event)">
+    <w3s-dynamic-form [questions]="filterQuestions" (dynamicFormSubmit)="onDynamicFilterFormSubmit($event)">
 
     </w3s-dynamic-form>
 
     <!-- ################################################ -->
 
-      <button mat-raised-button matTooltip="Save filters as template" (click)="TODO()">
-        Save Filters
-      </button>
-
     <div id="filterButtons">
-      <button mat-raised-button matTooltip="Add / Remove Filters" (click)="TODO()">
-        Maintain Filters
+
+      <button mat-raised-button matTooltip="Save filters as new template, or update existing template" (click)="TODO()">
+        Save Filters
       </button>
 
       <button mat-raised-button matTooltip="Clear all filters" (click)="TODO()">
         Clear Filters
+      </button>
+
+      <button mat-raised-button matTooltip="Add / Remove Filters" (click)="TODO()">
+        Settings
       </button>
 
     </div>

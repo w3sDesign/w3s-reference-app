@@ -1,0 +1,23 @@
+
+table {
+  width: 100%;
+}
+
+.mat-spinner {
+  margin: 16px 10px;
+}
+
+.mat-cell,
+.mat-header-cell,
+.mat-footer-cell {
+  padding-right: 10px;
+  font-size: 14px;
+}
+
+.mat-header-row,
+.mat-footer-row {
+  background-color: whitesmoke;
+  /* #f7f7f7; */
+  color: #346187;
+  text-shadow: 0 0 0.125rem #ffffff;
+}

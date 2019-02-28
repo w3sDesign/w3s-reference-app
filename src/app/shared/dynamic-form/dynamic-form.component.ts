@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { DynamicField } from './dynamic-field';
+import { QuestionBase } from './question-base';
 import { DynamicFormGroupService } from './dynamic-form-group.service';
 
 @Component({
@@ -12,7 +12,8 @@ import { DynamicFormGroupService } from './dynamic-form-group.service';
 })
 export class DynamicFormComponent implements OnInit {
 
-  @Input() dynamicFields: DynamicField[] = [];
+  @Input() questions: QuestionBase[] = [];
+  @Input() formClass = {};
   @Output() dynamicFormSubmit: EventEmitter<any> = new EventEmitter<any>();
   form: FormGroup;
   payLoad = '';
@@ -20,7 +21,7 @@ export class DynamicFormComponent implements OnInit {
   constructor(private dynamicFormGroupService: DynamicFormGroupService) { }
 
   ngOnInit() {
-    this.form = this.dynamicFormGroupService.createFormGroup(this.dynamicFields);
+    this.form = this.dynamicFormGroupService.createFormGroup(this.questions);
   }
 
   onSubmit() {

@@ -1,13 +1,13 @@
-<!-- <div> -->
-  <form (ngSubmit)="onSubmit()" [formGroup]="form">
+<div>
+  <form (ngSubmit)="onSubmit()" [formGroup]="form" [ngClass]="formClass">
 
-    <div *ngFor="let dynamicField of dynamicFields">
+    <div *ngFor="let question of questions">
 
       <!-- ################################################ -->
 
-      <w3s-dynamic-field [dynamicField]="dynamicField" [form]="form">
+      <w3s-dynamic-form-question [question]="question" [form]="form">
 
-      </w3s-dynamic-field>
+      </w3s-dynamic-form-question>
 
       <!-- ################################################ -->
 
@@ -19,8 +19,8 @@
 
   </form>
 
-  <!-- <div *ngIf="payLoad">
+  <div *ngIf="payLoad">
     <strong>Saved the following values</strong><br>{{payLoad}}
-  </div> -->
+  </div>
 
-<!-- </div> -->
+</div>

@@ -24,7 +24,7 @@ import { QueryResult } from '../../shared/query-result';
 export class MockCustomerService extends CustomerService {
 
   private customers: Customer[] = mockCustomers;
-  private lastResult: Observable<any>;
+  lastResult: Observable<any>;
 
   constructor() {
     super();

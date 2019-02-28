@@ -1,0 +1,44 @@
+<div [formGroup]="form">
+
+
+  <div *ngIf="question.controlType !== 'checkbox'" [ngSwitch]="question.controlType">
+
+    <mat-form-field>
+
+      <textarea *ngSwitchCase="'textbox'" matInput [formControlName]="question.key" [id]="question.key" [type]="question.inputType" [w3sHighlight]="'yellow'">
+        </textarea>
+
+      <!-- ERROR Error: Input type "checkbox" isn't supported by matInput. -->
+      <!-- <input *ngSwitchCase="'checkbox'" matInput [formControlName]="question.key" [id]="question.key" [type]="question.inputType" [w3sHighlight]="'yellow'"> -->
+
+
+      <mat-select *ngSwitchCase="'dropdown'" [formControlName]="question.key" [id]="question.key">
+        <mat-option *ngFor="let option of question.options" [value]="option.key">{{option.value}}</mat-option>
+      </mat-select>
+
+
+      <mat-hint align="start">{{question.label}}</mat-hint>
+
+      <!-- <mat-error *ngIf="!isValid"> -->
+
+      <mat-error>{{question.label}} is required</mat-error>
+
+    </mat-form-field>
+
+
+  </div>
+
+
+
+  <!-- checkbox not allowed inside mat-form-field -->
+
+  <div *ngIf="question.controlType === 'checkbox'" [ngSwitch]="question.controlType">
+
+      <br><br>
+      <mat-checkbox *ngSwitchCase="'checkbox'" [formControlName]="question.key" [id]="question.key">
+      {{question.label}}
+    </mat-checkbox>
+
+  </div>
+
+</div>

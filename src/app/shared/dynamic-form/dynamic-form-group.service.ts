@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { DynamicField } from './dynamic-field';
+import { QuestionBase } from './question-base';
 
 @Injectable()
 export class DynamicFormGroupService {
   constructor() { }
 
-  createFormGroup(dynamicFields: DynamicField[]) {
+  createFormGroup(questions: QuestionBase[]) {
     const group: any = {};
 
-    dynamicFields.forEach(dynamicField => {
+    questions.forEach(question => {
 
-      group[dynamicField.id] = dynamicField.required
-        ? new FormControl(dynamicField.value || '', Validators.required)
-        : new FormControl(dynamicField.value || '');
+      group[question.key] = question.required
+        ? new FormControl(question.value || '', Validators.required)
+        : new FormControl(question.value || '');
     });
 
     return new FormGroup(group);

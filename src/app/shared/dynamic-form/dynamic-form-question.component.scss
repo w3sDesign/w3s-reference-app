@@ -18,3 +18,19 @@
 .mat-form-field {
   margin-right: 30px;
 }
+
+
+
+.checkbox {
+  display: flex;
+
+  flex-direction: column;
+  align-items: center; // vertical
+  justify-content: flex-start; // horizontal
+  flex-wrap: wrap; // default = nowrap
+
+  font-size: 14px;
+  // padding-bottom: 16px; // 8px 16px 24px;
+}
+
+

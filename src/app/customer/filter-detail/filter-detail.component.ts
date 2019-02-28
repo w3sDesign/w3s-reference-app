@@ -1,9 +1,12 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { DynamicField } from '../../shared/dynamic-form/dynamic-field';
+import { QuestionBase } from '../../shared/dynamic-form/question-base';
 import { DynamicFormGroupService } from '../../shared/dynamic-form/dynamic-form-group.service';
-import { DynamicFilterFieldService } from '../dynamic-form/dynamic-filter-field.service';
+import { FilterService } from '../model/filter.service';
+
+import { SelectionModel } from '@angular/cdk/collections';
+import { MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort } from '@angular/material';
 
 @Component({
   selector: 'app-filter-detail',
@@ -13,35 +16,63 @@ import { DynamicFilterFieldService } from '../dynamic-form/dynamic-filter-field.
 })
 export class FilterDetailComponent implements OnInit {
 
-  // @Input() dynamicFields: DynamicField[] = [];
-  // @Output() dynamicFormSubmit: EventEmitter<any> = new EventEmitter<any>();
+  filterQuestions: QuestionBase[];
+  selectFilterQuestions: QuestionBase[];
 
-  form: FormGroup;
-  payLoad = '';
+  rowForm = { rowForm: true };
+  columnForm = { columnForm: true };
 
-  dynFields: DynamicField[];
+  // data table
+  filters: QuestionBase[] = [];
+  selectedFilter = '';
+  allColumns = ['key', 'label'];
+  displayedColumns = ['select', 'label'];
+  selection = new SelectionModel<QuestionBase>(true, []);
 
   constructor(
-    private dynFormGroupService: DynamicFormGroupService,
-    private dynService: DynamicFilterFieldService,
+    private filterQuestionService: FilterService,
   ) {
     /** Getting the filter fields dynamically. */
-    this.dynFields = dynService.getFields();
+    this.filterQuestions = filterQuestionService.getFilters();
+    this.selectFilterQuestions = filterQuestionService.getSelectFilters();
+    // data table
+    this.filters = this.selectFilterQuestions;
   }
 
   ngOnInit() {
-    this.form = this.dynFormGroupService.createFormGroup(this.dynFields);
+    // this.form = this.formGroupService.createFormGroup(this.filterQuestions);
   }
 
-  onSubmit() {
-    // this.dynamicFormSubmit.emit(this.form.value);
-    // // this.payLoad = this.form.value;
-    this.payLoad = JSON.stringify(this.form.value);
-  }
-
-  onDynamicFilterFormSubmit(value) {
+  onFilterFormSubmit(value) {
     // this.filterFormValue = value;
     // this.loadCustomers();
   }
 
+  /**
+   * ##################################################################
+   * Helpers data table
+   * ##################################################################
+   */
+
+  /** Whether number of selected rows matches total number of rows. */
+  isAllSelected(): boolean {
+    // const numSelected = this.selection.selected.length;
+    // const numRows = this.customers.length;
+    return this.selection.selected.length === this.filters.length;
+  }
+
+  /** Selects all rows if not all selected; otherwise clears selection. */
+  masterToggle() {
+    this.isAllSelected()
+      ? this.selection.clear()
+      : this.filters.forEach(filter => this.selection.select(filter));
+  }
+
+  onSelect(row: QuestionBase) {
+    this.selectedFilter = JSON.stringify(row);
+    // this.selectedFilter = '***********TEST****************';
+    // this.router.navigate(['/customers', row.id]);
+  }
+
 }
+
