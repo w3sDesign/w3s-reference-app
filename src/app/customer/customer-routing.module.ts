@@ -4,8 +4,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { CustomerRootComponent } from './customer-root/customer-root.component';
 import { CustomerListComponent } from './customer-list/customer-list.component';
 import { CustomerDetailComponent } from './customer-detail/customer-detail.component';
-import { FilterDetailComponent } from './filter-detail/filter-detail.component';
-import { FilterTemplateDetailComponent } from './filter-template-detail/filter-template-detail.component';
 
 const customerRoutes: Routes = [
   {
@@ -26,14 +24,15 @@ const customerRoutes: Routes = [
         //   }
         // ]
       },
-      {
-        path: 'templates',
-        component: FilterTemplateDetailComponent
-      },
-      {
-        path: 'filters',
-        component: FilterDetailComponent
-      },
+      // {
+      //   path: 'filter-templates',
+      //   component: FilterTemplateListComponent
+      // },
+      // {
+      //   path: 'templates',
+      //   component: FilterTemplateDetailComponent
+      // },
+
       {
         path: ':id',
         component: CustomerDetailComponent

@@ -26,7 +26,7 @@ import { QueryResult } from '../../shared/query-result';
  */
 @Injectable()
 // export class MockFilterTemplateService extends FilterTemplateService {
-export class MockFilterTemplateService  {
+export class FilterTemplateService  {
 
   private filterTemplates: FilterTemplate[] = mockFilterTemplates;
   lastResult: Observable<any>;

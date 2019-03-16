@@ -5,11 +5,18 @@ import { tap, map } from 'rxjs/operators';
 import { asyncData } from '../../../testing';
 
 import { Customer } from './customer';
+import { CustomerFilterTemplate } from './customer-filter-template';
+
 import { CustomerService } from './customer.service';
+
 import { mockCustomers } from './mock-customers';
+import { mockCustomerFilterTemplates } from './mock-customer-filter-templates';
 
 import { QueryParams } from '../../shared/query-params';
 import { QueryResult } from '../../shared/query-result';
+import { mockCustomerFilterTemplateQuestions } from './mock-customer-filter-template-questions';
+import { QuestionBase } from '../../shared/dynamic-form/question-base';
+
 
 
 /**
@@ -24,6 +31,9 @@ import { QueryResult } from '../../shared/query-result';
 export class MockCustomerService extends CustomerService {
 
   private customers: Customer[] = mockCustomers;
+  private customerFilterTemplates: CustomerFilterTemplate[] = mockCustomerFilterTemplates;
+  private customerFilterTemplateQuestions: QuestionBase[] = mockCustomerFilterTemplateQuestions;
+
   lastResult: Observable<any>;
 
   constructor() {
@@ -43,6 +53,7 @@ export class MockCustomerService extends CustomerService {
 
     return this.lastResult = asyncData(queryResult);
   }
+
 
 
   searchCustomers(term: string): Observable<Customer[]> {
@@ -91,6 +102,23 @@ export class MockCustomerService extends CustomerService {
     for (let i = 0; i < ids.length; i++) {
       return this.deleteCustomer(ids[i]);
     }
+  }
+
+
+  /** Customer filter templates */
+  /** Get all customer filter templates */
+  getCustomerFilterTemplates(): Observable<CustomerFilterTemplate[]> {
+    return this.lastResult = asyncData(this.customerFilterTemplates);
+  }
+
+  getCustomerFilterTemplate(id: number): Observable<CustomerFilterTemplate> {
+    return this.lastResult = asyncData(this.customerFilterTemplates[0]);
+  }
+
+  /** Customer filter template Questions */
+  getCustomerFilterTemplateQuestions(filterTemplate?: string): Observable<QuestionBase[]> {
+    return this.lastResult = asyncData(this.customerFilterTemplateQuestions);
+
   }
 
 }

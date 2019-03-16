@@ -14,19 +14,45 @@ export class DynamicFormComponent implements OnInit {
 
   @Input() questions: QuestionBase[] = [];
   @Input() formClass = {};
-  @Output() dynamicFormSubmit: EventEmitter<any> = new EventEmitter<any>();
+
+  @Output() formSubmit: EventEmitter<any> = new EventEmitter<any>();
+
   form: FormGroup;
+
   payLoad = '';
 
   constructor(private dynamicFormGroupService: DynamicFormGroupService) { }
 
   ngOnInit() {
     this.form = this.dynamicFormGroupService.createFormGroup(this.questions);
+    // this.form.controls['id'].disable();
   }
 
   onSubmit() {
-    this.dynamicFormSubmit.emit(this.form.value);
-    // this.payLoad = this.form.value;
+    // RawValue() includes disabled controls.
+    // this.formSubmit.emit(this.form.getRawValue());
+
+    this.formSubmit.emit(this.form.value);
+
+    // this.payLoad = JSON.stringify(this.form.getRawValue());
     this.payLoad = JSON.stringify(this.form.value);
+  }
+
+  getFormValue() {
+    // return JSON.stringify(this.form.value);
+
+    // RawValue() includes disabled controls.
+    return JSON.stringify(this.form.getRawValue());
+
+
+  }
+
+  setFormValue(value) {
+    // this.form.setValue(value);
+
+    // patchValue does its best to match the values
+    // to the correct controls in the group.
+    this.form.patchValue(value);
+
   }
 }

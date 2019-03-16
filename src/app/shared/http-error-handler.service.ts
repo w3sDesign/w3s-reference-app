@@ -37,11 +37,11 @@ export class HttpErrorHandler {
 
     return (error: HttpErrorResponse): Observable<T> => {
 
-      const message = (error.error instanceof ErrorEvent) ?
+      const message = (error.error instanceof ErrorEvent)
         // Client side error
-        error.error.message :
+        ? error.error.message
         // Server side error
-        `server returned code ${error.status} with body "${error.error}"`;
+        : `server returned code ${error.status} (${error.statusText}) with body "${error.error}"`;
 
       // Showing the error.
       this.openSnackBar(message);

@@ -32,85 +32,77 @@ export class HttpUtilsService {
    * Client side filtering, sorting, and pagination.
    * ##################################################################
    */
-  query(
-    items: any[],
-    queryParams: QueryParams): QueryResult {
+  query(items: any[], queryParams: QueryParams): QueryResult {
 
-    /** Filtering */
-    // let itemsResult = items.filter(item =>
-    //      item.id.toString()     .indexOf(queryParams.filter.filterById.toString()) > -1
-    //   && item.name.toLowerCase().indexOf(queryParams.filter.filterByName.toLowerCase()) > -1
-    //   && ...
-    // );
+    let filteredItems: any[] = items;
+    const filterTemplate = queryParams.filter;
 
-    const filterObj = queryParams.filter;
-    const filterString = '';
-    let itemsResult: any[] = items;
-
-
-    let invalidEntries = 0;
     let notPassedTests = 0;
-    // const itemKey = '';
+    let hasPassedTests = true;
 
-    function isNumber(obj) {
-      return obj !== undefined && typeof (obj) === 'number' && !isNaN(obj);
-    }
+    // function isNumber(obj) {
+    //   return obj !== undefined && typeof (obj) === 'number' && !isNaN(obj);
+    // }
 
-    function filterByID(item) {
-      if (isNumber(item.id) && item.id !== 0) {
-        return true;
-      }
-      invalidEntries++;
-      return false;
-    }
+    // function filterByID(item) {
+    //   if (isNumber(item.id) && item.id !== 0) {
+    //     return true;
+    //   }
+    //   invalidEntries++;
+    //   return false;
+    // }
 
-    const arrByID = items.filter(filterByID);
+    // const arrByID = items.filter(filterByID);
 
 
 
     /**
-     * Returns each item that passes all tests (filter criteria).
+     * Returns only items that pass all tests (filter criteria).
      */
-    itemsResult = items.filter(item => {
+    filteredItems = items.filter(item => {
 
       notPassedTests = 0;
-      Object.keys(filterObj).forEach(key => { // key = 'filterById', 'filterByName', ...
+      hasPassedTests = true;
 
-        if (key.startsWith('filterBy') && filterObj[key]) {
+      Object.keys(filterTemplate).forEach(key => { // key = 'customerId', 'customerName', ...
 
-          const itemKey = key.substring(8).toLowerCase(); // itemKey = 'id', 'name', ...
+        if (filterTemplate[key]) {
 
+          // Transform for example: key = 'customerId' to itemKey = 'id'.
+          // const itemKey = key.replace(/([a-z]+)([A-Z])(\w+)/, '$2$3');
+          let itemKey = key.replace(/^([a-z]+)([A-Z])/, (match, p1, p2) => p2.toLowerCase());
 
           if (typeof (item[itemKey]) === 'number') {
 
-            if (filterObj[key].substring(0, 1) === '>') {
-              if (item[itemKey] < +filterObj[key].substring(1)) {
-                notPassedTests++;
+            if (filterTemplate[key].substring(0, 1) === '>') {
+              if (item[itemKey] < +filterTemplate[key].substring(1)) {
+                hasPassedTests = false;
               }
-            } else if (filterObj[key].substring(0, 1) === '<') {
-              if (item[itemKey] > +filterObj[key].substring(1)) {
-                notPassedTests++;
+            } else if (filterTemplate[key].substring(0, 1) === '<') {
+              if (item[itemKey] > +filterTemplate[key].substring(1)) {
+                hasPassedTests = false;
               }
             } else
-              if (item[itemKey] !== +filterObj[key]) {
-                notPassedTests++;
+              if (item[itemKey] !== +filterTemplate[key]) {
+                hasPassedTests = false;
               }
-          }
+          } else
 
-          if (typeof (item[itemKey]) === 'string') {
+            if (typeof (item[itemKey]) === 'string') {
 
-            if (item[itemKey].toLowerCase().indexOf(filterObj[key].toLowerCase()) === -1) {
-              notPassedTests++;
+              if (item[itemKey].toLowerCase().indexOf(filterTemplate[key].toLowerCase()) === -1) {
+                hasPassedTests = false;
+              }
+
+              // other tests ...
             }
-
-            // other tests ...
-          }
         }
       });
 
-      // End of forEach loop.
       // If item has passed all tests (filter criteria) return true.
-      if (notPassedTests > 0) { return false; } else { return true; }
+      // if (notPassedTests > 0) { return false; } else { return true; }
+      return hasPassedTests;
+
     });
 
 
@@ -147,63 +139,63 @@ export class HttpUtilsService {
 
     /** Sorting */
     if (queryParams.sortField) {
-      itemsResult = this.arraySort(
-        itemsResult,
+      filteredItems = this.arraySort(
+        filteredItems,
         queryParams.sortField,
         queryParams.sortOrder
       );
     }
 
     /** Pagination */
-    const totalCount = itemsResult.length;
+    const totalCount = filteredItems.length;
     const initialPos = queryParams.pageNumber * queryParams.pageSize;
-    itemsResult = itemsResult.slice(
+    filteredItems = filteredItems.slice(
       initialPos,
       initialPos + queryParams.pageSize
     );
 
     /** Return queryResult */
     const queryResult = new QueryResult();
-    queryResult.items = itemsResult;
+    queryResult.items = filteredItems;
     queryResult.totalCount = totalCount;
     return queryResult;
   }
 
-  queryOriginal(
-    items: any[],
-    queryParams: QueryParams,
-    filtrationFields: string[] = []): QueryResult {
+  // queryOriginal(
+  //   items: any[],
+  //   queryParams: QueryParams,
+  //   filtrationFields: string[] = []): QueryResult {
 
-    /** Filtering */
-    let itemsResult = this.arraySearch(
-      items,
-      queryParams.filter,
-      filtrationFields
-    );
+  //   /** Filtering */
+  //   let itemsResult = this.arraySearch(
+  //     items,
+  //     queryParams.filter,
+  //     filtrationFields
+  //   );
 
-    /** Sorting */
-    if (queryParams.sortField) {
-      itemsResult = this.arraySort(
-        itemsResult,
-        queryParams.sortField,
-        queryParams.sortOrder
-      );
-    }
+  //   /** Sorting */
+  //   if (queryParams.sortField) {
+  //     itemsResult = this.arraySort(
+  //       itemsResult,
+  //       queryParams.sortField,
+  //       queryParams.sortOrder
+  //     );
+  //   }
 
-    /** Pagination */
-    const totalCount = itemsResult.length;
-    const initialPos = queryParams.pageNumber * queryParams.pageSize;
-    itemsResult = itemsResult.slice(
-      initialPos,
-      initialPos + queryParams.pageSize
-    );
+  //   /** Pagination */
+  //   const totalCount = itemsResult.length;
+  //   const initialPos = queryParams.pageNumber * queryParams.pageSize;
+  //   itemsResult = itemsResult.slice(
+  //     initialPos,
+  //     initialPos + queryParams.pageSize
+  //   );
 
-    /** Return queryResult */
-    const queryResult = new QueryResult();
-    queryResult.items = itemsResult;
-    queryResult.totalCount = totalCount;
-    return queryResult;
-  }
+  //   /** Return queryResult */
+  //   const queryResult = new QueryResult();
+  //   queryResult.items = itemsResult;
+  //   queryResult.totalCount = totalCount;
+  //   return queryResult;
+  // }
 
 
   /**

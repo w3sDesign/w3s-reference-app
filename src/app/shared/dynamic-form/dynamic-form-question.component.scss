@@ -14,12 +14,21 @@
 //  </mat-form-field>
 
 
+.hide {
+  display: none;
+}
+
+// textarea:disabled {
+//   display: none;
+// }
+// .form-control:disabled {
+//   display: none;
+// }
+
 
 .mat-form-field {
   margin-right: 30px;
 }
-
-
 
 .checkbox {
   display: flex;

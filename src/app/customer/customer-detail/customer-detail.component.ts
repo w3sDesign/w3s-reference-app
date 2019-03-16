@@ -34,6 +34,7 @@ export class CustomerDetailComponent implements OnInit {
   hasErrors = false;
   isLoading = false;
   title = '';
+
   // loadingAfterSubmit: boolean = false;
   // @ViewChild("nameInput") nameInput: ElementRef;
 

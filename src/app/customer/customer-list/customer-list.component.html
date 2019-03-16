@@ -7,15 +7,15 @@
 
 
 
-  <!-- ################################################# -->
+  <!-- ############################################################ -->
   <!-- Collapsible Expansion Panel for Search Filters-->
-  <!-- ################################################# -->
+  <!-- ############################################################ -->
 
   <mat-expansion-panel>
 
-    <!-- ################################################ -->
+    <!-- ########################################################## -->
     <!-- Expansion Header: Showing active filters -->
-    <!-- ################################################ -->
+    <!-- ########################################################## -->
 
     <mat-expansion-panel-header>
 
@@ -30,12 +30,40 @@
 
     </mat-expansion-panel-header>
 
-    <!-- ################################################ -->
-    <!-- Expansion Content: All Filter input fields -->
-    <!-- ################################################ -->
+
+    <!-- ########################################################## -->
+    <!-- Expansion Content: Customer Filter Template -->
+    <!-- ########################################################## -->
 
 
-    <!-- ################################################ -->
+
+    <!-- ========================================================== -->
+    <!-- Selecting a filter template -->
+    <!-- ========================================================== -->
+
+    <mat-form-field>
+      <mat-select [(value)]="selectedFilterTemplateName" (selectionChange)="renderFilterTemplate(selectedFilterTemplateName)">
+
+        <!-- <mat-option value="standard">Standard</mat-option> -->
+        <mat-option *ngFor="let name of filterTemplateNames" value="{{name}}">{{name}}</mat-option>
+      </mat-select>
+      <mat-hint align="start">
+        Select Filter Template
+      </mat-hint>
+    </mat-form-field>
+
+    <!-- <mat-form-field appearance="fill">
+      <mat-label>Country</mat-label>
+      <mat-select formControlName="country">
+        <mat-option *ngFor="let country of countries" value="{{country.name}}">{{country.name}}</mat-option>
+      </mat-select>
+      <mat-error>Country is required.</mat-error>
+    </mat-form-field> -->
+
+
+    <!-- ========================================================== -->
+    <!-- Search input field for searching in all customer fields -->
+    <!-- ========================================================== -->
 
     <mat-form-field style="padding-bottom: 16px">
       <input matInput #searchInput placeholder="Search">
@@ -44,43 +72,59 @@
       </mat-hint>
     </mat-form-field>
 
-    <!-- ################################################ -->
 
-    <w3s-dynamic-form [questions]="filterQuestions" (dynamicFormSubmit)="onDynamicFilterFormSubmit($event)">
+
+    <!-- ========================================================== -->
+    <!-- Generating the filter template form. -->
+    <!-- ========================================================== -->
+
+    <w3s-dynamic-form *ngIf="filterTemplateQuestions" [questions]="filterTemplateQuestions" (formSubmit)="onFilterTemplateFormSubmit($event)">
 
     </w3s-dynamic-form>
 
-    <!-- ################################################ -->
+    <!-- ========================================================== -->
+
+
+
+    <!-- ========================================================== -->
+    <!-- Filter template buttons -->
+    <!-- ========================================================== -->
 
     <div id="filterButtons">
 
-      <button mat-raised-button matTooltip="Save filters as new template, or update existing template" (click)="TODO()">
-        Save Filters
+      <!-- <button mat-raised-button matTooltip="Start searching with the provided filters." (click)="searchCustomers(dynFormComponent.form.value)">
+        Search
+      </button> -->
+
+      <button mat-raised-button matTooltip="Save current filters as new template." (click)="createFilterTemplate(dynFormComponent.form.getRawValue())">
+        Save as
       </button>
 
-      <button mat-raised-button matTooltip="Clear all filters" (click)="TODO()">
-        Clear Filters
+      <button mat-raised-button matTooltip="Save current filters (= update current template)." (click)="updateFilterTemplate(dynFormComponent.form.getRawValue())">
+        Save
       </button>
 
-      <button mat-raised-button matTooltip="Add / Remove Filters" (click)="TODO()">
+      <button mat-raised-button matTooltip="Clear all filters." (click)="dynFormComponent.form.reset()">
+        Clear all
+      </button>
+
+      <button mat-raised-button matTooltip="Add new and/or remove existing filters." (click)="TODO()">
         Settings
       </button>
 
     </div>
-    <!-- </div> -->
+    filterTemplates: {{filterTemplates | json}}
+    <br>
+    filterTemplateFormValue: {{filterTemplateFormValue | json}}
+    <br>
+    <!-- dynFormComponent.value: {{dynFormComponent.form.value | json}} -->
+    <br>
+    selectedFilterTemplateName = {{selectedFilterTemplateName}}
 
 
-
-
-
-
-
-
-
-
-    <!-- #####OLD:########################################### -->
-
-    <!-- <mat-form-field>
+    <!-- ========================================================== -->
+    <!-- OLD
+      <mat-form-field>
         <input matInput [(ngModel)]="filterById" (change)="loadCustomers()">
         <mat-error></mat-error>
         <mat-hint align="start">
@@ -97,41 +141,6 @@
       </mat-form-field>
 
       <mat-form-field>
-        <input matInput [(ngModel)]="filterByCountry" (change)="loadCustomers()">
-        <mat-error></mat-error>
-        <mat-hint align="start">
-          Country
-        </mat-hint>
-      </mat-form-field>
-
-      <mat-form-field>
-        <input matInput [(ngModel)]="filterByPostalCode" (change)="loadCustomers()">
-        <mat-error></mat-error>
-        <mat-hint align="start">
-          Postal Code
-        </mat-hint>
-      </mat-form-field>
-
-      <mat-form-field>
-        <input matInput [(ngModel)]="filterByCity" (change)="loadCustomers()">
-        <mat-error>City is required.</mat-error>
-        <mat-hint align="start">
-          City
-        </mat-hint>
-      </mat-form-field>
-
-      <mat-form-field>
-        <input matInput [(ngModel)]="filterByStreet" (change)="loadCustomers()">
-        <mat-error>Street is required.</mat-error>
-        <mat-hint align="start">
-          Street
-        </mat-hint>
-      </mat-form-field> -->
-
-    <!-- ################################################ -->
-
-    <!--
-      <mat-form-field>
         <mat-select [(value)]="filterByStatus" (selectionChange)="loadCustomers()">
           <mat-option value=""></mat-option>
           <mat-option value="0">Suspended</mat-option>
@@ -142,27 +151,21 @@
           Customer Status
         </mat-hint>
       </mat-form-field>
-
-      <mat-form-field>
-        <mat-select [(value)]="filterByType" (selectionChange)="loadCustomers()">
-          <mat-option value=""></mat-option>
-          <mat-option value="0">Business</mat-option>
-          <mat-option value="1">Individual</mat-option>
-        </mat-select>
-        <mat-hint align="start">
-          Customer Type
-        </mat-hint>
-      </mat-form-field>
-
-    </div> -->
+     -->
 
 
   </mat-expansion-panel>
 
+  <!-- Expansion panel end -->
 
-  <!-- ################################################# -->
+
+
+
+
+
+  <!-- ############################################################ -->
   <!-- CRUD - Create, Update, and Delete Buttons -->
-  <!-- ################################################# -->
+  <!-- ############################################################ -->
 
   <!-- <mat-action-row #crudButtons style="align-items: center; font-size:14px;"> -->
   <div id="crudButtons" #crudButtons>
@@ -196,9 +199,9 @@
   <mat-divider></mat-divider>
 
 
-  <!-- ################################################ -->
+  <!-- ############################################################ -->
   <!-- Material Data Table -->
-  <!-- ################################################ -->
+  <!-- ############################################################ -->
 
   <table mat-table #table matSort [dataSource]="dataSource">
 
@@ -234,9 +237,9 @@
   <!-- End data table -->
 
 
-  <!-- ################################################ -->
+  <!-- ############################################################ -->
   <!-- Bottom row - spinner and paginator -->
-  <!-- ################################################ -->
+  <!-- ############################################################ -->
   <!-- <div style="display:flex; justify-content:flex-end;"> -->
 
   <mat-action-row style="align-items: center">

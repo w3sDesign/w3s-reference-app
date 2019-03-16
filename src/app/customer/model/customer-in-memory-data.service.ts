@@ -3,7 +3,12 @@ import { Observable } from 'rxjs';
 import { InMemoryDbService } from 'angular-in-memory-web-api';
 
 import { Customer } from './customer';
+import { CustomerFilterTemplate } from './customer-filter-template';
+
 import { mockCustomers } from './mock-customers';
+import { mockCustomerFilterTemplates } from './mock-customer-filter-templates';
+import { mockCustomerFilterTemplateQuestions } from './mock-customer-filter-template-questions';
+import { QuestionBase } from '../../shared/dynamic-form/question-base';
 
 @Injectable()
 export class CustomerInMemoryDataService implements InMemoryDbService {
@@ -11,20 +16,11 @@ export class CustomerInMemoryDataService implements InMemoryDbService {
 
     const customers: Customer[] = mockCustomers;
 
-    const heroes = [
-      { id: 11, name: 'Mr. Nice' },
-      { id: 12, name: 'Narco' },
-      { id: 13, name: 'Bombasto' },
-      { id: 14, name: 'Celeritas' },
-      { id: 15, name: 'Magneta' },
-      { id: 16, name: 'RubberMan' },
-      { id: 17, name: 'Dynama' },
-      { id: 18, name: 'Dr IQ' },
-      { id: 19, name: 'Magma' },
-      { id: 20, name: 'Tornado' }
-    ];
+    const customerFilterTemplates: CustomerFilterTemplate[] = mockCustomerFilterTemplates;
 
-    return { customers, heroes };
+    const customerFilterTemplateQuestions: QuestionBase[] = mockCustomerFilterTemplateQuestions;
+
+    return { customers, customerFilterTemplates, customerFilterTemplateQuestions };
   }
 
   // Overrides the genId method to ensure that a hero always has an id.

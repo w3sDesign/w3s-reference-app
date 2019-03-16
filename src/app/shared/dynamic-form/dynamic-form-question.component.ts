@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { QuestionBase } from './question-base';
@@ -8,10 +8,16 @@ import { QuestionBase } from './question-base';
   templateUrl: './dynamic-form-question.component.html',
   styleUrls: ['./dynamic-form-question.component.scss']
 })
-export class DynamicFormQuestionComponent {
+export class DynamicFormQuestionComponent implements OnInit {
 
   @Input() form: FormGroup;
   @Input() question: QuestionBase;
+
+  ngOnInit() {
+    if (this.question.isDisabled) {
+      this.form.controls[this.question.key].disable();
+    }
+  }
 
   get isValid() {
     return this.form.controls[this.question.key].valid;

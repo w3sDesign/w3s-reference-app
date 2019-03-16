@@ -14,7 +14,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 
-import { SharedMaterialModule } from './shared/shared-material.module';
 
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
 import { MessageSnackBarComponent } from './shared/message-snack-bar/message-snack-bar.component';
@@ -22,15 +21,16 @@ import { MessageSnackBarComponent } from './shared/message-snack-bar/message-sna
 import { HttpErrorHandler } from './shared/http-error-handler.service';
 import { HttpUtilsService } from './shared/http-utils.service';
 import { MessageService } from './shared/message.service';
-// import { MatSnackBarModule } from '@angular/material';
-// import { MatSnackBarContainer } from '@angular/material';
 
-// import { MatSnackBar, MatSnackBarContainer } from '@angular/material';
+import { SharedMaterialModule } from './shared/shared-material.module';
 
-// import { DynamicFormComponent } from './shared/dynamic-form/dynamic-form.component';
-// import { DynamicFormQuestionComponent } from './shared/dynamic-form/dynamic-form-question.component';
+import { DynamicFormComponent } from './shared/dynamic-form/dynamic-form.component';
+import { DynamicFormQuestionComponent } from './shared/dynamic-form/dynamic-form-question.component';
+import { HighlightDirective } from './shared/directives/highlight.directive';
+import { InputDialogComponent } from './shared/input-dialog/input-dialog.component';
 
 @NgModule({
+
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -41,35 +41,33 @@ import { MessageService } from './shared/message.service';
     // MatSnackBarModule,
     AppRoutingModule,
   ],
+
   declarations: [
     AppComponent,
     HomeComponent,
     MessageDialogComponent,
     MessageSnackBarComponent,
-    // DynamicFormComponent,
-    // DynamicFormQuestionComponent,
+    InputDialogComponent,
   ],
+
   entryComponents: [
     MessageDialogComponent,
     MessageSnackBarComponent,
-    // MatSnackBarContainer
+    InputDialogComponent,
   ],
+
   providers: [
     HttpErrorHandler,
     HttpUtilsService,
     MessageService,
-    // MatSnackBar,
-    // MatSnackBarContainer
   ],
+
   exports: [
     MessageDialogComponent,
     MessageSnackBarComponent,
-    // MatSnackBarContainer
-    // MessageDialogComponent, SharedMaterialModule,
-    // HttpErrorHandler,
-    // HttpUtilsService,
-    // MessageService,
   ],
+
   bootstrap: [AppComponent]
 })
+
 export class AppModule { }

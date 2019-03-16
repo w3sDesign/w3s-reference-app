@@ -2,13 +2,29 @@ import { Injectable } from '@angular/core';
 
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
 
-
 @Injectable()
-export class FilterService { 
+export class FilterTemplateQuestionService {
 
-  getFilters() {
+  getQuestions() {
 
-    const filters: QuestionBase[] = [
+    const questions: QuestionBase[] = [
+      {
+        key: 'templateId',
+        value: ' ',
+        label: 'Template Id',
+        controlType: 'textbox',
+        inputType: 'text',
+        order: 2,
+      },
+      {
+        key: 'templateName',
+        value: '',
+        label: 'Template Name',
+        controlType: 'textbox',
+        inputType: 'text',
+        order: 3,
+      },
+
 
       {
         key: 'id', // customer id
@@ -16,7 +32,7 @@ export class FilterService {
         label: 'Filter by Id',
         controlType: 'textbox',
         inputType: 'text',
-        order: 10,
+        order: 4,
       },
       {
         key: 'name', // customer name
@@ -24,7 +40,7 @@ export class FilterService {
         label: 'Filter by Name',
         controlType: 'textbox',
         inputType: 'text',
-        order: 20,
+        order: 5,
       },
       {
         key: 'city',
@@ -32,14 +48,7 @@ export class FilterService {
         label: 'Filter by City',
         controlType: 'textbox',
         inputType: 'textarea',
-        order: 30,
-      },
-      {
-        key: 'cityCheckbox',
-        value: '',
-        label: 'Filter by City',
-        controlType: 'checkbox',
-        order: 31,
+        order: 6,
       },
       {
         key: 'email',
@@ -47,7 +56,7 @@ export class FilterService {
         label: 'Filter by Email',
         controlType: 'textbox',
         inputType: 'text',
-        order: 40,
+        order: 10,
       },
       {
         key: 'status',
@@ -59,48 +68,15 @@ export class FilterService {
           { key: 'good', value: 'Good' },
           { key: 'unproven', value: 'Unproven' }
         ],
-        order: 50
+        order: 11
+      }
 
-
-      }];
-
-    return filters.sort((a, b) => a.order - b.order);
-
-  }
-
-
-
-
-  getSelectFilters() {
-
-    const filters: QuestionBase[] = [
-      {
-        key: 'name',
-        value: '',
-        label: 'Filter by Name',
-        controlType: 'checkbox',
-        order: 1,
-      },
-      {
-        key: 'city',
-        value: '',
-        label: 'Filter by City',
-        controlType: 'checkbox',
-        order: 1,
-      },
-      {
-        key: 'email',
-        value: '',
-        label: 'Filter by Email',
-        controlType: 'checkbox',
-        order: 1,
-      },
     ];
 
-    return filters.sort((a, b) => a.order - b.order);
+    return questions.sort((a, b) => a.order - b.order);
 
   }
 
-
-
 }
+
+

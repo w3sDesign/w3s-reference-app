@@ -18,10 +18,10 @@ export const mockFilterTemplates: FilterTemplate[] = [
     person: '',
     phone: '',
     email: ''
-  }, 
-  
+  },
+
   {
-    templateId: 1, 
+    templateId: 1,
     templateName: 'myTemplate',
     templateComment: '',
 

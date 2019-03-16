@@ -1,12 +1,8 @@
 import { NgModule } from '@angular/core';
-
-// CommonModule instead of BrowserModule
-// (BrowserModule only in the root AppModule).
 import { CommonModule } from '@angular/common';
-// import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { LayoutModule } from '@angular/cdk/layout';
+import { CustomerRoutingModule } from './customer-routing.module';
+import { SharedModule } from '../shared/shared.module';
 
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
@@ -15,41 +11,21 @@ import { environment } from '../../environments/environment';
 
 import { CustomerRootComponent } from './customer-root/customer-root.component';
 import { CustomerListComponent } from './customer-list/customer-list.component';
-import { CustomerDetailComponent, CustomerDetailDialogComponent } from './customer-detail/customer-detail.component';
+import {
+  CustomerDetailComponent,
+  CustomerDetailDialogComponent
+} from './customer-detail/customer-detail.component';
 import { HttpCustomerService } from './model/http-customer.service';
-import { CustomerRoutingModule } from './customer-routing.module';
-  
-// import { HttpUtilsService } from '../common/http-utils.service';
-// import { TypesUtilsService } from '../common/types-utils.service';
-
-import { SharedMaterialModule } from '../shared/shared-material.module';
-
-// import { MatSnackBarModule } from '@angular/material';
-
-// import { MatSnackBarContainer } from '@angular/material';
-
-import { DynamicFormComponent } from '../shared/dynamic-form/dynamic-form.component';
-import { DynamicFormQuestionComponent } from '../shared/dynamic-form/dynamic-form-question.component';
-
-import { HighlightDirective } from '../shared/directives/highlight.directive';
-
-import { FilterService } from './model/filter.service';
-import { FilterDetailComponent } from './filter-detail/filter-detail.component';
-import { FilterTemplateDetailComponent } from './filter-template-detail/filter-template-detail.component';
-import { FilterTemplateQuestionService } from './model/filter-template-question.service';
+import { questionsConfig, customerConfig } from './model/customer.config';
 
 
 @NgModule({
+
   imports: [
     CommonModule,
-    // BrowserAnimationsModule,
-    FormsModule,
-    ReactiveFormsModule,
-    LayoutModule,
-    SharedMaterialModule,
-    // MatSnackBarModule,
-    CustomerRoutingModule,
-
+    // FormsModule,
+    // ReactiveFormsModule,
+    // LayoutModule,
     HttpClientModule,
     //  The HttpClientInMemoryWebApiModule module intercepts HTTP requests
     //  and returns simulated server responses.
@@ -61,34 +37,33 @@ import { FilterTemplateQuestionService } from './model/filter-template-question.
           delay: 350,
           dataEncapsulation: false
         }),
+    CustomerRoutingModule,
+    SharedModule,
   ],
+
   declarations: [
     CustomerRootComponent,
     CustomerListComponent,
     CustomerDetailComponent,
     CustomerDetailDialogComponent,
-
-    DynamicFormComponent,
-    DynamicFormQuestionComponent,
-    HighlightDirective,
-    FilterDetailComponent,
-    FilterTemplateDetailComponent,
   ],
+
   entryComponents: [
     CustomerDetailDialogComponent,
-    // MatSnackBarContainer
   ],
+
   providers: [
     HttpCustomerService,
     // {provide: CustomerService, useClass: HttpCustomerService},
-    FilterService,
     CustomerInMemoryDataService,
-    FilterTemplateQuestionService
+    // { provide: customerConfig, useValue: questionsConfig}
   ],
+
   exports: [
     // CustomerListComponent,
     // CustomerDetailComponent,
     // CustomerDetailDialogComponent,
   ]
 })
+
 export class CustomerModule { }

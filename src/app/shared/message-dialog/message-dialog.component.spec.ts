@@ -3,7 +3,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import { MessageDialogComponent } from './message-dialog.component';
-import { SharedMaterialModule } from '../../shared/shared-material.module';
+import { SharedMaterialModule } from '../shared-material.module';
 
 describe('MessageDialogComponent', () => {
   let component: MessageDialogComponent;

@@ -3,11 +3,21 @@ import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
 
 import { HomeComponent } from './home/home.component';
 
+import { CustomerModule } from './customer/customer.module';
+
 
 const routes: Routes = [
- {
+  {
     path: 'customers',
-    loadChildren: './customer/customer.module#CustomerModule'
+    // err can't find module CustomerModule!!?
+    // loadChildren: './customer/customer.module#CustomerModule'
+    // loadChildren: '../src/app/customer/customer.module#CustomerModule'
+
+    loadChildren: () => CustomerModule
+  },
+  {
+    path: 'filter-templates',
+    loadChildren: './filter-template/filter-template.module#FilterTemplateModule'
   },
   {
     path: '', component: HomeComponent

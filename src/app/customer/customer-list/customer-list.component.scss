@@ -38,7 +38,11 @@ mat-expansion-panel {
   // padding: 0 8px 16px 0;
   width: 100%;
   align-items: xbaseline;
-}
+
+  .mat-form-field,
+  button {
+    margin-right: 30px;
+  }}
 
 #filterButtons {
   @extend %flex-box;

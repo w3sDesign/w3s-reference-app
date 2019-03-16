@@ -20,6 +20,8 @@ import { QueryResult } from '../../shared/query-result';
 import { MatSnackBar } from '@angular/material';
 import { MessageSnackBarComponent } from '../../shared/message-snack-bar/message-snack-bar.component';
 import { Overlay } from '@angular/cdk/overlay';
+import { CustomerFilterTemplate } from './customer-filter-template';
+import { QuestionBase } from '../../shared/dynamic-form/question-base';
 
 /**
  * Re-exporting HttpCustomerService as CustomerService,
@@ -43,6 +45,9 @@ const cudOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/jso
 export class HttpCustomerService extends CustomerService {
 
   private handleError: HandleError;
+
+  private filterTemplate: CustomerFilterTemplate;
+
 
   constructor(
     private http: HttpClient,
@@ -70,7 +75,6 @@ export class HttpCustomerService extends CustomerService {
         catchError(this.handleError<Customer>(`Get customer id=${id}`))
       );
   }
-
 
   /**
    * ##################################################################
@@ -111,6 +115,96 @@ export class HttpCustomerService extends CustomerService {
   }
 
 
+
+
+
+  /**
+    * ##################################################################
+    * Get a customer filter template by id.
+    * ##################################################################
+    */
+  getCustomerFilterTemplate(id: number): Observable<CustomerFilterTemplate> {
+    return this.http.get<CustomerFilterTemplate>(this.customerFilterTemplatesUrl + `/${id}`)
+      .pipe(
+        catchError(this.handleError<CustomerFilterTemplate>(`Get customerFilterTemplate id=${id}`))
+      );
+  }
+
+
+  /**
+   * ##################################################################
+   * Get all customer filter templates.
+   * ##################################################################
+   */
+  getCustomerFilterTemplates(): Observable<CustomerFilterTemplate[]> {
+    return this.http.get<CustomerFilterTemplate[]>(this.customerFilterTemplatesUrl)
+      .pipe(
+        catchError(this.handleError<CustomerFilterTemplate[]>('Get customerFilterTemplates'))
+      );
+  }
+
+
+  /**
+   * ##################################################################
+   * Get all customer filter template questions.
+   * ##################################################################
+   */
+
+  getCustomerFilterTemplateQuestions(filterTemplateName: string = 'standard'): Observable<QuestionBase[]> {
+
+    // // const filterTemplate = this.helper(filterTemplateName);
+    // this.getCustomerFilterTemplates()
+    //   .subscribe(
+    //     res => {
+    //       this.filterTemplate = res[0];
+    //       // let arr = [];
+    //       // const arr = res.filter(el => el.name === tmplName);
+    //       // return arr[0];
+    //     }
+    //   );
+
+    return this.http.get<QuestionBase[]>(this.customerFilterTemplateQuestionsUrl)
+      .pipe(
+        // tap(res => {
+        //   res.forEach(el => {
+        //     el.value = filterTemplate[el.key];
+        //   });
+        // }),
+
+        // mergeMap(res => {
+        //   const questions: QuestionBase[] = res;
+        //   // id -> customerId, name -> customerName, ...
+        //   // const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
+
+        //   questions.forEach(question => {
+        //     // question.value = this.filterTemplate['customer' + capitalize(question.key)];
+        //     question.value = this.filterTemplate[question.key];
+        //   });
+
+        //   return of(questions);
+        // }),
+
+        catchError(this.handleError<QuestionBase[]>('Get customerFilterTemplateQuestions'))
+      );
+  }
+
+
+  // helper(tmplName: string) {
+
+  //   this.getCustomerFilterTemplates()
+  //     .subscribe(
+  //       res => {
+  //         this.filterTemplate = res[0];
+  //         // let arr = [];
+  //         // const arr = res.filter(el => el.name === tmplName);
+  //         // return arr[0];
+  //       }
+  //     );
+
+  // }
+
+
+
   /**
    * ##################################################################
    * TODO
@@ -137,17 +231,34 @@ export class HttpCustomerService extends CustomerService {
    * ##################################################################
    */
   createCustomer(customer: Customer): Observable<Customer> {
+    const message = `Customer with id = ${customer.id} and name = ${customer.name} has been created.`;
     return this.http.post<Customer>(this.customersUrl, customer, cudOptions)
       .pipe(
-        catchError(this.handleError<Customer>('Create customer')),
-        // tap((cust: Customer) => this.log(`Create customer id=${cust.id}`))
+        tap(() => this.openSnackBar(message)),
+        tap(() => this.log(message)),
+        catchError(this.handleError<Customer>(message.replace('has been', 'has not been'))),
+        );
+  }
+
+  /**
+     * ##################################################################
+     * Create a customer filter template on the remote data server.
+     * ##################################################################
+     */
+  createCustomerFilterTemplate(filterTemplate: CustomerFilterTemplate): Observable<CustomerFilterTemplate> {
+    const message = `Filter template with id = ${filterTemplate.id} and name = ${filterTemplate.name} has been created.`;
+    return this.http.post<CustomerFilterTemplate>(this.customerFilterTemplatesUrl, filterTemplate, cudOptions)
+      .pipe(
+        tap(() => this.openSnackBar(message)),
+        tap(() => this.log(message)),
+        catchError(this.handleError<CustomerFilterTemplate>(message.replace('has been', 'has not been'))),
       );
   }
 
 
   /**
    * ##################################################################
-   * Update the customer on the remote data server.
+   * Update a customer on the remote data server.
    * Returns the updated customer upon success.
    *
    * PUT - Null response expected.
@@ -155,7 +266,7 @@ export class HttpCustomerService extends CustomerService {
    */
   updateCustomer(customer: Customer): Observable<Customer> {
     // const httpHeader = this.httpUtils.getHttpHeaders();
-    const message = `Customer ${customer.id} updated.`;
+    const message = `Customer with id = ${customer.id} and name = ${customer.name} has been updated.`;
     return this.http.put<Customer>(this.customersUrl, customer, cudOptions)
       .pipe(
         tap(() => this.openSnackBar(message)),
@@ -163,6 +274,24 @@ export class HttpCustomerService extends CustomerService {
         catchError(this.handleError('updateCustomer', customer)),
       );
   }
+
+  /**
+     * ##################################################################
+     * Update a customer filter template on the remote data server.
+     * ##################################################################
+     */
+  updateCustomerFilterTemplate(customerFilterTemplate: CustomerFilterTemplate): Observable<CustomerFilterTemplate> {
+    // const httpHeader = this.httpUtils.getHttpHeaders();
+    const message = `CustomerFilterTemplate with id = ${customerFilterTemplate.id} and
+        name = ${customerFilterTemplate.name} has been updated.`;
+    return this.http.put<CustomerFilterTemplate>(this.customerFilterTemplatesUrl, customerFilterTemplate, cudOptions)
+      .pipe(
+        tap(() => this.openSnackBar(message)),
+        tap(() => this.log(message)),
+        catchError(this.handleError('updateCustomerFilterTemplate', customerFilterTemplate)),
+      );
+  }
+
 
 
   /**
@@ -224,7 +353,7 @@ export class HttpCustomerService extends CustomerService {
   private openSnackBar(message: string) {
     this.snackBar.openFromComponent(MessageSnackBarComponent, {
       data: message,
-      duration: 3000,
+      duration: 5000,
       verticalPosition: 'top',
       panelClass: 'w3s-snack-bar', // adds to snack-bar-container
     });
@@ -232,7 +361,7 @@ export class HttpCustomerService extends CustomerService {
 
   private openSnackBarSimple(message: string, action: string) {
     this.snackBar.open(message, action, {
-      duration: 2000,
+      duration: 3000,
       verticalPosition: 'top',
       panelClass: 'w3s-snack-bar', /* added to snack-bar-container */
     });

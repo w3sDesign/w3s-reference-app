@@ -8,10 +8,11 @@ export class QuestionBase {
   label?= '';
   controlType = '';
   inputType?= '';
-  options?: { key: string, value: string }[] = [];
-  templateRefVar?= '';
-  required?= false;
   order?= 0;
+  required?= false;
+  isDisabled?= false;
+
+  options?: { key: string, value: string }[] = [];
 }
 
 

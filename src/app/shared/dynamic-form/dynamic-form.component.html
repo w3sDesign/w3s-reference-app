@@ -1,5 +1,7 @@
 <div>
-  <form (ngSubmit)="onSubmit()" [formGroup]="form" [ngClass]="formClass">
+
+  <form (ngSubmit)="onSubmit()" *ngIf="form" [formGroup]="form" [ngClass]="formClass">
+
 
     <div *ngFor="let question of questions">
 
@@ -14,7 +16,7 @@
     </div>
 
 
-        <button type="submit" mat-raised-button matTooltip="Start Searching" [disabled]="!form.valid">Search</button>
+    <button type="submit" *ngIf="form" mat-raised-button matTooltip="Start Searching" [disabled]="!form.valid">Search</button>
 
 
   </form>

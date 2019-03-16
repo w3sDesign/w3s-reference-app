@@ -6,7 +6,7 @@ import { Component, ElementRef, OnInit, ViewChild, ViewContainerRef } from '@ang
 
 import { MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort } from '@angular/material';
 
-import { fromEvent, merge } from 'rxjs';
+import { fromEvent, merge, Observable } from 'rxjs';
 //
 import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
 import { CustomerDataSource } from '../model/customer.datasource';
@@ -24,8 +24,13 @@ import { Router } from '@angular/router';
 import { MessageSnackBarComponent } from '../../shared/message-snack-bar/message-snack-bar.component';
 
 import { DynamicFormComponent } from '../../shared/dynamic-form/dynamic-form.component';
-import { FilterService } from '../model/filter.service';
+import { DynamicFormQuestionComponent } from '../../shared/dynamic-form/dynamic-form-question.component';
 import { FormGroup } from '@angular/forms';
+import { QuestionBase } from '../../shared/dynamic-form/question-base';
+import { CustomerFilterTemplate } from '../model/customer-filter-template';
+import { mockCustomerFilterTemplateQuestions } from '../model/mock-customer-filter-template-questions';
+import { mockCustomerFilterTemplates } from '../model/mock-customer-filter-templates';
+import { InputDialogComponent } from '../../shared/input-dialog/input-dialog.component';
 
 
 
@@ -76,44 +81,88 @@ export class CustomerListComponent implements OnInit {
   // filterByStatus = '';
   // filterByType = '';
 
-  filterFormValue: any = {};
-
-
-  // filterById: number;
-  // filterByName = '';
-
-  // filterByCountry = '';
-  // filterByPostalCode = '';
-  // filterByCity = '';
-  // filterByStreet = '';
 
   @ViewChild('crudButtons', { read: ViewContainerRef })
   crudButtons;
 
+  /** For handling selection of data table rows. */
   selection = new SelectionModel<Customer>(true, []);
-  //
-
-  filterQuestions: any[];
 
 
 
-  // Injecting services.
-  // #################################################
+  /** Reference to the dynamic form component (CustomerFilterTemplate) */
+  @ViewChild(DynamicFormComponent)
+  dynFormComponent: DynamicFormComponent;
+
+  /**
+   * Questions for generating the dynamic form:
+   * <w3s-dynamic-form [questions]="filterTemplateQuestions" ...
+   */
+  // filterTemplateQuestions: QuestionBase[];
+  // TODO? loading from server must be before app! APP-INITIALIZE?
+  filterTemplateQuestions: QuestionBase[] = mockCustomerFilterTemplateQuestions;
+
+
+  /** Filter templates */
+  filterTemplates: CustomerFilterTemplate[]; // mockCustomerFilterTemplates;
+
+  // selectedFilterTemplate: CustomerFilterTemplate;
+
+  filterTemplateNames: string[] = [];
+
+  selectedFilterTemplateName = 'standard';
+
+  filterTemplateFormValue: any = {};
+
+
+
+
+  // ##################################################################
   constructor(
+
     private router: Router,
-    private customerService: CustomerService,
-    // private httpErrorHandler: HttpErrorHandler,
     private dialog: MatDialog,
-    // private snackBar: MatSnackBar
-    filterQuestionService: FilterService,
+
+    private customerService: CustomerService,
+
+    // Question service now included in customer service.
+    // private questionService: CustomerFilterTemplateQuestionService,
   ) {
-    this.filterQuestions = filterQuestionService.getFilters();
+    // this.filterTemplateQuestions = this.questionService.getQuestions();
   }
 
 
+  // ##################################################################
   ngOnInit() {
 
-    // If the user changes the sort order, reset back to the first page.
+    // /** Getting the questions for generating w3s-dynamic-form. */
+    // this.customerService.getCustomerFilterTemplateQuestions()
+    //   .subscribe(
+    //     res => {
+    //       this.filterTemplateQuestions = res;
+    //       // console.log('################################' + JSON.stringify(this.filterTemplateQuestions));
+    //     }
+    //   );
+
+    /** Getting the filter templates and names. */
+    this.customerService.getCustomerFilterTemplates()
+      .subscribe(
+        res => {
+          this.filterTemplates = res;
+          for (let i = 0; i < res.length; i++) {
+            this.filterTemplateNames[i] = res[i].name;
+          }
+
+          this.selectedFilterTemplateName = 'standard';
+          this.renderFilterTemplate(this.selectedFilterTemplateName);
+          // console.log(this.filterTemplateNames);
+        }
+      );
+
+
+
+
+    /** If the user changes the sort order, reset back to the first page. */
     this.sort.sortChange
       .subscribe(
         () => this.paginator.pageIndex = 0
@@ -148,7 +197,7 @@ export class CustomerListComponent implements OnInit {
     queryParams.filter = this.filterConfig(false);
 
     // Initial data load.
-    // ########################################
+    // ################################################################
     this.dataSource = new CustomerDataSource(this.customerService);
     this.dataSource.loadCustomers(queryParams);
 
@@ -159,23 +208,60 @@ export class CustomerListComponent implements OnInit {
   }
 
 
+
+
+
+  /**
+   * ##################################################################
+   * Render the selected filter template.
+   * ##################################################################
+   */
+
+  renderFilterTemplate(name: string) {
+
+    const arr = this.filterTemplates.filter(template => template.name === name);
+    const filterTemplate = arr[0];
+
+    this.dynFormComponent.setFormValue(filterTemplate);
+    // this.loadCustomers();
+  }
+
+
+
+
+  /**
+   * Filter template form commit.
+   */
+  onFilterTemplateFormSubmit(value) {
+    this.filterTemplateFormValue = value;
+    // this.selectedFilterTemplate = value;
+    this.loadCustomers();
+  }
+
+  /**
+   * Filter template form commit.
+   */
+  // searchCustomers(filterTemplate: CustomerFilterTemplate) {
+  //   // this.filterTemplateFormValue = filterTemplate;
+  //   this.selectedFilterTemplate = filterTemplate;
+  //   this.loadCustomers();
+  // }
+
+
+
   /**
    * ##################################################################
    * Load customers.
    * ##################################################################
    */
-  onDynamicFilterFormSubmit(value) {
-    this.filterFormValue = value;
-    this.loadCustomers();
-  }
-
   loadCustomers() {
 
     const queryParams = new QueryParams();
 
     /** Setting filters based on search criteria */
     // queryParams.filter = this.filterConfig(true);
-    queryParams.filter = this.filterFormValue;
+    queryParams.filter = this.filterTemplateFormValue;
+    // queryParams.filter = this.selectedFilterTemplate;
 
     queryParams.sortOrder = this.sort.direction;
     queryParams.sortField = this.sort.active; /** The id of the column being sorted. */
@@ -264,6 +350,69 @@ export class CustomerListComponent implements OnInit {
 
   /**
    * ##################################################################
+   * Create a filter template.
+   * ##################################################################
+   */
+  createFilterTemplate(filterTemplate: CustomerFilterTemplate) {
+
+    const dialogRef = this.dialog.open(InputDialogComponent, {
+      data: {
+        title: 'Save as',
+        message: `Please enter the filter template name`,
+        name: '',
+      }
+    });
+
+    dialogRef.afterClosed()
+      .subscribe(
+        name => {
+          if (!name) { return; }
+
+          filterTemplate.name = name;
+          filterTemplate.id = null;
+
+          /** Delegating to customer service */
+          this.customerService.createCustomerFilterTemplate(filterTemplate)
+            .subscribe(
+              () => {
+                this.customerService.getCustomerFilterTemplates()
+                  .subscribe(
+                    (res) => {
+                      this.filterTemplates = res;
+                      // console.log('#######this.filterTemplates = ' + JSON.stringify(this.filterTemplates));
+
+                      this.filterTemplateNames = [];
+                      for (let i = 0; i < res.length; i++) {
+                        this.filterTemplateNames[i] = res[i].name;
+                      }
+
+                      this.selectedFilterTemplateName = filterTemplate.name;
+                      this.renderFilterTemplate(this.selectedFilterTemplateName);
+
+
+                      // Also update the in memory filter templates (this.filterTemplates)
+                      // and filter template names.
+                      // TODO
+                      // const idx = this.filterTemplates.findIndex(element => element.id === filterTemplate.id);
+                      // this.filterTemplates[idx] = filterTemplate;
+                    },
+                    // err handled in customerService
+                  );
+              }
+            );
+        }
+      );
+
+  }
+
+
+
+
+
+
+
+  /**
+   * ##################################################################
    * Update selected customers (by opening a modal dialog.
    * TODO: multiple selections
    * ##################################################################
@@ -294,7 +443,7 @@ export class CustomerListComponent implements OnInit {
     dialogConfig.data = { customer };
 
     // Open modal dialog and load CustomerDetailDialogComponent.
-    // #########################################################
+    // ################################################################
     const dialogRef = this.dialog.open(CustomerDetailDialogComponent, dialogConfig);
 
     dialogRef.afterClosed()
@@ -308,8 +457,31 @@ export class CustomerListComponent implements OnInit {
 
 
   /**
-   * Navigate to customer detail.
+   * ##################################################################
+   * Update a filter template.
+   * ##################################################################
    */
+  updateFilterTemplate(filterTemplate: CustomerFilterTemplate) {
+    this.customerService.updateCustomerFilterTemplate(filterTemplate)
+      .subscribe(
+        () => {
+          // Also update the in memory filter templates (this.filterTemplates).
+          const idx = this.filterTemplates.findIndex(element => element.id === filterTemplate.id);
+          this.filterTemplates[idx] = filterTemplate;
+        },
+        // err handled in customerService
+      );
+  }
+
+
+
+
+
+
+
+  /**
+  * Navigate to customer detail.
+  */
   onSelect(row: Customer) {
     this.selectedCustomer = row;
     this.router.navigate(['/customers', row.id]);
@@ -356,7 +528,7 @@ export class CustomerListComponent implements OnInit {
           }
 
           // Delete identified (selected) customers.
-          // #######################################
+          // ##########################################################
           this.customerService.deleteCustomers(ids)
             .subscribe(
               () => {
