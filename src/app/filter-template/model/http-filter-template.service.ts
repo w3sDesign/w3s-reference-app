@@ -90,7 +90,7 @@ export class HttpFilterTemplateService extends FilterTemplateService {
       return this.http.get<FilterTemplate[]>(this.filterTemplatesUrl)
         .pipe(
           mergeMap(res => {
-            const queryResult = this.httpUtils.query(res, queryParams);
+            const queryResult = this.httpUtils.filterAndSort(res, queryParams);
             return of(queryResult);
           }),
           catchError(this.handleError('getFilterTemplates with queryParams', new QueryResult()))

@@ -1,16 +1,4 @@
-export interface Address {
-  type: number;
-  street: string;
-  postalCode: string;
-  city: string;
-  country: string;
-}
-
-// TODO
-export type CustomerType = 'business' | 'individual';
-
-
-export class Customer {
+ export class Customer {
   // Basic Data
   id = 0;
   name = ''; // 'A' || 'B';
@@ -18,23 +6,18 @@ export class Customer {
   status = 1; // 0 = Active | 1 = Suspended | Pending = 2
   comment = '';
   creationDate = '';
-
-  // Main address
-  street = '';
+  // Addresses
+  country = '';
+  // region: string = '';
   postalCode = '';
   city = '';
-  country = '';
-  // Addresses
-  // addresses: Address[];
-
-  // Main contact
+  street = '';
+  // Contacts
   department = '';
   person = '';
   phone = '';
   email = '';
-  // Contacts
-  // contacts: Contact[];
-}
+  }
 
 
   // homepage?: string

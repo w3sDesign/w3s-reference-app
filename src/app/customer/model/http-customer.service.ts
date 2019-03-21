@@ -80,10 +80,8 @@ export class HttpCustomerService extends CustomerService {
    * ##################################################################
    * Get customers from the remote http data server.
    *
-   * This code emulates real server response (by getting all customers
-   * and performing client-side filtering, sorting, and pagination).
-   *
-   * If no params specified, all customers are returned.
+   * This code emulates real server response by getting all customers
+   * and performing client-side filtering, sorting, and pagination.
    *
    * Note: getCustomers() returns QueryResult
    *       http.get()     returns Customer[]
@@ -94,7 +92,9 @@ export class HttpCustomerService extends CustomerService {
       return this.http.get<Customer[]>(this.customersUrl)
         .pipe(
           mergeMap(res => {
-            const queryResult = this.httpUtils.query(res, queryParams);
+            // ===============================================================
+            const queryResult = this.httpUtils.filterAndSort(res, queryParams);
+            // ===============================================================
             return of(queryResult);
           }),
           catchError(this.handleError('getCustomers with queryParams', new QueryResult()))

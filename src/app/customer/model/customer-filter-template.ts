@@ -1,3 +1,13 @@
+// export const customerFilterMap = {
+//   customerId: 'id',
+//   customerName: 'name',
+//   customerStreet: 'addresses[0].street',
+//   customerPostalCode: 'addresses[0].postalCode',
+//   customerCity: 'addresses[0].city',
+//   customerCountry: 'addresses[0].country',
+// };
+
+
 export class CustomerFilterTemplate {
 
   id = 0;
@@ -7,10 +17,10 @@ export class CustomerFilterTemplate {
   customerName = '';
 
   // Addresses
-  // customerCountry = '';
+  // customerStreet = '';
   customerPostalCode = '';
   customerCity = '';
-  // customerStreet = '';
+  // customerCountry = '';
 
   // Contacts
   // customerDepartment = '';

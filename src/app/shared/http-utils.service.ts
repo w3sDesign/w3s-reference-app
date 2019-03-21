@@ -5,6 +5,25 @@ import { QueryParams } from './query-params';
 import { QueryResult } from './query-result';
 import * as _ from 'lodash';
 
+/**
+   * ##################################################################
+   * Mapping filter key to target key.
+   * TODO ? Should be in customer package
+   * - customer-utils.service
+   * ##################################################################
+   */
+// const filterMap = {
+//   customerId: 'id',
+//   customerName: 'name',
+//   customerStreet: 'addresses[0].street',
+//   customerPostalCode: 'addresses[0].postalCode',
+//   customerCity: 'addresses[0].city',
+//   customerCountry: 'addresses[0].country',
+
+//   filterByProductId: 'id'
+// };
+
+
 @Injectable({ providedIn: 'root' })
 export class HttpUtilsService {
 
@@ -29,16 +48,17 @@ export class HttpUtilsService {
 
   /**
    * ##################################################################
-   * Client side filtering, sorting, and pagination.
+   * Client side filtering and sorting.
    * ##################################################################
    */
-  query(items: any[], queryParams: QueryParams): QueryResult {
+
+  filterAndSort(items: any[], queryParams: QueryParams): QueryResult {
 
     let filteredItems: any[] = items;
     const filterTemplate = queryParams.filter;
 
-    let notPassedTests = 0;
-    let hasPassedTests = true;
+    // let notPassedTests = 0;
+    let hasPassedTests: boolean;
 
     // function isNumber(obj) {
     //   return obj !== undefined && typeof (obj) === 'number' && !isNaN(obj);
@@ -57,46 +77,66 @@ export class HttpUtilsService {
 
 
     /**
-     * Returns only items that pass all tests (filter criteria).
+     * ==================================================================
+     * Filtering
+     * Filtered items have passed all tests (filter criteria).
+     * ==================================================================
      */
+
+    // JS array.filter() method
+    // For each item in the items array (item = customer, product, ...).
     filteredItems = items.filter(item => {
 
-      notPassedTests = 0;
+      // notPassedTests = 0;
       hasPassedTests = true;
 
+      // For each filter in the filter template object.
       Object.keys(filterTemplate).forEach(key => { // key = 'customerId', 'customerName', ...
 
-        if (filterTemplate[key]) {
 
-          // Transform for example: key = 'customerId' to itemKey = 'id'.
-          // const itemKey = key.replace(/([a-z]+)([A-Z])(\w+)/, '$2$3');
-          let itemKey = key.replace(/^([a-z]+)([A-Z])/, (match, p1, p2) => p2.toLowerCase());
+        // For example, transform: key = 'customerPostalCode' to itemKey = 'postalCode'.
+        // const itemKey = key.replace(/([a-z]+)([A-Z])(\w+)/, '$2$3');
+        // For better performance:
+        const itemKey = key.replace(/^([a-z]+)([A-Z])/, (match, p1, p2) => p2.toLowerCase());
 
-          if (typeof (item[itemKey]) === 'number') {
+        // For better performance:
+        // const itemKey = filterMap[key];
+        // const itemKey = key;
 
-            if (filterTemplate[key].substring(0, 1) === '>') {
-              if (item[itemKey] < +filterTemplate[key].substring(1)) {
-                hasPassedTests = false;
-              }
-            } else if (filterTemplate[key].substring(0, 1) === '<') {
-              if (item[itemKey] > +filterTemplate[key].substring(1)) {
-                hasPassedTests = false;
-              }
-            } else
-              if (item[itemKey] !== +filterTemplate[key]) {
-                hasPassedTests = false;
-              }
-          } else
+        const data = item[itemKey];
+        const filter = filterTemplate[key].trim().toLowerCase();
 
-            if (typeof (item[itemKey]) === 'string') {
 
-              if (item[itemKey].toLowerCase().indexOf(filterTemplate[key].toLowerCase()) === -1) {
-                hasPassedTests = false;
-              }
+        if (filter && hasPassedTests) {
 
-              // other tests ...
+          if (typeof (data) === 'string') {
+
+            if (data.toLocaleLowerCase().indexOf(filter) === -1) {
+              hasPassedTests = false;
             }
+
+          } else if (typeof (data) === 'number') {
+
+            if (filter.substring(0, 1) === '>') {
+              if (data <= +filter.substring(1)) {
+                hasPassedTests = false;
+              }
+            } else if (filter.substring(0, 1) === '<') {
+              if (data >= +filter.substring(1)) {
+                hasPassedTests = false;
+              }
+            } else if (filter.substring(0, 1) === '=') {
+              if (data !== +filter.substring(1)) {
+                hasPassedTests = false;
+              }
+            } else if (data !== +filter) {
+              hasPassedTests = false;
+            }
+          }
+
+          // other tests ...
         }
+
       });
 
       // If item has passed all tests (filter criteria) return true.
@@ -135,9 +175,11 @@ export class HttpUtilsService {
 
 
 
-
-
-    /** Sorting */
+    /**
+     * ==================================================================
+     * Sorting
+     * ==================================================================
+     */
     if (queryParams.sortField) {
       filteredItems = this.arraySort(
         filteredItems,
@@ -146,7 +188,11 @@ export class HttpUtilsService {
       );
     }
 
-    /** Pagination */
+    /**
+     * ==================================================================
+     * Paginating
+     * ==================================================================
+     */
     const totalCount = filteredItems.length;
     const initialPos = queryParams.pageNumber * queryParams.pageSize;
     filteredItems = filteredItems.slice(
@@ -154,12 +200,21 @@ export class HttpUtilsService {
       initialPos + queryParams.pageSize
     );
 
-    /** Return queryResult */
+    /**
+     * ==================================================================
+     * Returning result
+     * ==================================================================
+     */
     const queryResult = new QueryResult();
     queryResult.items = filteredItems;
     queryResult.totalCount = totalCount;
     return queryResult;
   }
+
+
+
+
+
 
   // queryOriginal(
   //   items: any[],
