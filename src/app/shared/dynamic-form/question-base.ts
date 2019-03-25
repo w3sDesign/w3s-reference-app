@@ -12,6 +12,8 @@ export class QuestionBase {
   required?= false;
   isDisabled?= false;
 
+  nestedQuestions?: QuestionBase[] = [];
+
   options?: { key: string, value: string }[] = [];
 }
 

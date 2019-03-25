@@ -1,4 +1,4 @@
-import { Customer } from './customer';
+import { Customer } from '../model/customer';
 
 // Generated on generatedata.com
 export const mockCustomers: Customer[] = [

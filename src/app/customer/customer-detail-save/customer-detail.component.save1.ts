@@ -18,10 +18,6 @@ import { Customer } from '../model/customer';
 import { countries } from '../../shared/countries';
 import { Observable } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
-import { DynamicFormComponent } from '../../shared/dynamic-form/dynamic-form.component';
-import { QuestionBase } from '../../shared/dynamic-form/question-base';
-import { mockCustomerQuestions } from '../model/mock-customer-questions';
-
 
 // changeDetection: ChangeDetectionStrategy.OnPush
 @Component({
@@ -46,30 +42,6 @@ export class CustomerDetailComponent implements OnInit {
 
   // dialogRef: MatDialogRef<CustomerDetailDialogComponent>;
   data: any;
-
-
-  /** Reference to the dynamic form component (Customer) */
-  @ViewChild(DynamicFormComponent)
-  dynFormComponent: DynamicFormComponent;
-
-  /**
-   * Questions for generating the dynamic form:
-   * <w3s-dynamic-form [questions]="customerQuestions" ...
-   */
-  // filterTemplateQuestions: QuestionBase[];
-  // TODO? loading from server must be before app! APP-INITIALIZE?
-  customerQuestions: QuestionBase[] = mockCustomerQuestions;
-
-
-  /** Filter templates */
-  // customers: Customer[]; // mockCustomerFilterTemplates;
-
-  customerFormValue: any = {};
-
-
-
-
-
 
   constructor(
     // public dialogRef: MatDialogRef<CustomerDetailDialogComponent>,
@@ -111,11 +83,6 @@ export class CustomerDetailComponent implements OnInit {
         res => {
           // console.log(res);
           this.customer = res;
-
-          /** Render the dynamic customer form */
-          this.dynFormComponent.setFormValue(this.customer);
-
-          /** Build the static customer form */
           this.buildForm();
         }
       );
@@ -126,15 +93,6 @@ export class CustomerDetailComponent implements OnInit {
     //   // setTimeout(() => {
     //   //   this.isLoading = false;
     //   // }, 500);
-  }
-
-/**
-   * Filter template form commit.
-   */
-  onCustomerFormSubmit(value) {
-    this.customerFormValue = value;
-    // this.selectedFilterTemplate = value;
-    // this.loadCustomers();
   }
 
 
@@ -214,7 +172,7 @@ export class CustomerDetailComponent implements OnInit {
       return;
     }
 
-    const editedCustomer: Customer = this.prepareCustomer();
+    const editedCustomer = this.prepareCustomer();
 
     if (editedCustomer.id > 0) {
       this.updateCustomer(editedCustomer);

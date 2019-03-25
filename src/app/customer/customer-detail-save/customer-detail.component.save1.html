@@ -1,24 +1,6 @@
 <h5>{{title}}</h5>
 
-<!-- ========================================================== -->
-    <!-- Generating the customer form. -->
-    <!-- ========================================================== -->
-
-    <w3s-dynamic-form *ngIf="customerQuestions" [questions]="customerQuestions" (formSubmit)="onCustomerFormSubmit($event)">
-
-    </w3s-dynamic-form>
-
-
-    <!-- ========================================================== -->
-    *** customer: {{customer | json}}
-    <br>
-    *** customerFormValue: {{customerFormValue | json}}
-    <br>
-<!-- ========================================================== -->
-
-
-
-    <!-- <form *ngIf="customer$ | async as customer" -->
+<!-- <form *ngIf="customer$ | async as customer" -->
 
 <form *ngIf="customer" [formGroup]="customerForm">
 

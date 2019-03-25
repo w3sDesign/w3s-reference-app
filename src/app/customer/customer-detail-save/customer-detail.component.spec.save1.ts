@@ -6,7 +6,7 @@ import {
 } from '../../../testing';
 
 import { Customer } from '../model/customer';
-import { CustomerDetailComponent } from './customer-detail.component';
+import { CustomerDetailComponent } from '../customer-detail/customer-detail.component';
 import { CustomerModule } from '../customer.module';
 import { CustomerRoutingModule } from '../customer-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';

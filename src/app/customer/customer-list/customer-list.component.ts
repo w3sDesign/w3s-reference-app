@@ -154,6 +154,8 @@ export class CustomerListComponent implements OnInit {
           }
 
           this.selectedFilterTemplateName = 'standard';
+
+          /** Render the customer form */
           this.renderFilterTemplate(this.selectedFilterTemplateName);
           // console.log(this.filterTemplateNames);
         }

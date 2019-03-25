@@ -1,38 +1,106 @@
 <div [formGroup]="form">
 
 
-  <div *ngIf="question.controlType !== 'checkbox'" [ngSwitch]="question.controlType">
+  <!-- ########################################################## -->
+  <!-- Handling a question according to its controlType -->
+  <!-- ########################################################## -->
 
-    <mat-form-field [class.hide]="question.isDisabled">
+  <div [ngSwitch]="question.controlType">
 
-      <textarea *ngSwitchCase="'textbox'" matInput [formControlName]="question.key" [id]="question.key" [type]="question.inputType" [w3sHighlight]="'yellow'">
-        </textarea>
 
-      <mat-select *ngSwitchCase="'dropdown'" [formControlName]="question.key" [id]="question.key">
-        <mat-option *ngFor="let option of question.options" [value]="option.key">{{option.value}}</mat-option>
-      </mat-select>
+    <!-- ========================================================== -->
+    <!-- Question controlType === 'textbox' -->
+    <!-- ========================================================== -->
+
+    <mat-form-field *ngSwitchCase="'textbox'" [class.hide]="question.isDisabled">
+
+      <textarea matInput [formControlName]="question.key" [id]="question.key" [type]="question.inputType" [w3sHighlight]="'yellow'"></textarea>
 
       <mat-hint align="start">{{question.label}}</mat-hint>
-
       <!-- <mat-error *ngIf="!isValid"> -->
       <mat-error>{{question.label}} is required</mat-error>
 
     </mat-form-field>
 
 
-  </div>
+    <!-- ========================================================== -->
+    <!-- Question controlType === 'textbox' -->
+    <!-- ========================================================== -->
+
+    <mat-form-field *ngSwitchCase="'dropdown'" [class.hide]="question.isDisabled">
+
+      <mat-select [formControlName]="question.key" [id]="question.key">
+        <mat-option *ngFor="let option of question.options" [value]="option.key">{{option.value}}</mat-option>
+      </mat-select>
+
+      <mat-hint align="start">{{question.label}}</mat-hint>
+      <mat-error>{{question.label}} is required</mat-error>
+
+    </mat-form-field>
 
 
+    <!-- ========================================================== -->
+    <!-- Question controlType === 'checkbox' -->
+    <!-- checkbox not allowed inside mat-form-field -->
+    <!-- ========================================================== -->
 
-  <!-- checkbox not allowed inside mat-form-field -->
+    <div *ngSwitchCase="'checkbox'" [class.hide]="question.isDisabled">
 
-  <div *ngIf="question.controlType === 'checkbox'" >
+      <mat-checkbox [formControlName]="question.key" [id]="question.key">{{question.label}}</mat-checkbox>
 
-      <br><br>
-      <mat-checkbox [formControlName]="question.key" [id]="question.key">
-      {{question.label}}
-    </mat-checkbox>
+    </div>
 
-  </div>
+
+    <!-- ========================================================== -->
+    <!-- Question controlType === 'formArray' -->
+    <!-- ========================================================== -->
+
+    <div *ngSwitchCase="'formArray'">
+
+      <div *ngIf="getFormArray()" [formArrayName]="question.key">
+
+        <div *ngFor="let control of getFormArray().controls; let i=index" [formGroupName]="i">
+
+          <div *ngFor="let nestedQuestion of question.nestedQuestions">
+
+            <div [ngSwitch]="nestedQuestion.controlType">
+
+              <mat-form-field *ngSwitchCase="'textbox'" [class.hide]="nestedQuestion.isDisabled">
+
+                <textarea matInput [formControlName]="nestedQuestion.key" [id]="nestedQuestion.key" [type]="nestedQuestion.inputType" [w3sHighlight]="'yellow'"></textarea>
+
+                <mat-hint align="start">{{nestedQuestion.label}}</mat-hint>
+                <!-- <mat-error *ngIf="!isValid"> -->
+                <mat-error>{{nestedQuestion.label}} is required</mat-error>
+
+              </mat-form-field>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <br>***getFormArray() = {{getFormArray()}}
+        <br>***question.nestedQuestions = {{question.nestedQuestions | json}}
+
+      </div>
+
+      <button mat-raised-button color="primary" (click)="addFormGroup()">Add Address</button>
+
+    </div>
+
+
+    <!-- ========================================================== -->
+    <!-- All question controlTypes should have been handled -->
+    <!-- ========================================================== -->
+
+    <div *ngSwitchDefault>
+
+    </div>
+
+
+  </div> <!-- End of ngSwitch -->
+
 
 </div>
