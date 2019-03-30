@@ -75,7 +75,7 @@
 
 
     <!-- ========================================================== -->
-    <!-- Generating the filter template form. -->
+    <!-- Filter template dynamic form. -->
     <!-- ========================================================== -->
 
     <w3s-dynamic-form *ngIf="filterTemplateQuestions" [questions]="filterTemplateQuestions" (formSubmit)="onFilterTemplateFormSubmit($event)">
@@ -115,13 +115,9 @@
     </div>
 
 
-    filterTemplates: {{filterTemplates | json}}
-    <br>
-    filterTemplateFormValue: {{filterTemplateFormValue | json}}
-    <br>
-    <!-- dynFormComponent.value: {{dynFormComponent.form.value | json}} -->
-    <br>
-    selectedFilterTemplateName = {{selectedFilterTemplateName}}
+    <br>***filterTemplates:<br>           {{filterTemplates | json}}
+    <br>***filterTemplateFormValue:<br>   {{filterTemplateFormValue | json}}
+    <br>***selectedFilterTemplateName<br> {{selectedFilterTemplateName}}
 
 
     <!-- ========================================================== -->

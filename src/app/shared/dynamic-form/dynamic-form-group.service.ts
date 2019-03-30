@@ -7,7 +7,9 @@ import { QuestionBase } from './question-base';
 export class DynamicFormGroupService {
   constructor() { }
 
-  /** Only depends on the questions */
+  /**
+   * Creating a FormGroup from the given questions
+   */
   createFormGroup(questions: QuestionBase[]) {
     const group: any = {};
 
@@ -23,9 +25,10 @@ export class DynamicFormGroupService {
       }
     });
 
-    console.log('*** questions = ' + JSON.stringify(questions));
-    console.log('*** group = ' + JSON.stringify(group));
+    console.log('############## questions = ' + JSON.stringify(questions));
+    console.log('############## group = ' + JSON.stringify(group));
 
     return new FormGroup(group);
   }
+
 }

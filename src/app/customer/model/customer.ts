@@ -1,14 +1,14 @@
-export interface Address {
-  // type?: AddressType = other;
-  street2: string;
-  postalCode2: string;
-  // city: string;
+export interface AddAddress {
+  // type?: AddAddressType = other;
+  addStreet: string;
+  addPostalCode: string;
+  addCity: string;
   // country: string;
 }
 
 // TODO
 export type CustomerType = 'business' | 'individual' | 'other';
-export type AddressType = 'shipping' | 'billing' | 'other';
+export type AddAddressType = 'shipping' | 'billing' | 'other';
 
 
 export class Customer {
@@ -27,7 +27,7 @@ export class Customer {
   country = '';
 
   // Additional Addresses
-  addresses?: Address[];
+  addAddresses?: any[];
 
   // Main contact
   department = '';

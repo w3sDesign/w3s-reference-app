@@ -14,7 +14,9 @@ export class DynamicFormQuestionComponent implements OnInit {
   @Input() form: FormGroup;
   @Input() question: QuestionBase;
 
-  constructor(private fb: FormBuilder, private formGroupService: DynamicFormGroupService) { }
+  constructor(
+    private fb: FormBuilder,
+    private formGroupService: DynamicFormGroupService) { }
 
   ngOnInit() {
     if (this.question.isDisabled) {
@@ -22,14 +24,16 @@ export class DynamicFormQuestionComponent implements OnInit {
     }
   }
 
+  /** Get FormArray control(s) */
   getFormArray() {
-    // get the AbstractControl of 'addresses' as AbstractControl[]
     return this.form.get(this.question.key) as FormArray;
   }
 
+  /** Add FormGroup to FormArray */
   addFormGroup() {
+    // Creating a FormGroup from the given *nested* questions.
     const formGroup = this.formGroupService.createFormGroup(this.question.nestedQuestions);
-
+    // Adding this new FormGroup to the FormArray.
     this.getFormArray().push(formGroup);
   }
 

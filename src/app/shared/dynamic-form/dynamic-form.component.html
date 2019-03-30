@@ -3,26 +3,84 @@
   <form (ngSubmit)="onSubmit()" *ngIf="form" [formGroup]="form" [ngClass]="formClass">
 
 
-    <div *ngFor="let question of questions">
+    <!-- ========================================================== -->
+    <!-- With data grouping (e.g. Basic Data, Addresses, Contacts). -->
+    <!-- ========================================================== -->
+
+    <div *ngIf="questions[0].group > 0">
+
+      <br />
+      <h6> {{questions[0].groupName}} </h6>
+      <!-- TODO <h6> {{questions[0].groupName}} </h6> Basic Data -->
+      <mat-divider></mat-divider>
+
+      <div class="flex-box">
+
+        <div *ngFor="let question of questions">
+
+          <w3s-dynamic-form-question *ngIf="question.group === 1" [question]="question" [form]="form">
+
+          </w3s-dynamic-form-question>
+
+        </div>
+
+      </div>
 
       <!-- ################################################ -->
 
-      <w3s-dynamic-form-question [question]="question" [form]="form">
 
-      </w3s-dynamic-form-question>
+      <br />
+      <h6> {{questions[0].groupName}} Addresses </h6>
+      <mat-divider></mat-divider>
 
-      <!-- ################################################ -->
+      <div class="flex-box">
+
+        <div *ngFor="let question of questions">
+
+          <w3s-dynamic-form-question *ngIf="question.group === 2" [question]="question" [form]="form">
+
+          </w3s-dynamic-form-question>
+
+        </div>
+
+      </div>
+
+    </div> <!-- End of group > 0 -->
+
+
+    <!-- ========================================================== -->
+    <!-- Without data grouping. -->
+    <!-- ========================================================== -->
+
+    <div *ngIf="questions[0].group === 0">
+
+      <div class="flex-box">
+
+        <div *ngFor="let question of questions">
+
+          <w3s-dynamic-form-question [question]="question" [form]="form">
+
+          </w3s-dynamic-form-question>
+
+        </div>
+
+      </div>
 
     </div>
 
+    <!-- ################################################ -->
 
-    <button type="submit" *ngIf="form" mat-raised-button matTooltip="Start Searching" [disabled]="!form.valid">Search</button>
+
+
+
+    <button type="submit" *ngIf="form" mat-raised-button matTooltip="Start Searching" [disabled]="!form.valid">Submit Dyn Form</button>
 
 
   </form>
 
+
   <div *ngIf="payLoad">
-    <strong>Saved the following values</strong><br>{{payLoad}}
+    <br>***Saved the following values (form.value) :<br> {{payLoad}}
   </div>
 
 </div>

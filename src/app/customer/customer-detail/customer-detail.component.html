@@ -1,26 +1,60 @@
+<!-- ############################################################ -->
+<!--                        Dynamic Version                       -->
+<!-- ############################################################ -->
+
+
 <h5>{{title}}</h5>
 
+<mat-spinner [diameter]="20" *ngIf="isLoading">
+</mat-spinner>
+
+
 <!-- ========================================================== -->
-    <!-- Generating the customer form. -->
-    <!-- ========================================================== -->
+<!-- Generating customer dynamic form. -->
+<!-- ========================================================== -->
 
-    <w3s-dynamic-form *ngIf="customerQuestions" [questions]="customerQuestions" (formSubmit)="onCustomerFormSubmit($event)">
+<w3s-dynamic-form *ngIf="customerQuestions" [questions]="customerQuestions" (formSubmit)="onCustomerFormSubmit($event)">
 
-    </w3s-dynamic-form>
+</w3s-dynamic-form>
 
-
-    <!-- ========================================================== -->
-    *** customer: {{customer | json}}
-    <br>
-    *** customerFormValue: {{customerFormValue | json}}
-    <br>
 <!-- ========================================================== -->
 
 
 
-    <!-- <form *ngIf="customer$ | async as customer" -->
+<br>
+<div class="nix-flex-box">
 
-<form *ngIf="customer" [formGroup]="customerForm">
+  <!-- cdkFocusInitial -->
+  <!-- [mat-dialog-close]="customer" only for closing dialog window -->
+  <button type="button" mat-raised-button (click)="returnToList()" matTooltip="Cancel changes">
+    Cancel
+  </button>&nbsp;
+
+  <!-- Create or update customer -->
+  <button type="button" mat-raised-button color="primary" (click)="saveDyn()" [disabled]="isLoading" matTooltip="Save changes">
+    Save Dyn
+  </button>
+
+</div> <!-- End flex-box -->
+
+
+<br>*** customer:<br> {{customer | json}}
+<br>*** customerFormValue:<br> {{customerFormValue  | json}}
+<br>*** Form Status:<br> {{customerForm?.status }}
+<br><br>
+
+
+
+
+<!-- ############################################################ -->
+<!--                     OLD Static Version                       -->
+<!-- ############################################################ -->
+
+
+<!-- <form *ngIf="customer$ | async as customer" -->
+
+<!-- Check if customer is defined, not null, *and* not {} -->
+<form *ngIf="customer && customer.name && customerForm" [formGroup]="customerForm">
 
   <mat-spinner [diameter]="20" *ngIf="isLoading">
   </mat-spinner>
@@ -158,6 +192,6 @@
 
   </div> <!-- End flex-box -->
 
-  <p>Test Form Status =  {{customerForm.status }}</p>
+  <p>Test Form Status = {{customerForm.status }}</p>
 
 </form>

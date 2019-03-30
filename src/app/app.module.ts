@@ -17,6 +17,7 @@ import { HomeComponent } from './home/home.component';
 
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
 import { MessageSnackBarComponent } from './shared/message-snack-bar/message-snack-bar.component';
+import { InputDialogComponent } from './shared/input-dialog/input-dialog.component';
 
 import { HttpErrorHandler } from './shared/http-error-handler.service';
 import { HttpUtilsService } from './shared/http-utils.service';
@@ -24,10 +25,6 @@ import { MessageService } from './shared/message.service';
 
 import { SharedMaterialModule } from './shared/shared-material.module';
 
-import { DynamicFormComponent } from './shared/dynamic-form/dynamic-form.component';
-import { DynamicFormQuestionComponent } from './shared/dynamic-form/dynamic-form-question.component';
-import { HighlightDirective } from './shared/directives/highlight.directive';
-import { InputDialogComponent } from './shared/input-dialog/input-dialog.component';
 
 @NgModule({
 

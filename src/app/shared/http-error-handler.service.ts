@@ -41,7 +41,8 @@ export class HttpErrorHandler {
         // Client side error
         ? error.error.message
         // Server side error
-        : `server returned code ${error.status} (${error.statusText}) with body "${error.error}"`;
+        // : `Server returned code ${error.status} (${error.statusText}) with body "${error.error}"`;
+        : `Server returned code ${error.status} (${error.statusText}).`;
 
       // Showing the error.
       this.openSnackBar(message);
@@ -67,12 +68,12 @@ export class HttpErrorHandler {
    */
 
   /**
-   * Showing the error for user consumation.
+   * Showing a user friendly error message (on a snack bar).
    */
   private openSnackBar(message: string) {
     this.snackBar.openFromComponent(MessageSnackBarComponent, {
       data: message,
-      duration: 3000,
+      duration: 5000,
       verticalPosition: 'top',
       panelClass: 'w3s-snack-bar', // adds to snack-bar-container
     });

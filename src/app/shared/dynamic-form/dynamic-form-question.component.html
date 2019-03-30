@@ -24,7 +24,7 @@
 
 
     <!-- ========================================================== -->
-    <!-- Question controlType === 'textbox' -->
+    <!-- Question controlType === 'dropdown' -->
     <!-- ========================================================== -->
 
     <mat-form-field *ngSwitchCase="'dropdown'" [class.hide]="question.isDisabled">
@@ -49,6 +49,8 @@
       <mat-checkbox [formControlName]="question.key" [id]="question.key">{{question.label}}</mat-checkbox>
 
     </div>
+
+
 
 
     <!-- ========================================================== -->
@@ -79,14 +81,19 @@
 
           </div>
 
+          <br>
+
         </div>
 
-        <br>***getFormArray() = {{getFormArray()}}
-        <br>***question.nestedQuestions = {{question.nestedQuestions | json}}
+        <br>
+        <button mat-raised-button color="nixprimary" (click)="addFormGroup()">Add Address</button>
+
+
+        <br>***getFormArray() = form.get(this.question.key) as FormArray:<br>  {{getFormArray()}}
+        <br>***question.nestedQuestions:<br> {{question.nestedQuestions | json}}
 
       </div>
 
-      <button mat-raised-button color="primary" (click)="addFormGroup()">Add Address</button>
 
     </div>
 

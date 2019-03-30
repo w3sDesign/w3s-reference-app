@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 
 import { HttpCustomerService } from '../model/http-customer.service';
 import { HttpErrorHandler } from '../../shared/http-error-handler.service';
@@ -21,6 +21,8 @@ import { switchMap, tap } from 'rxjs/operators';
 import { DynamicFormComponent } from '../../shared/dynamic-form/dynamic-form.component';
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
 import { mockCustomerQuestions } from '../model/mock-customer-questions';
+import { DynamicFormGroupService } from '../../shared/dynamic-form/dynamic-form-group.service';
+import { questionsConfig } from '../model/customer.config';
 
 
 // changeDetection: ChangeDetectionStrategy.OnPush
@@ -30,11 +32,12 @@ import { mockCustomerQuestions } from '../model/mock-customer-questions';
   styleUrls: ['./customer-detail.component.scss']
 })
 export class CustomerDetailComponent implements OnInit {
+
   // customer: Customer | Observable<Customer>;
   customer$: Observable<Customer>;
   customer: Customer;
 
-  customerForm: FormGroup;
+  customerForm: FormGroup; // = static form
   hasErrors = false;
   isLoading = false;
   title = '';
@@ -58,16 +61,20 @@ export class CustomerDetailComponent implements OnInit {
    */
   // filterTemplateQuestions: QuestionBase[];
   // TODO? loading from server must be before app! APP-INITIALIZE?
+
+  // Compare <w3s-dynamic-form [questions]="customerQuestions" ...
   customerQuestions: QuestionBase[] = mockCustomerQuestions;
+
+  // Compare <w3s-dynamic-form [ngClass]="customerFormClass"
+  // customerFormClass: any = {
+  //   'flex-box': true,
+  // };
 
 
   /** Filter templates */
   // customers: Customer[]; // mockCustomerFilterTemplates;
 
   customerFormValue: any = {};
-
-
-
 
 
 
@@ -81,13 +88,14 @@ export class CustomerDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private customerService: HttpCustomerService,
     private httpErrorHandler: HttpErrorHandler,
-    private typesUtilsService: TypesUtilsService
+    private typesUtilsService: TypesUtilsService,
+    private formGroupService: DynamicFormGroupService,
   ) {
     // this.isDialogComponent = false;
   }
 
-  /** LOAD DATA */
   ngOnInit() {
+
     // if (this.isDialogComponent) {
     //   this.customer = this.data.customer;
     //   this.buildForm();
@@ -102,6 +110,10 @@ export class CustomerDetailComponent implements OnInit {
     // )
     //   .subscribe(x => console.log(x));
 
+
+    /**
+     * Loading data (e.g. from customers/20000).
+     */
     if (this.route) {
       this.customer$ = this.route.paramMap.pipe(
         switchMap((params: ParamMap) =>
@@ -109,33 +121,97 @@ export class CustomerDetailComponent implements OnInit {
 
       this.customer$.subscribe(
         res => {
-          // console.log(res);
+          console.log('##################' + JSON.stringify(res));
           this.customer = res;
 
-          /** Render the dynamic customer form */
-          this.dynFormComponent.setFormValue(this.customer);
+          /** Error handler service (in customer service) returns {} in case of an error (e.g. if customer not found).
+           * So we need to check if the customer is defined, not null, *and* not {}. */
 
-          /** Build the static customer form */
-          this.buildForm();
-        }
-      );
+          if (this.customer && this.customer.name) {
+
+            /** Update empty form /Set (patch) values /Render the dynamic customer form */
+            this.dynFormComponent.setFormValue(this.customer);
+
+
+            // Analog to DynamicFormQuestionComponent!
+            this.customerQuestions.forEach(question => {
+              if (question.controlType === 'formArray' && this.customer[question.key]) {
+
+                if (this.customer[question.key].length > 0) { // e.g. addAddresses
+
+                  const l = this.customer[question.key].length;
+                  for (let i = 0; i < l; i++) {
+
+                    /** Creating a FormGroup from the given *nested* questions. */
+                    const formGroup = this.formGroupService.createFormGroup(question.nestedQuestions);
+
+                    /** Adding this new FormGroup to the FormArray. */
+                    const formArray = this.dynFormComponent.form.get(question.key) as FormArray;
+                    formArray.push(formGroup);
+
+                  }
+
+                  // TODO update only address fields?
+                  /** Render the dynamic customer form */
+                  this.dynFormComponent.setFormValue(this.customer);
+
+
+                }
+
+              }
+            });
+
+
+            /** Build the static customer form */
+            this.buildForm();
+          }
+
+        }); // End of subscribing customer
     }
 
-    //   // /* Server loading imitation. Remove this on real code */
-    //   // this.isLoading = true;
-    //   // setTimeout(() => {
-    //   //   this.isLoading = false;
-    //   // }, 500);
-  }
+  } // End of ngOnInit()
 
-/**
-   * Filter template form commit.
+
+
+  //   // /* Server loading imitation. Remove this on real code */
+  //   // this.isLoading = true;
+  //   // setTimeout(() => {
+  //   //   this.isLoading = false;
+  //   // }, 500);
+
+
+  /** Two update variants: */
+
+  /**
+   * ###############################################
+   * 1. Customer form commit. TO DO Create or update customer.
+   * onDynamicFormSubmit
+   * ##############################################
    */
   onCustomerFormSubmit(value) {
-    this.customerFormValue = value;
+
+
+    // this.updateCustomer(value); // fires too often (to be used for update)!
+
+    // this.updateCustomer(this.customer);
+
+    // this.customerFormValue = value;
     // this.selectedFilterTemplate = value;
     // this.loadCustomers();
   }
+
+
+  /**
+   * ###############################################
+   *2. SaveDyn button. TO DO Create or update customer.
+   * ##############################################
+   */
+  saveDyn() {
+    // this.updateCustomer(value);
+    this.updateCustomer(this.dynFormComponent.form.value);
+
+  }
+
 
 
   buildForm() {
@@ -294,9 +370,10 @@ export class CustomerDetailDialogComponent extends CustomerDetailComponent imple
     route: ActivatedRoute,
     customerService: HttpCustomerService,
     httpErrorHandler: HttpErrorHandler,
-    typesUtilsService: TypesUtilsService
+    typesUtilsService: TypesUtilsService,
+    formGroupService: DynamicFormGroupService,
   ) {
-    super(formBuilder, router, route, customerService, httpErrorHandler, typesUtilsService);
+    super(formBuilder, router, route, customerService, httpErrorHandler, typesUtilsService, formGroupService);
     // this.isDialogComponent = true;
   }
 

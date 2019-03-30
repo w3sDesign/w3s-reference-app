@@ -6,6 +6,7 @@ import { LayoutModule } from '@angular/cdk/layout';
 import { HighlightDirective } from './directives/highlight.directive';
 import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
 import { DynamicFormQuestionComponent } from './dynamic-form/dynamic-form-question.component';
+import { DynamicFormGroupService } from './dynamic-form/dynamic-form-group.service';
 
 import { SharedMaterialModule } from './shared-material.module';
 
@@ -17,7 +18,11 @@ import { SharedMaterialModule } from './shared-material.module';
   ],
 
   declarations: [
-    HighlightDirective, DynamicFormComponent, DynamicFormQuestionComponent
+    HighlightDirective, DynamicFormComponent, DynamicFormQuestionComponent,
+  ],
+
+  providers: [
+    DynamicFormGroupService
   ],
 
   exports: [

@@ -8,12 +8,12 @@ import { DynamicFormGroupService } from './dynamic-form-group.service';
   selector: 'w3s-dynamic-form',
   templateUrl: './dynamic-form.component.html',
   styleUrls: ['./dynamic-form.component.scss'],
-  providers: [DynamicFormGroupService]
+  // providers: [DynamicFormGroupService]
 })
 export class DynamicFormComponent implements OnInit {
 
   @Input() questions: QuestionBase[] = [];
-  @Input() formClass = {};
+  @Input() formClass = {}; // curr not used
 
   @Output() formSubmit: EventEmitter<any> = new EventEmitter<any>();
 
@@ -21,12 +21,31 @@ export class DynamicFormComponent implements OnInit {
 
   payLoad = '';
 
-  constructor(private dynamicFormGroupService: DynamicFormGroupService) { }
+  // TODO
+  groupNames: any[] = ['Basic Data', 'Addresses'];
+
+  constructor(private formGroupService: DynamicFormGroupService) { }
 
   ngOnInit() {
-    this.form = this.dynamicFormGroupService.createFormGroup(this.questions);
+
+    // TODO
+    // for (let i = 1; i < 3; i++) {
+    //   const idx = this.questions.findIndex(question => question.group === i);
+    //   this.groupNames[i] = this.questions[idx].groupName;
+    // }
+
+
+    /**
+     * ##################################################################
+     * Creating the initial form from the given questions.
+     * ##################################################################
+     */
+    this.form = this.formGroupService.createFormGroup(this.questions);
     // this.form.controls['id'].disable();
+
   }
+
+
 
   onSubmit() {
     // RawValue() includes disabled controls.

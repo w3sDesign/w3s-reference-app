@@ -25,6 +25,12 @@
 //   display: none;
 // }
 
+// To avoid that user agent stylesheet sets display: block
+// (when div isn't set anywhere!?)
+div {
+  display: inherit;
+}
+
 
 .mat-form-field {
   margin-right: 30px;
@@ -42,4 +48,15 @@
   // padding-bottom: 16px; // 8px 16px 24px;
 }
 
+// test
+.flex-box {
+  display: flex;
 
+  flex-direction: row;
+  align-items: center; // vertical
+  justify-content: flex-start; // horizontal
+  flex-wrap: wrap; // default = nowrap
+
+  font-size: 14px;
+  // padding-bottom: 16px; // 8px 16px 24px;
+}

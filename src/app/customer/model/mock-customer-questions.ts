@@ -1,14 +1,18 @@
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
 
-
+// TODO? mockCustomerDetailQuestions for CustomerDetailComponent
 export const mockCustomerQuestions: QuestionBase[] = [
+  // Group 1: Basic Data
+
   {
     key: 'id',
     value: 0,
     label: 'Id',
     controlType: 'textbox',
     inputType: 'number',
-    order: 1,
+    group: 1,
+    groupName: 'Basic Data',
+    order: 110,
     required: false,
     isDisabled: false,
   },
@@ -18,19 +22,24 @@ export const mockCustomerQuestions: QuestionBase[] = [
     label: 'Name',
     controlType: 'textbox',
     inputType: 'text',
-    order: 2,
+    group: 1,
+    groupName: 'Basic Data',
+    order: 120,
     required: false,
     isDisabled: false,
   },
 
-  // Main Address
+  // Group 2: Main Address and Additional Addresses
+
   {
     key: 'street',
     value: '',
     label: 'Street',
     controlType: 'textbox',
     inputType: 'text',
-    order: 10,
+    group: 2,
+    groupName: 'Addresses',
+    order: 210,
     required: false,
     isDisabled: false,
   },
@@ -40,7 +49,9 @@ export const mockCustomerQuestions: QuestionBase[] = [
     label: 'Postal Code',
     controlType: 'textbox',
     inputType: 'textarea',
-    order: 30,
+    group: 2,
+    groupName: 'Addresses',
+    order: 230,
     required: false,
     isDisabled: false,
   },
@@ -50,32 +61,50 @@ export const mockCustomerQuestions: QuestionBase[] = [
     label: 'City',
     controlType: 'textbox',
     inputType: 'textarea',
-    order: 30,
+    group: 2,
+    groupName: 'Addresses',
+    order: 240,
     required: false,
     isDisabled: false,
   },
+
+  // Additional Addresses
   {
-    key: 'addresses',
+    key: 'addAddresses',
     value: '',
     controlType: 'formArray',
+    group: 2,
     nestedQuestions: [
       {
-        key: 'street2',
+        key: 'addStreet',
         value: '',
-        label: 'Street 2',
+        label: 'Street',
         controlType: 'textbox',
         inputType: 'text',
-        order: 10,
+        group: 2,
+        order: 250,
         required: false,
         isDisabled: false,
       },
       {
-        key: 'postalCode2',
+        key: 'addPostalCode',
         value: '',
-        label: 'Postal Code 2',
+        label: 'Postal Code',
         controlType: 'textbox',
         inputType: 'textarea',
-        order: 30,
+        group: 2,
+        order: 260,
+        required: false,
+        isDisabled: false,
+      },
+      {
+        key: 'addCity',
+        value: '',
+        label: 'City',
+        controlType: 'textbox',
+        inputType: 'textarea',
+        group: 2,
+        order: 270,
         required: false,
         isDisabled: false,
       },

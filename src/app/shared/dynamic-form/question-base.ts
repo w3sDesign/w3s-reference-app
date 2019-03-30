@@ -1,16 +1,18 @@
 /**
  * Form field metadata
- * for generating form fields dynamically.
+ * for generating dynamic forms.
  */
 export class QuestionBase {
   key = '';
   value?: any;
-  label?= '';
+  label? = '';
   controlType = '';
-  inputType?= '';
-  order?= 0;
-  required?= false;
-  isDisabled?= false;
+  inputType? = '';
+  group?: 0 | 1 | 2 | 3 = 0; // 0 = no grouping; 1,2,3... = grouping
+  groupName? = '';
+  order? = 0;
+  required? = false;
+  isDisabled? = false;
 
   nestedQuestions?: QuestionBase[] = [];
 
