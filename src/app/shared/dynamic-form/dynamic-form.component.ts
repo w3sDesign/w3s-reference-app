@@ -3,6 +3,7 @@ import { FormGroup } from '@angular/forms';
 
 import { QuestionBase } from './question-base';
 import { DynamicFormGroupService } from './dynamic-form-group.service';
+import { DynamicFormOptions } from './dynamic-form-options';
 
 @Component({
   selector: 'w3s-dynamic-form',
@@ -12,27 +13,57 @@ import { DynamicFormGroupService } from './dynamic-form-group.service';
 })
 export class DynamicFormComponent implements OnInit {
 
-  @Input() questions: QuestionBase[] = [];
+  showTestValues: true;
+
+  @Input() questions: QuestionBase[];
+  @Input() options: DynamicFormOptions = {};
+  @Input() dataGroupNames: string[]; // undefined needed for *ngIf
+  @Input() title: string;
+
   @Input() formClass = {}; // curr not used
 
   @Output() formSubmit: EventEmitter<any> = new EventEmitter<any>();
 
   form: FormGroup;
 
+  // TODO
+  get controls() { return this.questions.filter(({ controlType }) => controlType !== 'button'); }
+  get changes() { return this.form.valueChanges; }
+  get valid() { return this.form.valid; }
+  get value() { return this.form.value; }
+
   payLoad = '';
 
-  // TODO
-  groupNames: any[] = ['Basic Data', 'Addresses'];
+  /**
+   * Note that input properties (like questions and options)
+   * are set *after* construction (but before OnInit).
+   */
+  constructor( // #####################################################
 
-  constructor(private formGroupService: DynamicFormGroupService) { }
+    private formGroupService: DynamicFormGroupService) {
 
-  ngOnInit() {
+  }
 
-    // TODO
-    // for (let i = 1; i < 3; i++) {
-    //   const idx = this.questions.findIndex(question => question.group === i);
+  ngOnInit() { // #####################################################
+
+    // /** Setting data group names. */
+    // for (let i = 0; i < 100; i++) {
+    //   const idx = this.questions.findIndex(question => question.group === i + 1);
+    //   if (idx === -1) { break; }
     //   this.groupNames[i] = this.questions[idx].groupName;
     // }
+
+    //  /** V2 ! Setting data group names. */
+    //  for (let i = 0; i < 100; i++) {
+
+    //   const idx = this.questions.map(q => q.group).findIndex(group => group === i + 1);
+    //   if (idx === -1) { break; }
+    //   this.groupNames[i] = this.questions[idx].groupName;
+    // }
+
+    // /** V3 !! = OK  Setting data group names. */
+
+    //   this.groupNames = ['Basic Data', 'Addresses'];
 
 
     /**
@@ -41,6 +72,7 @@ export class DynamicFormComponent implements OnInit {
      * ##################################################################
      */
     this.form = this.formGroupService.createFormGroup(this.questions);
+
     // this.form.controls['id'].disable();
 
   }

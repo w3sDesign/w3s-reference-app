@@ -1,19 +1,77 @@
 /* @import '~@angular/material/prebuilt-themes/indigo-pink.css'; */
 /* @import './w3s-custom-theme.scss';  */
 
+
 html,
 body {
   height: 100%;
 }
 
-// /* everywhere else */
-// * {
-//   font-family: Arial, Helvetica, sans-serif;
-// }
 body {
   margin: 0;
+  overflow: auto;
   // font-family: 'Roboto', sans-serif;
 }
+
+
+.showTestValues {
+  font-family: monospace;
+  font-size: 13px;
+  color: blue;
+  // white-space:pre-line; // preserve new lines
+}
+
+
+// ####################################################################
+// Overriding material styles in "app.component.html".
+// ####################################################################
+
+.w3s-app-component .mat-sidenav .mat-expansion-panel-body {
+  padding: 0 16px 16px 8px; // orig 0 24 16
+  // font-size: inherit;//1em;//14px; //0.99em;
+}
+
+.w3s-app-component .mat-sidenav .mat-nav-list .mat-list-item .mat-list-item-content {
+  padding-left: 8px;
+  font-size: 14px;//inherit;//1em;//14px; //0.99em;
+}
+
+
+
+// ####################################################################
+// Overriding material styles in "customer-list.component.html"
+// ( and other list components).
+// ####################################################################
+
+.w3s-list-component {
+  margin: 30px;
+}
+
+.w3s-list-component .mat-expansion-panel-header .mat-expansion-panel-header-title {
+  font-size: 1rem;
+  font-weight: 500;
+}
+.w3s-list-component .mat-expansion-panel-body {
+  padding: 0;
+}
+
+.w3s-list-component table .mat-sort-header-button {
+  cursor: move;
+}
+
+// ####################################################################
+// Overriding material styles in "customer-detail.component.html"
+// (and other detail components).
+// ####################################################################
+
+.w3s-detail-component {
+  margin: 30px;
+}
+
+
+
+
+
 
 
 // global!?
@@ -29,7 +87,7 @@ body {
   flex-wrap: wrap; // default = nowrap
 
   font-size: 14px;
-  // padding: 16px 8px 16px 24px;
+  // padding: 16px p8px 16px 24px;
 
   .mat-form-field,
   button {

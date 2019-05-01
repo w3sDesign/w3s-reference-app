@@ -3,16 +3,19 @@
  * for generating dynamic forms.
  */
 export class QuestionBase {
-  key = '';
-  value?: any;
-  label? = '';
+  name = '';
+  defaultValue ?: any = '';
+  label ? = '';
+  hint ? = '';
+  tooltip ? = '';
   controlType = '';
-  inputType? = '';
+  inputType ? = '';
   group?: 0 | 1 | 2 | 3 = 0; // 0 = no grouping; 1,2,3... = grouping
-  groupName? = '';
-  order? = 0;
-  required? = false;
-  isDisabled? = false;
+  groupName ? = '';
+  order ? = 0;
+  isRequired ? = false;
+  isDisabled ? = false;
+  isReadonly ? = false;
 
   nestedQuestions?: QuestionBase[] = [];
 

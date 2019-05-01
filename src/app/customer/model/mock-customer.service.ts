@@ -55,7 +55,6 @@ export class MockCustomerService extends CustomerService {
   }
 
 
-
   searchCustomers(term: string): Observable<Customer[]> {
     throw new Error('Search method not implemented');
   }
@@ -113,12 +112,6 @@ export class MockCustomerService extends CustomerService {
 
   getCustomerFilterTemplate(id: number): Observable<CustomerFilterTemplate> {
     return this.lastResult = asyncData(this.customerFilterTemplates[0]);
-  }
-
-  /** Customer filter template Questions */
-  getCustomerFilterTemplateQuestions(filterTemplate?: string): Observable<QuestionBase[]> {
-    return this.lastResult = asyncData(this.customerFilterTemplateQuestions);
-
   }
 
 }

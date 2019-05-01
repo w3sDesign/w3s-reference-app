@@ -9,16 +9,16 @@ export class FilterTemplateQuestionService {
 
     const questions: QuestionBase[] = [
       {
-        key: 'templateId',
-        value: ' ',
+        name: 'templateId',
+        defaultValue: ' ',
         label: 'Template Id',
         controlType: 'textbox',
         inputType: 'text',
         order: 2,
       },
       {
-        key: 'templateName',
-        value: '',
+        name: 'templateName',
+        defaultValue: '',
         label: 'Template Name',
         controlType: 'textbox',
         inputType: 'text',
@@ -27,39 +27,39 @@ export class FilterTemplateQuestionService {
 
 
       {
-        key: 'id', // customer id
-        value: 'value2',
+        name: 'id', // customer id
+        defaultValue: 'value2',
         label: 'Filter by Id',
         controlType: 'textbox',
         inputType: 'text',
         order: 4,
       },
       {
-        key: 'name', // customer name
-        value: 'value3',
+        name: 'name', // customer name
+        defaultValue: 'value3',
         label: 'Filter by Name',
         controlType: 'textbox',
         inputType: 'text',
         order: 5,
       },
       {
-        key: 'city',
-        value: 'value4',
+        name: 'city',
+        defaultValue: 'value4',
         label: 'Filter by City',
         controlType: 'textbox',
         inputType: 'textarea',
         order: 6,
       },
       {
-        key: 'email',
-        value: 'default',
+        name: 'email',
+        defaultValue: 'default',
         label: 'Filter by Email',
         controlType: 'textbox',
         inputType: 'text',
         order: 10,
       },
       {
-        key: 'status',
+        name: 'status',
         label: 'Filter by Status',
         controlType: 'dropdown',
         options: [

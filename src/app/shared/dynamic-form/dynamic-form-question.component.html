@@ -1,113 +1,166 @@
-<div [formGroup]="form">
+<!-- <div [formGroup]="form"> -->
 
 
-  <!-- ########################################################## -->
-  <!-- Handling a question according to its controlType -->
-  <!-- ########################################################## -->
+<!-- ########################################################## -->
+<!-- Handling a question according to its controlType -->
+<!-- ########################################################## -->
 
-  <div [ngSwitch]="question.controlType">
+<ng-container [ngSwitch]="question.controlType" [formGroup]="form">
 
 
-    <!-- ========================================================== -->
-    <!-- Question controlType === 'textbox' -->
-    <!-- ========================================================== -->
+  <!-- ========================================================== -->
+  <!-- Question controlType === 'textbox' -->
+  <!-- ========================================================== -->
 
-    <mat-form-field *ngSwitchCase="'textbox'" [class.hide]="question.isDisabled">
+  <ng-container *ngSwitchCase="'textbox'">
 
-      <textarea matInput [formControlName]="question.key" [id]="question.key" [type]="question.inputType" [w3sHighlight]="'yellow'"></textarea>
+    <mat-form-field *ngSwitchCase="'textbox'" [class.hide]="question.isDisabled" [appearance]="options.formFieldAppearance">
 
-      <mat-hint align="start">{{question.label}}</mat-hint>
+      <mat-label>{{question.label}}</mat-label>
+
+      <ng-container *ngIf="question.inputType !== 'textarea'">
+
+        <input matInput [formControlName]="question.name" [id]="question.name" [type]="question.inputType" [readonly]="question.isReadonly" [required]="question.isRequired" [matTooltip]="question.tooltip" />
+
+      </ng-container>
+
+      <ng-container *ngIf="question.inputType === 'textarea'">
+
+        <textarea matInput [formControlName]="question.name" [id]="question.name" [type]="question.inputType" [readonly]="question.isReadonly" [required]="question.isRequired" [matTooltip]="question.tooltip" rows="2" cols="200" [w3sHighlight]="'yellow'">
+
+        </textarea>
+
+      </ng-container>
+
+      <mat-hint align="start">{{question.hint}}</mat-hint>
+
       <!-- <mat-error *ngIf="!isValid"> -->
       <mat-error>{{question.label}} is required</mat-error>
 
     </mat-form-field>
 
-
-    <!-- ========================================================== -->
-    <!-- Question controlType === 'dropdown' -->
-    <!-- ========================================================== -->
-
-    <mat-form-field *ngSwitchCase="'dropdown'" [class.hide]="question.isDisabled">
-
-      <mat-select [formControlName]="question.key" [id]="question.key">
-        <mat-option *ngFor="let option of question.options" [value]="option.key">{{option.value}}</mat-option>
-      </mat-select>
-
-      <mat-hint align="start">{{question.label}}</mat-hint>
-      <mat-error>{{question.label}} is required</mat-error>
-
-    </mat-form-field>
-
-
-    <!-- ========================================================== -->
-    <!-- Question controlType === 'checkbox' -->
-    <!-- checkbox not allowed inside mat-form-field -->
-    <!-- ========================================================== -->
-
-    <div *ngSwitchCase="'checkbox'" [class.hide]="question.isDisabled">
-
-      <mat-checkbox [formControlName]="question.key" [id]="question.key">{{question.label}}</mat-checkbox>
-
-    </div>
+  </ng-container>
 
 
 
+  <!-- TODO? Orig version for textarea -->
+  <!-- <mat-form-field *ngSwitchCase="'textbox'" [class.hide]="question.isDisabled"> -->
+  <!-- <input matInput [formControlName]="question.name" [id]="question.name" [type]="question.inputType" [readonly]="question.isReadonly" [required]="question.isRequired" [matTooltip]="question.tooltip" rows="1" cols="200" [w3sHighlight]="'yellow'" /> -->
+  <!-- <mat-hint align="start">{{question.label}}</mat-hint> -->
+  <!-- <mat-error>{{question.label}} is required</mat-error> -->
+  <!-- </mat-form-field> -->
 
-    <!-- ========================================================== -->
-    <!-- Question controlType === 'formArray' -->
-    <!-- ========================================================== -->
 
-    <div *ngSwitchCase="'formArray'">
+  <!-- ========================================================== -->
+  <!-- Question controlType === 'dropdown' -->
+  <!-- ========================================================== -->
 
-      <div *ngIf="getFormArray()" [formArrayName]="question.key">
+  <mat-form-field *ngSwitchCase="'dropdown'" [class.hide]="question.isDisabled">
 
-        <div *ngFor="let control of getFormArray().controls; let i=index" [formGroupName]="i">
+    <mat-select [formControlName]="question.name" [id]="question.name">
+      <mat-option *ngFor="let option of question.options" [value]="option.key">{{option.value}}</mat-option>
+    </mat-select>
 
-          <div *ngFor="let nestedQuestion of question.nestedQuestions">
+    <mat-hint align="start">{{question.label}}</mat-hint>
+    <mat-error>{{question.label}} is required</mat-error>
 
-            <div [ngSwitch]="nestedQuestion.controlType">
+  </mat-form-field>
 
-              <mat-form-field *ngSwitchCase="'textbox'" [class.hide]="nestedQuestion.isDisabled">
 
-                <textarea matInput [formControlName]="nestedQuestion.key" [id]="nestedQuestion.key" [type]="nestedQuestion.inputType" [w3sHighlight]="'yellow'"></textarea>
+  <!-- ========================================================== -->
+  <!-- Question controlType === 'checkbox' -->
+  <!-- checkbox not allowed inside mat-form-field -->
+  <!-- ========================================================== -->
 
-                <mat-hint align="start">{{nestedQuestion.label}}</mat-hint>
-                <!-- <mat-error *ngIf="!isValid"> -->
+  <ng-container *ngSwitchCase="'checkbox'">
+
+    <mat-checkbox [formControlName]="question.name" [id]="question.name" [class.hide]="question.isDisabled">{{question.label}}</mat-checkbox>
+
+  </ng-container>
+
+
+
+
+  <!-- ========================================================== -->
+  <!-- Question controlType === 'formArray' -->
+  <!-- ========================================================== -->
+
+  <ng-container *ngSwitchCase="'formArray'">
+
+    <ng-container *ngIf="getFormArray()" [formArrayName]="question.name">
+
+      <ng-container *ngFor="let control of getFormArray().controls; let i=index" [formGroupName]="i">
+
+        <!-- The repeated form group template -->
+
+        <div class="flex-box">
+
+          <ng-container *ngFor="let nestedQuestion of question.nestedQuestions">
+
+            <ng-container [ngSwitch]="nestedQuestion.controlType">
+
+
+
+              <!-- = copy of textbox above, + replace question with nestedQuestion -->
+
+              <mat-form-field *ngSwitchCase="'textbox'" [class.hide]="nestedQuestion.isDisabled" appearance="fill">
+
+                <mat-label>{{question.label}}</mat-label>
+
+                <input matInput [formControlName]="nestedQuestion.name" [id]="nestedQuestion.name" [type]="nestedQuestion.inputType" [readonly]="nestedQuestion.isReadonly" [required]="nestedQuestion.isRequired" [matTooltip]="nestedQuestion.tooltip" />
+
                 <mat-error>{{nestedQuestion.label}} is required</mat-error>
 
               </mat-form-field>
 
-            </div>
 
-          </div>
 
-          <br>
+
+              <!-- TODO textarea analog textbox above -->
+              <!-- <mat-form-field *ngSwitchCase="'textbox'" [class.hide]="nestedQuestion.isDisabled"> -->
+
+              <!-- <textarea matInput [formControlName]="nestedQuestion.name" [id]="nestedQuestion.name" [type]="nestedQuestion.inputType" [w3sHighlight]="'yellow'"></textarea> -->
+
+              <!-- <mat-hint align="start">{{nestedQuestion.label}}</mat-hint> -->
+              <!-- <mat-error>{{nestedQuestion.label}} is required</mat-error> -->
+
+              <!-- </mat-form-field> -->
+
+
+            </ng-container>
+
+          </ng-container>
 
         </div>
 
-        <br>
-        <button mat-raised-button color="nixprimary" (click)="addFormGroup()">Add Address</button>
+
+      </ng-container>
+
+      <br>
+      <button mat-raised-button color="nixprimary" (click)="addFormGroup()">Add Address</button>
 
 
-        <br>***getFormArray() = form.get(this.question.key) as FormArray:<br>  {{getFormArray()}}
-        <br>***question.nestedQuestions:<br> {{question.nestedQuestions | json}}
-
+      <div *ngIf="showTestValues" class="showTestValues">
+        <br>##########getFormArray() = form.get(this.question.name) as FormArray:<br> {{getFormArray()}}
+        <br>##########question.nestedQuestions:<br> {{question.nestedQuestions | json}}
       </div>
 
-
-    </div>
-
-
-    <!-- ========================================================== -->
-    <!-- All question controlTypes should have been handled -->
-    <!-- ========================================================== -->
-
-    <div *ngSwitchDefault>
-
-    </div>
+    </ng-container>
 
 
-  </div> <!-- End of ngSwitch -->
+  </ng-container> <!-- End of ngSwitchCase formArray -->
 
 
-</div>
+  <!-- ========================================================== -->
+  <!-- All relevant question controlTypes should have been handled -->
+  <!-- ========================================================== -->
+
+  <ng-container *ngSwitchDefault>
+
+  </ng-container>
+
+
+</ng-container> <!-- End of ngSwitch -->
+
+
+<!-- </div> -->

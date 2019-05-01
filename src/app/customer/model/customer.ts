@@ -1,8 +1,8 @@
-export interface AddAddress {
+export interface Address {
   // type?: AddAddressType = other;
-  addStreet: string;
-  addPostalCode: string;
-  addCity: string;
+  street: string;
+  postalCode: string;
+  city: string;
   // country: string;
 }
 

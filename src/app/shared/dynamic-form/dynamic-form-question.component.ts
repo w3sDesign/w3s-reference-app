@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, FormArray } from '@angular/forms';
 
 import { QuestionBase } from './question-base';
 import { DynamicFormGroupService } from './dynamic-form-group.service';
+import { DynamicFormOptions } from './dynamic-form-options';
 
 @Component({
   selector: 'w3s-dynamic-form-question',
@@ -11,8 +12,16 @@ import { DynamicFormGroupService } from './dynamic-form-group.service';
 })
 export class DynamicFormQuestionComponent implements OnInit {
 
+  showTestValues = true;
+
   @Input() form: FormGroup;
   @Input() question: QuestionBase;
+  @Input() options: DynamicFormOptions;
+  // options2: DynamicFormOptions;
+
+  get isValid() {
+    return this.form.controls[this.question.name].valid;
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -20,13 +29,13 @@ export class DynamicFormQuestionComponent implements OnInit {
 
   ngOnInit() {
     if (this.question.isDisabled) {
-      this.form.controls[this.question.key].disable();
+      this.form.controls[this.question.name].disable();
     }
   }
 
   /** Get FormArray control(s) */
   getFormArray() {
-    return this.form.get(this.question.key) as FormArray;
+    return this.form.get(this.question.name) as FormArray;
   }
 
   /** Add FormGroup to FormArray */
@@ -37,7 +46,4 @@ export class DynamicFormQuestionComponent implements OnInit {
     this.getFormArray().push(formGroup);
   }
 
-  get isValid() {
-    return this.form.controls[this.question.key].valid;
-  }
 }

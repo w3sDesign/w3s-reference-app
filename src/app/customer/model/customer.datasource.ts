@@ -49,7 +49,7 @@ export class CustomerDataSource implements DataSource<any> {
 
 
   /**
-   * Connecting the data table to receive the customers to be displayed.
+   * Connecting the data table by returning the customers observable.
    * The data table renders a row for each object in the data array.
    */
   connect(collectionViewer: CollectionViewer): Observable<any[]> {
@@ -65,25 +65,24 @@ export class CustomerDataSource implements DataSource<any> {
 
 
   /**
-   * loadCustomer() is implemented by delegating to the customer service.
+   * getCustomers() is implemented by delegating to the customer service.
    * If the data arrives successfully, it is passed to the customers
    * subject (by calling next(res.items)), which in turn emits the data
    * to the connected data table for rendering.
    */
-  loadCustomers(queryParams: QueryParams) {
+  getCustomers(queryParams: QueryParams) {
     this.isLoading.next(true);
 
     /**
-     * Delegating to customer service.
-     * Returns Observable QueryResult.
+     * Delegating to customer service which returns a query result observable.
      * ###########################################
      */
     this.customerService.getCustomers(queryParams)
       .pipe(
         tap((res: QueryResult) => {
           /**
-           * Passing the queryResult.items to the customers subject,
-           * which emits the data to the connected data table for rendering.
+           * Passing the queryResult.items to the customers subject, which
+           * emits the data to the connected (subscribed) data table for rendering.
            */
           this.customers.next(res.items);
 

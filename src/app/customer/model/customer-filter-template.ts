@@ -8,26 +8,50 @@
 // };
 
 
+// export class CustomerFilterTemplate {
+
+//   id = 0;
+//   name = '';
+
+//   customerId = '';
+//   customerName = '';
+
+//   // Addresses
+//   // customerStreet = '';
+//   customerPostalCode = '';
+//   customerCity = '';
+//   // customerCountry = '';
+
+//   // Contacts
+//   // customerDepartment = '';
+//   // customerPerson = '';
+//   // customerPhone = '';
+//   // customerEmail = '';
+
+//   // customerStatus = '';
+// }
+
+
 export class CustomerFilterTemplate {
 
   id = 0;
   name = '';
 
-  customerId = '';
-  customerName = '';
+  idFilter = '';
+  nameFilter = '';
 
   // Addresses
-  // customerStreet = '';
-  customerPostalCode = '';
-  customerCity = '';
-  // customerCountry = '';
+  // streetFilter = '';
+  postalCodeFilter = '';
+  cityFilter = '';
+  // countryFilter = '';
 
   // Contacts
-  // customerDepartment = '';
-  // customerPerson = '';
-  // customerPhone = '';
-  // customerEmail = '';
+  // departmentFilter = '';
+  // personFilter = '';
+  // phoneFilter = '';
+  // emailFilter = '';
 
-  // customerStatus = '';
+  // statusFilter = '';
 }
 

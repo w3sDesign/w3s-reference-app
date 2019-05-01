@@ -1,18 +1,32 @@
-//  HTML structure
-//  ##############
+.flex-box {
 
-//  <mat-form-field>
+  display: flex;
 
-//    <input matInput ;
+  flex-direction: row;
+  justify-content: flex-start; // horizontal
+  align-items: center; // vertical
+  flex-wrap: wrap; // default = nowrap
 
-//    <mat-select *ngSwitchCase="'dropdown'"
-//       <mat-option {{option.value}}
-//    </mat-select>
+  font-size: 14px;
+  // padding: 16px 8px 16px 24px;
+  padding-top: 16px;
 
-//    <mat-error>{{dynamicField.label}} is required</mat-error>
+  .mat-form-field {
+    flex: 1;
+    // margin-right: 30px;
+    // max-width: 400px;
+  }
 
-//  </mat-form-field>
+}
 
+
+// see dynamic-form-component.scss -> w3s-dynamic-form-question { ... }
+.mat-form-field {
+  margin-right: 30px; // w3s-dynamic-form-question already has margin-right
+  // display: inherit;
+  display: block;
+  // max-width: 400px;
+}
 
 .hide {
   display: none;
@@ -27,14 +41,12 @@
 
 // To avoid that user agent stylesheet sets display: block
 // (when div isn't set anywhere!?)
-div {
-  display: inherit;
-}
+// Solved by ng-container (no add div's)
+// div {
+//   display: inherit;
+// }
 
 
-.mat-form-field {
-  margin-right: 30px;
-}
 
 .checkbox {
   display: flex;
@@ -48,15 +60,15 @@ div {
   // padding-bottom: 16px; // 8px 16px 24px;
 }
 
-// test
-.flex-box {
-  display: flex;
+// // test
+// .flex-box {
+//   display: flex;
 
-  flex-direction: row;
-  align-items: center; // vertical
-  justify-content: flex-start; // horizontal
-  flex-wrap: wrap; // default = nowrap
+//   flex-direction: row;
+//   align-items: center; // vertical
+//   justify-content: flex-start; // horizontal
+//   flex-wrap: wrap; // default = nowrap
 
-  font-size: 14px;
-  // padding-bottom: 16px; // 8px 16px 24px;
-}
+//   font-size: 14px;
+//   // padding-bottom: 16px; // 8px 16px 24px;
+// }

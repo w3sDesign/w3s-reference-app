@@ -1,52 +1,58 @@
-//  HTML structure
-//  ##############
+// .w3s-list-component .mat-expansion-panel {
+//   // @extend %flex-box;
+//   // padding: 0 8px 16px 0;
+//   width: 100%;
+//   align-items: xbaseline;
 
-//  <mat-expansion-panel> // filters
-
-//    <mat-expansion-panel-header>; // render active filters
-//    <mat-form-field> <input #searchInput>;
-
-//    <w3s-dynamic-form> // filter form
-//      <form class="w3s-flex-box">
-//        <w3s-dynamic-form-field>s <mat-form-field>s
-//        <button type="submit"
-//      </form>
-//    </w3s-dynamic-form>
-
-//    <div id="filterButtons">
-//      <buttons Add Filters / Clear Filters /Save Filters
-//    </div>
-
-//  </mat-expansion-panel>
+//   .mat-form-field,
+//   button {
+//     margin-right: 30px;
+//   }
+// }
 
 
-//  <div class="flex-box" #crudButtons>
-//    <buttons Create/Update/Delete customers
-//  </div>
+.nixclose:hover {
+  background: #ff4081;
+  color: #fff;
+}
 
-//  <table mat-table>; // main data table
+.cdk-drag-preview {
+  max-width: 100px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+              0 8px 10px 1px rgba(0, 0, 0, 0.14),
+              0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
 
-//  <mat-action-row>
-//    <mat-spinner>;
-//    <mat-paginator>;
-//  </mat-action-row>
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
 
+.cdk-drag-placeholder {
+  opacity: 0;
+}
 
+// Moved to global styles.scss
+// .mat-sort-header-button {
+//   cursor: move;
+// }
 
-mat-expansion-panel {
-  // @extend %flex-box;
-  // padding: 0 8px 16px 0;
-  width: 100%;
-  align-items: xbaseline;
-
-  .mat-form-field,
-  button {
-    margin-right: 30px;
-  }}
+// .example-handle {
+//   position: relative;
+//   left: -20px;
+//   // top: 10px;
+//   // right: 10px;
+//   color: #777;
+//   cursor: move;
+//   width: 24px;
+//   height: 24px;
+// }
 
 #filterButtons {
   @extend %flex-box;
-  padding: 30px 8px 16px 0px;
+  padding: 0 0 16px 24px; //30px 8px 16px 0px;
+  width: 100%;
 }
 
 #crudButtons {
@@ -124,6 +130,10 @@ table {
 
 // .mat-column-id {
 // 	flex: 0 0 78px;
+// }
+
+// .mat-column-name {
+// 	flex: 2 0 200px;
 // }
 
 // .mat-column-main {

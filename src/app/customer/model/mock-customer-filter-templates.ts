@@ -5,46 +5,46 @@ export const mockCustomerFilterTemplates: CustomerFilterTemplate[] = [
     id: 0,
     name: 'standard',
 
-    customerId: '>20010',
-    customerName: 'Foundation',
+    idFilter: '>20010',
+    nameFilter: 'Foundation',
 
     // Addresses
 
     // TODO if country === 'disabled' set form control = disabled
     // country: 'disabled',
-    customerPostalCode: '',
-    customerCity: '',
-    // street: 'disabled',
+    postalCodeFilter: '',
+    cityFilter: '',
+    // streetFilter: 'disabled',
 
     // Contacts
 
-    // customerDepartment: '',
-    // customerPerson: '',
-    // customerPhone: '',
-    // customerEmail: '',
+    // Department: '',
+    // Person: '',
+    // Phone: '',
+    // Email: '',
 
-    // customerStatus: ''
+    // Status: ''
   },
 
   {
     id: 1,
     name: 'myTemplate',
 
-    customerId: '',
-    customerName: 'w3sdesign',
+    idFilter: '',
+    nameFilter: 'w3sdesign',
 
     // country: 'disabled',
-    customerPostalCode: '',
-    customerCity: 'vienna',
+    postalCodeFilter: '',
+    cityFilter: 'vienna',
     // street: 'disabled',
 
     // Contacts
 
-    // customerDepartment: '',
-    // customerPerson: '',
-    // customerPhone: '',
-    // customerEmail: '',
-    // customerStatus: ''
+    // Department: '',
+    // Person: '',
+    // Phone: '',
+    // Email: '',
+    // Status: ''
   },
 
 ];

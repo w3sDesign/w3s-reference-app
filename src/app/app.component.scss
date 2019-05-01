@@ -1,46 +1,89 @@
-.sidenav-container {
-  height: 100%;
-}
-
-.sidenav {
-  margin-top: 64px;
-  padding: 20px;
-  width: 220px;
-}
+// ####################################################################
+// Fixed top mat-toolbar
+// ####################################################################
 
 .mat-toolbar.mat-primary {
-  position: sticky;
+  position: fixed; // sticky;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 10;
 }
 
-.mat-expansion-panel {
+
+// ####################################################################
+// Fixed left mat-sidenav
+// ####################################################################
+
+.w3s-app-component .mat-sidenav {
+  margin-top: 64px;
+  padding-left: 0; //20px;
+  width: 220px;
+}
+
+
+.w3s-app-component .mat-sidenav .mat-expansion-panel {
   margin-top: 3px;
+  padding-left: 0; //8px;
 }
 
-.mat-expansion-panel-header {
-  // height: 48px !important; //64
-  max-height: 48px;
-  padding-left: 16px;
-}
-
-// .mat-expansion-panel-body {
-//   padding-left: 16px !important;
+// in global styles.scss
+// because .mat-expansion-panel-body does not exist locally
+// .w3s-app-component .mat-sidenav .mat-expansion-panel-body {
+//   padding-left: 0; // isn't recognized
 // }
 
-.mat-nav-list {
-  padding: 0; //orig: padding-top:8px
+.w3s-app-component .mat-sidenav .mat-nav-list {
+  padding: 0 0 0 12px; //orig: 0 16
 }
 
-.sidenav .mat-list-item {
-  font-size: 14px; //orig: 16
-  height: 35px !important; //orig: 48
-  margin-left: -8px !important; // padding isn't recognized
+.w3s-app-component .mat-sidenav .mat-nav-list .mat-list-item {
+  font-size: 15px; //orig: 16
+  height: 35px; //orig: 48
+  padding: 0;
+}
+
+.mat-sidenav h6 {
+  margin: 40px 0 20px 20px;
+}
+
+
+// in global styles.scss
+// because .mat-list-item-content does not exist locally
+// .mat-list-item-content {
+//   padding: 0;
+// }
+
+
+
+// ####################################################################
+// Relative positioned mat-sidenav-content
+// ####################################################################
+
+// .w3s-app-component .mat-sidenav-container {
+//   position: fixed; must be relative!
+//   top: 0;
+//   left: 0;
+//   margin-top: 64px;
+//   height: 100%;
+// }
+
+.w3s-app-component .mat-sidenav-content {
+  // position: relative; // = default!
+  margin-top: 64px; // = height of fixed top mat-toolbar
+  // margin-left: 220px; // = width of fixed left mat-sidenav // = default!
 }
 
 
 
-.title {
+
+
+
+// ####################################################################
+// mat-toolbar
+// ####################################################################
+
+.mat-toolbar .title {
   font-size: 16px;
   // margin-left: 15px;
   margin-right: 40px;
@@ -48,7 +91,7 @@
   padding: 0 22px;
 }
 
-.description {
+.mat-toolbar .description {
   flex: 1 1 auto;
   // justify-content: center; //  items justified toward the center of the container
   text-align: center; // item content aligned horizontally
@@ -63,11 +106,11 @@
   }
 }
 
-.github img {
+.mat-toolbar .github img {
   padding: 0 0 4px 10px;
 }
 
-.github span {
+.mat-toolbar .github span {
   font-size: 15px;
   color: white;
   padding: 0 30px 0 10px

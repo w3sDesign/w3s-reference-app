@@ -1,86 +1,119 @@
-<div>
+<!-- <div> -->
 
-  <form (ngSubmit)="onSubmit()" *ngIf="form" [formGroup]="form" [ngClass]="formClass">
+<form (ngSubmit)="onSubmit()" *ngIf="form" [formGroup]="form" [ngClass]="formClass">
+
+  <ng-container *ngIf="title">
+    <h6>{{title}}</h6>
+  </ng-container>
 
 
-    <!-- ========================================================== -->
-    <!-- With data grouping (e.g. Basic Data, Addresses, Contacts). -->
-    <!-- ========================================================== -->
+  <!-- ########################################################## -->
+  <!-- Multiple data groups (e.g. Basic Data, Addresses, Contacts). -->
+  <!-- ########################################################## -->
 
-    <div *ngIf="questions[0].group > 0">
+  <ng-container *ngIf="dataGroupNames">
 
-      <br />
-      <h6> {{questions[0].groupName}} </h6>
-      <!-- TODO <h6> {{questions[0].groupName}} </h6> Basic Data -->
+    <ng-container *ngFor="let dataGroupName of dataGroupNames">
+
+
+      <br>
+      <h6> {{dataGroupName}} </h6>
       <mat-divider></mat-divider>
 
-      <div class="flex-box">
-
-        <div *ngFor="let question of questions">
-
-          <w3s-dynamic-form-question *ngIf="question.group === 1" [question]="question" [form]="form">
-
-          </w3s-dynamic-form-question>
-
-        </div>
-
-      </div>
-
-      <!-- ################################################ -->
 
 
-      <br />
-      <h6> {{questions[0].groupName}} Addresses </h6>
-      <mat-divider></mat-divider>
 
-      <div class="flex-box">
+      <!--TODO <ng-container *ngIf="!isFormArray"> -->
+      <ng-container *ngIf="dataGroupName !== 'Additional Addresses'">
 
-        <div *ngFor="let question of questions">
+        <div class="flex-box">
 
-          <w3s-dynamic-form-question *ngIf="question.group === 2" [question]="question" [form]="form">
+          <ng-container *ngFor="let question of questions">
 
-          </w3s-dynamic-form-question>
+            <!-- ########################################################## -->
+
+            <w3s-dynamic-form-question *ngIf="question.groupName === dataGroupName" [question]="question" [options]="options" [form]="form">
+
+            </w3s-dynamic-form-question>
+
+            <!-- ########################################################## -->
+
+          </ng-container>
 
         </div>
 
-      </div>
-
-    </div> <!-- End of group > 0 -->
+      </ng-container>
 
 
-    <!-- ========================================================== -->
-    <!-- Without data grouping. -->
-    <!-- ========================================================== -->
 
-    <div *ngIf="questions[0].group === 0">
 
-      <div class="flex-box">
+      <!-- TODO<ng-container *ngIf="isFormArray"> -->
+      <ng-container *ngIf="dataGroupName === 'Additional Addresses'">
 
-        <div *ngFor="let question of questions">
+        <!-- <ng-container *ngFor="let nestedQuestion of questions[x].nestedQuestions"> -->
 
-          <w3s-dynamic-form-question [question]="question" [form]="form">
+        <!-- <div class="flex-box"> -->
+
+        <ng-container *ngFor="let question of questions">
+
+          <w3s-dynamic-form-question *ngIf="question.groupName === dataGroupName" [question]="question" [options]="options" [form]="form">
 
           </w3s-dynamic-form-question>
 
-        </div>
+        </ng-container>
 
-      </div>
+        <!-- </div> -->
+
+        <!-- </ng-container> -->
+
+      </ng-container>
+
+
+
+
+
+
+    </ng-container>
+
+  </ng-container>
+
+
+  <!-- ########################################################## -->
+  <!-- No data groups. -->
+  <!-- ########################################################## -->
+
+  <ng-container *ngIf="!dataGroupNames">
+
+    <div class="flex-box">
+
+      <ng-container *ngFor="let question of questions">
+
+        <w3s-dynamic-form-question [question]="question" [options]="options" [form]="form">
+
+        </w3s-dynamic-form-question>
+
+      </ng-container>
 
     </div>
 
-    <!-- ################################################ -->
+  </ng-container>
 
 
 
 
-    <button type="submit" *ngIf="form" mat-raised-button matTooltip="Start Searching" [disabled]="!form.valid">Submit Dyn Form</button>
+  <!-- ########################################################## -->
+  <!-- Submit form button -->
+  <!-- ########################################################## -->
+
+  <button type="submit" *ngIf="form" mat-raised-button matTooltip="Start Searching" [disabled]="!form.valid">Submit Dyn Form</button>
 
 
-  </form>
+</form>
 
+<div *ngIf="showTestValues" class="showTestValues">
 
-  <div *ngIf="payLoad">
-    <br>***Saved the following values (form.value) :<br> {{payLoad}}
-  </div>
+  <ng-container *ngIf="payLoad">
+    <br>#######dynamic-form-component: Saved the following values (form.value) :<br> {{payLoad}}
+  </ng-container>
 
 </div>

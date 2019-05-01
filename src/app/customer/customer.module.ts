@@ -16,7 +16,7 @@ import {
   CustomerDetailDialogComponent
 } from './customer-detail/customer-detail.component';
 import { HttpCustomerService } from './model/http-customer.service';
-import { questionsConfig, customerConfig } from './model/customer.config';
+// import { questionsConfig, customerConfig } from './model/nix.customer.config';
 
 
 @NgModule({

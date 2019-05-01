@@ -1,9 +1,7 @@
-/**
- * ####################################################################
- * TODO SnackBar - see DELETE
- * ####################################################################
- *
- */
+// ####################################################################
+// TODO SnackBar - see DELETE
+// ####################################################################
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable, forkJoin, of } from 'rxjs';
@@ -30,16 +28,15 @@ import { QuestionBase } from '../../shared/dynamic-form/question-base';
  */
 export { HttpCustomerService as CustomerService };
 
-
-/** Headers for Create/Update/Delete methods */
+/** Http Headers for Create/Update/Delete methods */
 const cudOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
+
 /**
+ * # @class HttpCustomerService
  * ####################################################################
- * Injectable http data access service (via HTTP REST API).
- *
- * See also angular/in-memory-web-api/src/app/http-client-hero.service.ts
- * ####################################################################
+ * - Is an injectable http data access service (via HTTP REST API).
+ * - See also https://github.com/angular/in-memory-web-api/blob/master/src/app/http-client-hero.service.ts
  */
 @Injectable()
 export class HttpCustomerService extends CustomerService {
@@ -49,6 +46,12 @@ export class HttpCustomerService extends CustomerService {
   private filterTemplate: CustomerFilterTemplate;
 
 
+  /**
+   * ## @constructor HttpCustomerService
+   * ##################################################################
+   *  - Injects dependencies.
+   *  - Creates handleError function.
+   */
   constructor(
     private http: HttpClient,
     private httpErrorHandler: HttpErrorHandler,
@@ -65,9 +68,9 @@ export class HttpCustomerService extends CustomerService {
 
 
   /**
+   * ## @method getCustomer
    * ##################################################################
-   * Get a customer by id from the remote http data server.
-   * ##################################################################
+   * - Gets a customer by id from the http server.
    */
   getCustomer(id: number): Observable<Customer> {
     return this.http.get<Customer>(this.customersUrl + `/${id}`)
@@ -76,16 +79,29 @@ export class HttpCustomerService extends CustomerService {
       );
   }
 
+
   /**
+   * ## @method getCustomers
    * ##################################################################
-   * Get customers from the remote http data server.
+   * - Gets customers from the http server.
    *
-   * This code emulates real server response by getting all customers
-   * and performing client-side filtering, sorting, and pagination.
+   * @param queryParams   The filter, sort, and page parameters.
+   * @return queryResult  The filtered and sorted items (customer) array.
    *
-   * Note: getCustomers() returns QueryResult
-   *       http.get()     returns Customer[]
-   * ##################################################################
+   * - This code emulates real server response by getting all customers
+   * from the server and performs client-side filtering, sorting, and paginating.
+   *
+   * - Note: getCustomers() returns QueryResult Observable;
+   *       http.get()     returns Customer[] Observable.
+   *
+   * - mergeMap
+   * maps each value (Customer[]) emitted by the source observable
+   * to a new observable (queryResult) which is merged in the output observable.
+   *
+   * - TODO?  switchMap
+   * maps the *most recent*  value (Customer[]) emitted by source observable
+   * to a new observable (queryResult) which is merged in the output observable.
+   * It switches whenever a new value is emitted.
    */
   getCustomers(queryParams?: QueryParams): Observable<QueryResult> {
     if (queryParams) {
@@ -142,67 +158,6 @@ export class HttpCustomerService extends CustomerService {
         catchError(this.handleError<CustomerFilterTemplate[]>('Get customerFilterTemplates'))
       );
   }
-
-
-  /**
-   * ##################################################################
-   * Get all customer filter template questions.
-   * ##################################################################
-   */
-
-  getCustomerFilterTemplateQuestions(filterTemplateName: string = 'standard'): Observable<QuestionBase[]> {
-
-    // // const filterTemplate = this.helper(filterTemplateName);
-    // this.getCustomerFilterTemplates()
-    //   .subscribe(
-    //     res => {
-    //       this.filterTemplate = res[0];
-    //       // let arr = [];
-    //       // const arr = res.filter(el => el.name === tmplName);
-    //       // return arr[0];
-    //     }
-    //   );
-
-    return this.http.get<QuestionBase[]>(this.customerFilterTemplateQuestionsUrl)
-      .pipe(
-        // tap(res => {
-        //   res.forEach(el => {
-        //     el.value = filterTemplate[el.key];
-        //   });
-        // }),
-
-        // mergeMap(res => {
-        //   const questions: QuestionBase[] = res;
-        //   // id -> customerId, name -> customerName, ...
-        //   // const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
-
-        //   questions.forEach(question => {
-        //     // question.value = this.filterTemplate['customer' + capitalize(question.key)];
-        //     question.value = this.filterTemplate[question.key];
-        //   });
-
-        //   return of(questions);
-        // }),
-
-        catchError(this.handleError<QuestionBase[]>('Get customerFilterTemplateQuestions'))
-      );
-  }
-
-
-  // helper(tmplName: string) {
-
-  //   this.getCustomerFilterTemplates()
-  //     .subscribe(
-  //       res => {
-  //         this.filterTemplate = res[0];
-  //         // let arr = [];
-  //         // const arr = res.filter(el => el.name === tmplName);
-  //         // return arr[0];
-  //       }
-  //     );
-
-  // }
-
 
 
   /**

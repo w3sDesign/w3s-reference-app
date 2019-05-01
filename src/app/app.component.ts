@@ -43,6 +43,8 @@ export class AppComponent implements OnInit {
   navEnd: Observable<NavigationEnd>;
   openSideNav = false; // TODO
 
+  // displayMode = 'flat'; // test MatAccordion
+
   constructor(
     private breakpointObserver: BreakpointObserver,
     private activatedRoute: ActivatedRoute,
@@ -80,8 +82,8 @@ export class AppComponent implements OnInit {
     // url.subscribe(url2 => console.log(url2));
 
     this.isSmallScreen.subscribe(event => {
-      event ? this.description = 'Data Entry & Maintenance Components'
-        : this.description = 'High Performance Data Entry & Maintenance Applications';
+      event ? this.description = 'Data Entry & Data Maintenance'
+        : this.description = 'High Performance Data Entry & Data Maintenance Applications';
     });
 
   }

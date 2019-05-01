@@ -4,28 +4,13 @@ import { HttpParams, HttpHeaders } from '@angular/common/http';
 import { QueryParams } from './query-params';
 import { QueryResult } from './query-result';
 import * as _ from 'lodash';
-
-/**
-   * ##################################################################
-   * Mapping filter key to target key.
-   * TODO ? Should be in customer package
-   * - customer-utils.service
-   * ##################################################################
-   */
-// const filterMap = {
-//   customerId: 'id',
-//   customerName: 'name',
-//   customerStreet: 'addresses[0].street',
-//   customerPostalCode: 'addresses[0].postalCode',
-//   customerCity: 'addresses[0].city',
-//   customerCountry: 'addresses[0].country',
-
-//   filterByProductId: 'id'
-// };
+import { JsonPipe } from '@angular/common';
 
 
 @Injectable({ providedIn: 'root' })
+
 export class HttpUtilsService {
+
 
   ///////////////////////////////////////////////
   getFindHttpParams(queryParams): HttpParams {
@@ -47,91 +32,76 @@ export class HttpUtilsService {
 
 
   /**
+   * ## @method filterAndSort()
    * ##################################################################
-   * Client side filtering and sorting.
-   * ##################################################################
+   * - Client side filtering and sorting.
+   *
+   * @param items         The items (customers) array to be filtered and sorted.
+   * @param queryParams   The params for filtering, sorting, and paginating.
+   *
+   * @return queryResult  The filtered and sorted items array.
    */
 
   filterAndSort(items: any[], queryParams: QueryParams): QueryResult {
 
-    let filteredItems: any[] = items;
+    // ==================================================================
+    // (1) Filtering - setting filtered items.
+    // ==================================================================
+
+    /** Filtered items have passed all filter tests. */
+    let filteredItems: any[];
+
     const filterTemplate = queryParams.filter;
 
-    // let notPassedTests = 0;
-    let hasPassedTests: boolean;
+    filteredItems = items.filter(item => { // JS array.filter() method
 
-    // function isNumber(obj) {
-    //   return obj !== undefined && typeof (obj) === 'number' && !isNaN(obj);
-    // }
+      let testFailed = false;
 
-    // function filterByID(item) {
-    //   if (isNumber(item.id) && item.id !== 0) {
-    //     return true;
-    //   }
-    //   invalidEntries++;
-    //   return false;
-    // }
+      /**
+       * For example:
+       * item          : { "id"      : "20018",  "name"      : "Vehicle Risus Foundation" }
+       * filterTemplate: { "idFilter": ">20010", "nameFilter": "Foundation" }
+       *
+       * For each key in the filter template object ('idFilter', 'nameFilter').
+       */
+      Object.keys(filterTemplate).forEach(filterKey => {
 
-    // const arrByID = items.filter(filterByID);
+        const itemKey = filterKey.replace('Filter', '');
 
+        const value = item[itemKey];
 
+        if (!value) { console.error('##########no value! value = ' + value); }
+        // console.log('#########itemKey: ' + itemKey);
+        // console.log('#########value: ' + JSON.stringify(value));
 
-    /**
-     * ==================================================================
-     * Filtering
-     * Filtered items have passed all tests (filter criteria).
-     * ==================================================================
-     */
+        const filter = filterTemplate[filterKey].trim().toLowerCase();
 
-    // JS array.filter() method
-    // For each item in the items array (item = customer, product, ...).
-    filteredItems = items.filter(item => {
+        if (filter && !testFailed) {
 
-      // notPassedTests = 0;
-      hasPassedTests = true;
+          if (typeof (value) === 'string') {
 
-      // For each filter in the filter template object.
-      Object.keys(filterTemplate).forEach(key => { // key = 'customerId', 'customerName', ...
-
-
-        // For example, transform: key = 'customerPostalCode' to itemKey = 'postalCode'.
-        // const itemKey = key.replace(/([a-z]+)([A-Z])(\w+)/, '$2$3');
-        // For better performance:
-        const itemKey = key.replace(/^([a-z]+)([A-Z])/, (match, p1, p2) => p2.toLowerCase());
-
-        // For better performance:
-        // const itemKey = filterMap[key];
-        // const itemKey = key;
-
-        const data = item[itemKey];
-        const filter = filterTemplate[key].trim().toLowerCase();
-
-
-        if (filter && hasPassedTests) {
-
-          if (typeof (data) === 'string') {
-
-            if (data.toLocaleLowerCase().indexOf(filter) === -1) {
-              hasPassedTests = false;
+            if (value.toLocaleLowerCase().indexOf(filter) === -1) {
+              testFailed = true;
             }
 
-          } else if (typeof (data) === 'number') {
+          }
 
-            if (filter.substring(0, 1) === '>') {
-              if (data <= +filter.substring(1)) {
-                hasPassedTests = false;
-              }
-            } else if (filter.substring(0, 1) === '<') {
-              if (data >= +filter.substring(1)) {
-                hasPassedTests = false;
-              }
-            } else if (filter.substring(0, 1) === '=') {
-              if (data !== +filter.substring(1)) {
-                hasPassedTests = false;
-              }
-            } else if (data !== +filter) {
-              hasPassedTests = false;
+          if (typeof (value) === 'number') {
+
+            switch (filter.substring(0, 1)) {
+              case '>':
+                if (value <= +filter.substring(1)) { testFailed = true; }
+                break;
+              case '<':
+                if (value >= +filter.substring(1)) { testFailed = true; }
+                break;
+              case '=':
+                if (value !== +filter.substring(1)) { testFailed = true; }
+                break;
+              default:
+                if (value !== +filter) { testFailed = true; }
             }
+
           }
 
           // other tests ...
@@ -139,47 +109,17 @@ export class HttpUtilsService {
 
       });
 
-      // If item has passed all tests (filter criteria) return true.
-      // if (notPassedTests > 0) { return false; } else { return true; }
-      return hasPassedTests;
+      // If an item has passed all filter tests (not failed) return true
+      // to the array.filter method; else return false.
+      return !testFailed;
 
     });
 
 
+    // ================================================================
+    // (2) Sorting filtered items.
+    // ================================================================
 
-    //   filterString = filterObj[key]
-    //     .toString()
-    //     .trim()
-    //     .toLowerCase();
-
-    //   if (key && !_.includes(filtrationFields, key) && searchText) {
-    //     doSearch = true;
-    //     try {
-    //       incomingArray.forEach((element, index) => {
-    //         const val = element[key]
-    //           .toString()
-    //           .trim()
-    //           .toLowerCase();
-    //         if (
-    //           val.indexOf(searchText) > -1 &&
-    //           indexes.indexOf(index) === -1
-    //         ) {
-    //           indexes.push(index);
-    //         }
-    //       });
-    //     } catch (ex) {
-    //       console.log(ex, key, searchText);
-    //     }
-    //   }
-    // });
-
-
-
-    /**
-     * ==================================================================
-     * Sorting
-     * ==================================================================
-     */
     if (queryParams.sortField) {
       filteredItems = this.arraySort(
         filteredItems,
@@ -188,11 +128,11 @@ export class HttpUtilsService {
       );
     }
 
-    /**
-     * ==================================================================
-     * Paginating
-     * ==================================================================
-     */
+
+    // ================================================================
+    // (3) Paginating filtered (and sorted) items.
+    // ================================================================
+
     const totalCount = filteredItems.length;
     const initialPos = queryParams.pageNumber * queryParams.pageSize;
     filteredItems = filteredItems.slice(
@@ -200,127 +140,24 @@ export class HttpUtilsService {
       initialPos + queryParams.pageSize
     );
 
-    /**
-     * ==================================================================
-     * Returning result
-     * ==================================================================
-     */
+
+    // ================================================================
+    // (4) Returning the queryResult.
+    // ================================================================
+
     const queryResult = new QueryResult();
+
     queryResult.items = filteredItems;
+
     queryResult.totalCount = totalCount;
+
+    // console.log('##########http-utils-service / queryResult: ' + JSON.stringify(queryResult));
+
     return queryResult;
-  }
 
 
+  } // The end of filterAndSort().
 
-
-
-
-  // queryOriginal(
-  //   items: any[],
-  //   queryParams: QueryParams,
-  //   filtrationFields: string[] = []): QueryResult {
-
-  //   /** Filtering */
-  //   let itemsResult = this.arraySearch(
-  //     items,
-  //     queryParams.filter,
-  //     filtrationFields
-  //   );
-
-  //   /** Sorting */
-  //   if (queryParams.sortField) {
-  //     itemsResult = this.arraySort(
-  //       itemsResult,
-  //       queryParams.sortField,
-  //       queryParams.sortOrder
-  //     );
-  //   }
-
-  //   /** Pagination */
-  //   const totalCount = itemsResult.length;
-  //   const initialPos = queryParams.pageNumber * queryParams.pageSize;
-  //   itemsResult = itemsResult.slice(
-  //     initialPos,
-  //     initialPos + queryParams.pageSize
-  //   );
-
-  //   /** Return queryResult */
-  //   const queryResult = new QueryResult();
-  //   queryResult.items = itemsResult;
-  //   queryResult.totalCount = totalCount;
-  //   return queryResult;
-  // }
-
-
-  /**
-   * ##################################################################
-   * Client side filtering.
-   * ##################################################################
-   */
-  arraySearch(
-    incomingArray: any[],
-    queryObj: any,
-    filtrationFields: string[] = []): any[] {
-
-    const result: any[] = [];
-    let resultBuffer: any[] = [];
-    const indexes: number[] = [];
-    let firstIndexes: number[] = [];
-    let doSearch = false;
-
-    filtrationFields.forEach(item => {
-      if (item in queryObj) {
-        incomingArray.forEach((element, index) => {
-          if (element[item] === queryObj[item]) {
-            firstIndexes.push(index);
-          }
-        });
-        firstIndexes.forEach(element => {
-          resultBuffer.push(incomingArray[element]);
-        });
-        incomingArray = resultBuffer.slice(0);
-        resultBuffer = [].slice(0);
-        firstIndexes = [].slice(0);
-      }
-    });
-
-    Object.keys(queryObj).forEach(key => {
-      const searchText = queryObj[key]
-        .toString()
-        .trim()
-        .toLowerCase();
-      if (key && !_.includes(filtrationFields, key) && searchText) {
-        doSearch = true;
-        try {
-          incomingArray.forEach((element, index) => {
-            const val = element[key]
-              .toString()
-              .trim()
-              .toLowerCase();
-            if (
-              val.indexOf(searchText) > -1 &&
-              indexes.indexOf(index) === -1
-            ) {
-              indexes.push(index);
-            }
-          });
-        } catch (ex) {
-          console.log(ex, key, searchText);
-        }
-      }
-    });
-
-    if (!doSearch) {
-      return incomingArray;
-    }
-
-    indexes.forEach(re => {
-      result.push(incomingArray[re]);
-    });
-
-    return result;
-  }
 
 
   /**
@@ -352,4 +189,85 @@ export class HttpUtilsService {
     return result;
   }
 
-}
+
+} // The end.
+
+
+  // /**
+  //  * ##################################################################
+  //  * OLD Client side filtering.
+  //  * ##################################################################
+  //  */
+  // arraySearch(
+  //   incomingArray: any[],
+  //   queryObj: any,
+  //   filtrationFields: string[] = []): any[] {
+
+  //   const result: any[] = [];
+  //   let resultBuffer: any[] = [];
+  //   const indexes: number[] = [];
+  //   let firstIndexes: number[] = [];
+  //   let doSearch = false;
+
+  //   filtrationFields.forEach(item => {
+  //     if (item in queryObj) {
+  //       incomingArray.forEach((element, index) => {
+  //         if (element[item] === queryObj[item]) {
+  //           firstIndexes.push(index);
+  //         }
+  //       });
+  //       firstIndexes.forEach(element => {
+  //         resultBuffer.push(incomingArray[element]);
+  //       });
+  //       incomingArray = resultBuffer.slice(0);
+  //       resultBuffer = [].slice(0);
+  //       firstIndexes = [].slice(0);
+  //     }
+  //   });
+
+  //   Object.keys(queryObj).forEach(key => {
+  //     const searchText = queryObj[key]
+  //       .toString()
+  //       .trim()
+  //       .toLowerCase();
+  //     if (key && !_.includes(filtrationFields, key) && searchText) {
+  //       doSearch = true;
+  //       try {
+  //         incomingArray.forEach((element, index) => {
+  //           const val = element[key]
+  //             .toString()
+  //             .trim()
+  //             .toLowerCase();
+  //           if (
+  //             val.indexOf(searchText) > -1 &&
+  //             indexes.indexOf(index) === -1
+  //           ) {
+  //             indexes.push(index);
+  //           }
+  //         });
+  //       } catch (ex) {
+  //         console.log(ex, key, searchText);
+  //       }
+  //     }
+  //   });
+
+  //   if (!doSearch) {
+  //     return incomingArray;
+  //   }
+
+  //   indexes.forEach(re => {
+  //     result.push(incomingArray[re]);
+  //   });
+
+  //   return result;
+  // }
+
+
+// function isNumber(obj) {
+//   return obj !== undefined && typeof (obj) === 'number' && !isNaN(obj);
+// }
+
+// For example, transform: 'customerPostalCode' to 'postalCode'.
+// const itemKey = filterKey.replace(/([a-z]+)([A-Z])(\w+)/, '$2$3');
+// For better performance:
+// const itemKey = filterKey.replace(/^([a-z]+)([A-Z])/, (match, p1, p2) => p2.toLowerCase());

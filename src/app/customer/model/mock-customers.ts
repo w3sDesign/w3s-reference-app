@@ -18,8 +18,8 @@ export const mockCustomers: Customer[] = [
     phone: '1-374-325-3011',
     email: 'Nullam.vitae@semmollisdui.co.uk',
     addAddresses: [
-      { addStreet: 'a', addPostalCode: 'aa', addCity: 'aaa' },
-      { addStreet: 'b', addPostalCode: 'bb', addCity: 'bbb' }
+      { street: 'a', postalCode: 'aa', city: 'aaa' },
+      { street: 'b', postalCode: 'bb', city: 'bbb' }
     ],
   },
   {

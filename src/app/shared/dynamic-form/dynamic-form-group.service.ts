@@ -5,10 +5,13 @@ import { QuestionBase } from './question-base';
 
 @Injectable()
 export class DynamicFormGroupService {
+
   constructor() { }
 
   /**
-   * Creating a FormGroup from the given questions
+   * ##################################################################
+   * Creating a FormGroup from the given questions.
+   * ##################################################################
    */
   createFormGroup(questions: QuestionBase[]) {
     const group: any = {};
@@ -16,12 +19,12 @@ export class DynamicFormGroupService {
     questions.forEach(question => {
 
       if (question.controlType === 'formArray') {
-        group[question.key] = new FormArray([]);
+        group[question.name] = new FormArray([]);
       } else {
 
-        group[question.key] = question.required
-          ? new FormControl(question.value || '', Validators.required)
-          : new FormControl(question.value || '');
+        group[question.name] = question.isRequired
+          ? new FormControl(question.defaultValue || '', Validators.required)
+          : new FormControl(question.defaultValue || '');
       }
     });
 

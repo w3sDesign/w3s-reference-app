@@ -34,6 +34,4 @@ export abstract class CustomerService {
   abstract getCustomerFilterTemplate (id: number): Observable<CustomerFilterTemplate>;
   abstract getCustomerFilterTemplates (): Observable<CustomerFilterTemplate[]>;
 
-  /** Customer filter template Questions */
-  abstract getCustomerFilterTemplateQuestions(filterTemplate?: string): Observable<QuestionBase[]>;
 }
