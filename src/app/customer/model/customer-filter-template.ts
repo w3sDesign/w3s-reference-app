@@ -37,13 +37,13 @@ export class CustomerFilterTemplate {
   id = 0;
   name = '';
 
-  idFilter = '';
-  nameFilter = '';
+  idFilter ?= '';
+  nameFilter ?= '';
 
   // Addresses
   // streetFilter = '';
-  postalCodeFilter = '';
-  cityFilter = '';
+  postalCodeFilter ?= '';
+  cityFilter ?= '';
   // countryFilter = '';
 
   // Contacts

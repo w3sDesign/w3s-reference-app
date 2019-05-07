@@ -77,7 +77,11 @@ export class DynamicFormComponent implements OnInit {
 
   }
 
+  createForm(questions: QuestionBase[]) {
+    this.questions = questions;
+    this.form = this.formGroupService.createFormGroup(questions);
 
+  }
 
   onSubmit() {
     // RawValue() includes disabled controls.

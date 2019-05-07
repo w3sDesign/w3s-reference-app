@@ -28,19 +28,20 @@ export class CustomerDataSource implements DataSource<any> {
   // customers: Customer[];
   // customers$: Observable<Customer[]>;
 
-  /** Subject accepting and emitting customer arrays. */
-  customers = new BehaviorSubject<Customer[]>([]);
+  /** Subject for accepting and emitting customer arrays. */
+  customers: BehaviorSubject<Customer[]> = new BehaviorSubject([]);
 
   /**
-   * Subject accepting and emitting loading true/false
-   * (the progress bar will listen to this stream).
+   * Subject for accepting and emitting loading true/false
+   * (the progress bar listens to this stream).
    */
   isLoading = new BehaviorSubject<boolean>(false);
 
-  /** Subject accepting and emitting the total number of queried customers. */
+  /** Subject for accepting and emitting the total number of queried customers. */
   totalNumberOfItems = new BehaviorSubject<number>(0);
 
-  hasItems = false; // Need to show message: 'No customers found'
+  /** Needed e.g. for showing message: 'No customers found' */
+  hasItems = false;
 
 
   constructor(private customerService: CustomerService) {
@@ -65,32 +66,59 @@ export class CustomerDataSource implements DataSource<any> {
 
 
   /**
-   * getCustomers() is implemented by delegating to the customer service.
+   * getCustomers()
+   * ##################################################################
+   * is implemented by delegating to the customer service.
    * If the data arrives successfully, it is passed to the customers
    * subject (by calling next(res.items)), which in turn emits the data
    * to the connected data table for rendering.
    */
+
+  // getCustomers(queryParams: QueryParams) {
+  //   this.isLoading.next(true);
+  //   /**
+  //    * Delegating to customer service which returns a query result observable.
+  //    * ###########################################
+  //    */
+  //   this.customerService.getCustomers(queryParams)
+  //     .pipe(
+  //       tap((res: QueryResult) => {
+  //         /**
+  //          * Passing the queryResult.items to the customers subject, which
+  //          * emits the data to the connected (subscribed) data table for rendering.
+  //          */
+  //         this.customers.next(res.items);
+
+  //         this.totalNumberOfItems.next(res.totalCount);
+  //       }),
+  //       catchError(err => of(new QueryResult())), // TODO
+  //       finalize(() => this.isLoading.next(false))
+  //     )
+  //     .subscribe();
+  // }
+
+
   getCustomers(queryParams: QueryParams) {
     this.isLoading.next(true);
-
     /**
      * Delegating to customer service which returns a query result observable.
      * ###########################################
      */
     this.customerService.getCustomers(queryParams)
-      .pipe(
-        tap((res: QueryResult) => {
-          /**
-           * Passing the queryResult.items to the customers subject, which
-           * emits the data to the connected (subscribed) data table for rendering.
-           */
-          this.customers.next(res.items);
 
-          this.totalNumberOfItems.next(res.totalCount);
-        }),
-        catchError(err => of(new QueryResult())), // TODO
-        finalize(() => this.isLoading.next(false))
-      )
-      .subscribe();
+      .subscribe((res: QueryResult) => {
+        /**
+         * Passing the queryResult.items to the customers subject, which
+         * emits the data to the connected (subscribed) data table for rendering.
+         */
+        this.customers.next(res.items);
+
+        this.totalNumberOfItems.next(res.totalCount);
+
+        this.isLoading.next(false);
+      });
+
   }
+
+
 }

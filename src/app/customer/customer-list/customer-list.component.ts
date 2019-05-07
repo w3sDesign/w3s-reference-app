@@ -5,6 +5,7 @@ import { Component, ElementRef, OnInit, ViewChild, ViewContainerRef } from '@ang
 
 import { MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTable } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
+import { CdkDragStart, CdkDropList, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 import { fromEvent, merge, Observable } from 'rxjs';
 //
@@ -29,26 +30,15 @@ import { DynamicFormQuestionComponent } from '../../shared/dynamic-form/dynamic-
 import { FormGroup } from '@angular/forms';
 
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
-// TODO mockCustomerQuestions = mockCustomerFilterTemplateQuestions
 import { mockCustomerQuestions } from '../model/mock-customer-questions';
-import { mockCustomerFilterTemplateQuestions } from '../model/mock-customer-filter-template-questions';
 
 import { CustomerFilterTemplate } from '../model/customer-filter-template';
-import { mockCustomerFilterTemplates } from '../model/mock-customer-filter-templates';
 
 import { InputDialogComponent } from '../../shared/input-dialog/input-dialog.component';
 
-import { CdkDragStart, CdkDropList, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DynamicFormOptions } from '../../shared/dynamic-form/dynamic-form-options';
 import { DynamicFormGroupService } from '../../shared/dynamic-form/dynamic-form-group.service';
 
-
-
-////////////// tests ////////////////
-// import {interval} from 'rxjs';
-// const numbers = interval(1000);
-// numbers.subscribe(x => console.log(x));
-///////////////////////////////////////
 
 // ####################################################################
 // CustomerListComponent
@@ -62,38 +52,53 @@ import { DynamicFormGroupService } from '../../shared/dynamic-form/dynamic-form-
 
 export class CustomerListComponent implements OnInit {
 
-  showTestValues = false;
+  showTestValues = true;
 
   // ##################################################################
-  // Filter related properties.
+  // (1) Filter section related properties.
   // ##################################################################
 
-  /** ? All available filters that can be displayed.  */
-  availableFilters: string[] = [
-    'select', 'id', 'name', 'type', 'status', 'comment', 'creationDate', 'country', 'postalCode', 'city', 'street', 'phone', 'email'
-  ];
+  /** Available filters != available columns.  */
 
-  /** ? The filters that should be displayed */
-  filtersToDisplay: string[] = [
-    'select', 'id', 'name', 'country', 'postalCode', 'city', 'phone', 'email'
-  ];
+  // availableFilters: string[] = this.availableColumns;
+
+  /** Filters that are possible. */
+  availableFilters: string[] =
+    [
+      'idFilter', 'nameFilter',
+      'typeFilter', 'statusFilter', 'commentFilter', 'creationDateFilter',
+      'countryFilter', 'postalCodeFilter', 'cityFilter', 'streetFilter',
+      'phoneFilter', 'emailFilter'
+    ];
+
+  /** Filters that should be displayed in the filter templates. */
+  filtersToDisplay: string[] = [];
+    // [
+    //   'idFilter', 'nameFilter',
+    // ];
+
+  /** Filters that are displayed and have input values. */
+  activeFilters: string[] = [];
 
 
-
-  /** Filter template dynamic form component */
+  /**
+   * Reference to the filter template form.
+   */
   @ViewChild('filterTemplateForm')
   filterTemplateForm: DynamicFormComponent;
 
+  // filterTemplateFormValue: any = {};
+  // filterTemplateForm.form.value used instead!
+
+  filterTemplateFormOptions: DynamicFormOptions = {
+    formFieldAppearance: 'standard'
+  };
+
   /**
-   * Questions for generating the dynamic filter template form:
-   * <w3s-dynamic-form [questions]="filterTemplateQuestions" ...
-   * Questions are not loaded from server!
-   * Used from mock-customer-questions
+   * Filter template questions.
+   * - Generated from customer questions.
    */
-  // filterTemplateQuestions: QuestionBase[] = mockCustomerFilterTemplateQuestions;
-  filterTemplateQuestions: QuestionBase[]; // = mockCustomerQuestions;
-
-
+  filterTemplateQuestions: QuestionBase[];
 
   /** Filter templates */
   filterTemplates: CustomerFilterTemplate[]; // mockCustomerFilterTemplates;
@@ -104,35 +109,39 @@ export class CustomerListComponent implements OnInit {
 
   selectedFilterTemplateName = 'standard';
 
-  filterTemplateFormValue: any = {};
 
-  filterTemplateFormOptions: DynamicFormOptions = {
-    formFieldAppearance: 'standard'
-  };
-
-
-  /** Table for selecting the filters to display. */
-  @ViewChild('selectingColumnsTable')
+  /**
+   * Reference to the filter selection.
+   */
+  @ViewChild('selectingFiltersTable')
   selectingFiltersTable: MatTable<string[]>;
 
-  /** Selection handling - filters to display. */
+
+  /** Selection handling. */
   /** Args: allowMultiSelect, initialSelection */
   filterSelection = new SelectionModel<string>(true, this.filtersToDisplay);
 
 
 
+
+
   // ##################################################################
-  // List (data table) related properties.
+  // (2) List section related properties.
   // ##################################################################
 
-  /** The data source object is responsible for retrieving and emitting the customers to display. */
+  /**
+   * The data source object
+   * - is responsible for retrieving and emitting the customer objects
+   *   the table should display.
+   */
   dataSource: CustomerDataSource;
 
   customers: Customer[] = [];
   selectedCustomer: Customer;
 
+  // customerQuestions: QuestionBase[] = mockCustomerQuestions.slice();
 
-  /** All available columns in the data table.  */
+  /** All available columns in the data table. */
   // TODO from questions
   availableColumns: string[] = [
     'select', 'id', 'name', 'type', 'status', 'comment', 'creationDate', 'country', 'postalCode', 'city', 'street', 'phone', 'email'
@@ -157,7 +166,7 @@ export class CustomerListComponent implements OnInit {
   searchInput: ElementRef;
 
   /** Selection handling - data table rows. */
-  selection = new SelectionModel<Customer>(true, []);
+  rowSelection = new SelectionModel<Customer>(true, []);
 
 
   /** Create/Update/Delete buttons */
@@ -175,11 +184,13 @@ export class CustomerListComponent implements OnInit {
   columnSelection = new SelectionModel<string>(true, this.columnsToDisplay);
 
 
-
   /** For drag and drop main table columns. */
   previousDragIndex: number;
 
 
+
+  // ##################################################################
+  // constructor()
   // ##################################################################
 
   constructor(
@@ -189,21 +200,17 @@ export class CustomerListComponent implements OnInit {
     private dialog: MatDialog,
   ) {
 
-    /** Generate filter template questions from customer questions. */
-    this.filterTemplateQuestions = this.generateFilterTemplateQuestions(mockCustomerQuestions);
-
-
-
+    this.filterTemplateQuestions = this.generateFilterTemplateQuestions();
   }
 
 
   // ##################################################################
+  // ngOnInit()
+  // ##################################################################
 
   ngOnInit() {
 
-    /** Filter templates:
-     *  Getting the filter templates (from customer service), and
-     *  initialize/render the standard filter template form. */
+    // Getting filter templates and performing onSelectFilterTemplate(name).
     // ################################################################
 
     this.customerService.getCustomerFilterTemplates()
@@ -213,67 +220,58 @@ export class CustomerListComponent implements OnInit {
           for (let i = 0; i < res.length; i++) {
             this.filterTemplateNames[i] = res[i].name;
           }
-
           this.selectedFilterTemplateName = 'standard';
-
-          /** Render the filter template form */
-          this.renderFilterTemplateForm(this.selectedFilterTemplateName);
-
-          // console.log(this.filterTemplateNames);
+          this.onSelectFilterTemplate(this.selectedFilterTemplateName);
         }
       );
 
 
-
-
-
-    /** Searching in all fields.
-     *  Subscribing to the keyup event.
-     *  Whenever a 'keyup' event is emitted,
-     *  a data load will be triggered (getCustomers()). */
+    // Subscribing/Listening to keyup events emitted from searchInput when searching in all fields.
     // ################################################################
+    // Whenever a 'keyup' event is emitted, a data load will be triggered (getCustomers()).
 
     fromEvent(this.searchInput.nativeElement, 'keyup')
       .pipe(
         debounceTime(150), // limiting server requests to one every 150ms
-        distinctUntilChanged(), // eliminating duplicate values
-        tap(() => {
-          this.paginator.pageIndex = 0;
-          this.getCustomers();
-        })
+        distinctUntilChanged() // eliminating duplicate values
+        // tap(() => {
+        //   this.paginator.pageIndex = 0;
+        //   this.getCustomers();
+        // })
       )
-      .subscribe();
+      .subscribe(() => {
+
+        // TODO  onSearchInput:   getCustomers without setting QueryParams!
+
+        this.getCustomers();
+        /** Reset to first page */
+        this.paginator.pageIndex = 0;
+      });
 
 
-
-    /** Table sorting and paginating.
-     *  Subscribing to the sortChange and page EventEmitter.
-     *  Whenever a table sort/page change event is emitted,
-     *  a data load will be triggered (getCustomers()). */
+    // Subscribing/Listening to sort/page change events.
     // ################################################################
-
-    merge(this.sort.sortChange, this.paginator.page)
-      .pipe(
-        tap(() => this.getCustomers())
-      )
-      .subscribe();
-
-
-
-    /** If the user changes the sort order, reset back to the first page. */
-    // ################################################################
+    // Sorting and paginating the data table.
+    // Whenever a sort/page change event is emitted, a data load will be triggered (getCustomers()).
 
     this.sort.sortChange
-      .subscribe(
-        () => this.paginator.pageIndex = 0
-      );
+      .subscribe(() => {
+        this.getCustomers();
+        /** Reset to first page */
+        this.paginator.pageIndex = 0;
+      });
+
+    this.paginator.page
+      .subscribe(() => this.getCustomers());
 
 
-    /** Initial data load */
+    // Performing initial customer data load.
     // ################################################################
+    // Delegating data access to the CustomerDataSource object.
 
     const queryParams = new QueryParams();
-    queryParams.filter = this.filterConfig(false);
+    // queryParams.filter = this.filterConfig(false);
+    queryParams.filter = {};
 
     this.dataSource = new CustomerDataSource(this.customerService);
 
@@ -284,144 +282,128 @@ export class CustomerListComponent implements OnInit {
         res => this.customers = res
       );
 
-
     // this.setColumnsToDisplay();
 
-
-  } // The end of ngOnInit() ##########################################
-
+  } // ngOnInit()
 
 
+
+
+  // ####################################################################
+  // Methods
+  // ####################################################################
 
 
   /**
-   * generateFilterTemplateQuestions()
+   * Handles selecting a filter.
    * ##################################################################
-   * from the source questions (eg. customerQuestions)
+   * The (change) event is emitted when selecting a filter.
    */
-  generateFilterTemplateQuestions(fromQuestions: QuestionBase[]): QuestionBase[] {
-    const filterTemplateQuestions: QuestionBase[] = fromQuestions; // eg. mockCustomerQuestions
+  onSelectFilter() {      // setFiltersToDisplay() {
 
-    filterTemplateQuestions.forEach((q, i) => {
-      q.name = q.name + 'Filter'; // add 'Filter' to the name
-      if (q.controlType === 'formArray') {
-        filterTemplateQuestions.splice(i, 1); // remove this question
-      } else {
-        q.controlType = 'textbox';
+    // (1) Setting filtersToDisplay from selected filters.
+    this.filtersToDisplay = [];
+    this.availableFilters.forEach((filter, index) => {
+      if (this.filterSelection.isSelected(filter)) {
+        this.filtersToDisplay.push(filter);
       }
-      if (q.group) { q.group = 0; } // no dataGroups
-      if (q.groupName) { q.groupName = ''; }
-      if (q.isRequired) { q.isRequired = false; }
-      if (q.isReadonly) { q.isReadonly = false; }
-
-      q.hint = 'Filter by ' + q.label;
-      q.label = '';
-
-      if (q.inputType === 'number') {
-        q.tooltip = 'For example: 1000 (equal), <1000 (lower), >1000 (greater), 1000-2000 (between)';
-      }
-      q.inputType = 'textarea';
-
     });
+    // this.selectingFiltersTable.renderRows();//?
 
-    return filterTemplateQuestions;
+
+    // (2) Generating filterTemplateQuestions.
+    this.filterTemplateQuestions = this.generateFilterTemplateQuestions();
+
+
+    // (3) Generating filterTemplateForm.
+    this.generateFilterTemplateForm(this.filterTemplateQuestions);
+
+
+    // (4) Setting form values and get (search) customers.
+    this.renderFilterTemplateForm(this.selectedFilterTemplateName);
+
   }
 
+
   /**
-   * generateFilterTemplateForm()
+   * Handles selecting a filter template.
    * ##################################################################
-   * Generate the filter template form.
+   * The (selectionChange) event is emitted by <mat-select> when selecting a filter template.
+   *
+   * @param name The name of the filter template.
+   *
+   * For example:
+   *  filter template 'standard': [idFilter: '>20010', nameFilter: 'Foundation']
+   *  filtersToDisplay: [idFilter, nameFilter]
    */
-  generateFilterTemplateForm(questions: QuestionBase[]) {
+  onSelectFilterTemplate(name: string) {
 
-    this.filterTemplateForm.form = this.formGroupService.createFormGroup(questions);
+    // (1) Setting filtersToDisplay from selected filter template.
+    const filterTemplate = this.filterTemplates.find(ft => ft.name === name);
+    if (!filterTemplate) { return; }
+    //
+    this.filtersToDisplay = [];
+    Object.keys(filterTemplate).forEach((filterKey) => { // idFilter, nameFilter
+      if (filterKey.includes('Filter')) {
+        this.filtersToDisplay.push(filterKey);
+      }
+    });
+    console.log('##########onSelectFilterTemplate() / filtersToDisplay = ' + JSON.stringify(this.filtersToDisplay));
 
-    this.getCustomers();
+
+    // (2) Generating filterTemplate questions.
+    this.filterTemplateQuestions = this.generateFilterTemplateQuestions();
+    //
+    // tslint:disable-next-line:max-line-length
+    console.log('####################onSelectFilterTemplate() / this.filterTemplateQuestions = ' + JSON.stringify(this.filterTemplateQuestions));
+
+
+    // (3) Generating filterTemplateForm.
+    this.generateFilterTemplateForm(this.filterTemplateQuestions);
+
+
+    // (4) Setting form values and get (search) customers.
+    this.renderFilterTemplateForm(name);
+
+
+    // (5) Setting selected filters.
+    this.filterSelection.clear();
+    this.filtersToDisplay.forEach(filter => this.filterSelection.select(filter));
+
+    this.selectingFiltersTable.renderRows();
+
   }
 
 
-
   /**
-   * renderFilterTemplateForm
+   * Renders the filter template form.
    * ##################################################################
-   * Render the filter template form.
+   *
+   * @param name The name of the filter template.
    */
   renderFilterTemplateForm(name: string) {
 
-    const arr = this.filterTemplates.filter(template => template.name === name);
-    // if (!arr) 'standard or error TODO
-    const filterTemplate = arr[0];
+    const filterTemplate = this.filterTemplates.find(ft => ft.name === name);
+    if (!filterTemplate) { return; }
 
     this.filterTemplateForm.setFormValue(filterTemplate);
     this.getCustomers();
+
+    // new Setting activeFilters
+    this.activeFilters = [];
+    const obj = this.filterTemplateForm.form.value;
+    for (const key in obj) {
+      if (obj[key]) { // value   TODO obj.key?
+        this.activeFilters.push(key);
+      }
+    }
   }
 
 
-
-
   /**
-   * Filter template form commit.
-   */
-  onFilterTemplateFormSubmit(value) {
-    this.filterTemplateFormValue = value;
-    // this.selectedFilterTemplate = value;
-    this.getCustomers();
-  }
-
-
-  searchCustomers() {
-    this.filterTemplateFormValue = this.filterTemplateForm.form.value;
-    this.getCustomers();
-
-  }
-
-  /**
-   * Filter template form commit.
-   */
-  // searchCustomers(filterTemplate: CustomerFilterTemplate) {
-  //   // this.filterTemplateFormValue = filterTemplate;
-  //   this.selectedFilterTemplate = filterTemplate;
-  //   this.getCustomers();
-  // }
-
-
-
-  /**
-     * ##################################################################
-     * Load customers.
-     * ##################################################################
-     */
-  getCustomers() {
-
-    const queryParams = new QueryParams();
-
-    /** Setting current filters from filter template form */
-    // ==================================================
-    // queryParams.filter = this.selectedFilterTemplate;
-    // queryParams.filter = this.filterTemplateFormValue;
-    queryParams.filter = this.filterTemplateForm.form.value;
-
-    queryParams.sortOrder = this.sort.direction;
-    queryParams.sortField = this.sort.active; /** The id of the column being sorted. */
-    queryParams.pageNumber = this.paginator.pageIndex;
-    queryParams.pageSize = this.paginator.pageSize;
-
-    /** Delegating to customer data source.
-     * #######################################
-     */
-    this.dataSource.getCustomers(queryParams);
-
-    this.selection.clear();
-  }
-
-
-
-  /**
-   * ##################################################################
-   * Setting columns to display.
+   * Sets which columns to display in the data table.
    * ##################################################################
    */
-
   setColumnsToDisplay() {
     this.columnsToDisplay = [];
     this.availableColumns.forEach((column, index) => {
@@ -433,71 +415,149 @@ export class CustomerListComponent implements OnInit {
   }
 
 
-  setFiltersToDisplay() {
-    // TODO ? it's not a table, it's a dyn. form
+  /**
+   * Generates the filter template questions from the customer questions.
+   * ##################################################################
+   */
+  // generateFilterTemplateQuestions(fromQuestions: QuestionBase[]): QuestionBase[] {
+  generateFilterTemplateQuestions(): QuestionBase[] {
+
+    const fromQuestions = mockCustomerQuestions.filter(q => {
+      return this.filtersToDisplay.includes(q.name + 'Filter');
+    });
+
+    // Questions without formArray questions.
+    const questions = [];
+    fromQuestions.forEach(q => {
+      if (q.controlType !== 'formArray') {
+        questions.push(q);
+      }
+    });
+
+    const filterTemplateQuestions = questions.map(q => {
+
+      const newObj = {};
+
+      newObj['name'] = q.name + 'Filter';
+      newObj['controlType'] = 'textbox';
+      // newObj['inputType'] = 'textarea';
+      newObj['inputType'] = 'text';
+
+      newObj['label'] = '';
+      newObj['hint'] = 'Filter by ' + q.label;
+      newObj['toolTip'] = '';
+      // TODO
+      if (q.inputType === 'number') {
+        newObj['toolTip'] = 'For example: 1000 (equal), <1000 (lower), >1000 (greater), 1000-2000 (between)';
+      }
+
+      return newObj;
+
+    });
+
+    console.log('##########generateFilterTemplateQuestions() / this.filtersToDisplay = ' + JSON.stringify(this.filtersToDisplay));
+    console.log('##########generateFilterTemplateQuestions() / mockCustomerQuestions = ' + JSON.stringify(mockCustomerQuestions));
+    console.log('##########generateFilterTemplateQuestions() / fromQuestions = ' + JSON.stringify(fromQuestions));
+    console.log('##########generateFilterTemplateQuestions() / questions = ' + JSON.stringify(questions));
+    console.log('##########generateFilterTemplateQuestions() / filterTemplateQuestions = ' + JSON.stringify(filterTemplateQuestions));
+
+    return filterTemplateQuestions as QuestionBase[];
   }
 
 
+  /**
+   * Generates the filter template form.
+   * ##################################################################
+   */
+  generateFilterTemplateForm(questions: QuestionBase[]) {
 
-  // setDisplayedColumns() {
-  //   let i = 0;
-  //   this.availableColumns.forEach((column, index) => {
-  //     // column.index = index;
-  //     if (this.columnSelection.isSelected(column)) {
-  //       // this.columnsToDisplay[index] = column;
-  //       this.columnsToDisplay[i] = column;
-  //       i++;
-  //     }
-  //   });
+    // this.filterTemplateForm.form = this.formGroupService.createFormGroup(questions);
+    this.filterTemplateForm.createForm(questions);
+
+    // this.getCustomers();
+  }
+
+
+  // /**
+  //  * Filter template form commit.
+  //  */
+  // onFilterTemplateFormSubmit(value) {
+  //   this.filterTemplateFormValue = value;
+  //   // this.selectedFilterTemplate = value;
+  //   this.getCustomers();
   // }
 
 
-
-
+  // searchCustomers() {
+  //   this.filterTemplateFormValue = this.filterTemplateForm.form.value;
+  //   this.getCustomers();
+  // }
 
 
   /**
-   * ##################################################################
-   * Filter configuration.
+   * Sets the current query parameters and gets (searches) the customers.
    * ##################################################################
    */
-  filterConfig(isGeneralSearch: boolean = true): any {
-    const filter: any = {};
-    const searchText: string = this.searchInput.nativeElement.value;
+  getCustomers() {
+    const queryParams = new QueryParams();
 
-    // if (this.filterByStatus && this.filterByStatus.length > 0) {
-    //   filter.status = +this.filterByStatus;
-    // }
+    // Setting the current filters from the filter template form
+    // queryParams.filter = this.filterTemplateFormValue;
+    queryParams.filter = this.filterTemplateForm.form.value;
 
-    // if (this.filterByType && this.filterByType.length > 0) {
-    //   filter.type = +this.filterByType;
-    // }
+    queryParams.sortOrder = this.sort.direction;
+    // The id of the column being sorted.
+    queryParams.sortField = this.sort.active;
+    queryParams.pageNumber = this.paginator.pageIndex;
+    queryParams.pageSize = this.paginator.pageSize;
 
-    // filter = this.filterForm.value;
-    // filter.name = this.filterByName ? this.filterByName : searchText;
-    // filter.country = this.filterByCountry ? this.filterByCountry : searchText;
-    // filter.postalCode = this.filterByPostalCode ? this.filterByPostalCode : searchText;
+    // Delegating to the customer data source.
+    this.dataSource.getCustomers(queryParams);
 
-    // if (!isGeneralSearch) {
-    //   return filter;
-    // }
-
-    // filter.city = this.filterByCity ? this.filterByCity : searchText;
-
-
-    return filter;
+    this.rowSelection.clear();
   }
 
 
-  /**
-   * ##################################################################
-   * Helpers
-   * ##################################################################
-   */
+  // /**
+  //  * ##################################################################
+  //  * Filter configuration.
+  //  * ##################################################################
+  //  */
+  // filterConfig(isGeneralSearch: boolean = true): any {
+  //   const filter: any = {};
+  //   const searchText: string = this.searchInput.nativeElement.value;
+
+  //   // if (this.filterByStatus && this.filterByStatus.length > 0) {
+  //   //   filter.status = +this.filterByStatus;
+  //   // }
+
+  //   // if (this.filterByType && this.filterByType.length > 0) {
+  //   //   filter.type = +this.filterByType;
+  //   // }
+
+  //   // filter = this.filterForm.value;
+  //   // filter.name = this.filterByName ? this.filterByName : searchText;
+  //   // filter.country = this.filterByCountry ? this.filterByCountry : searchText;
+  //   // filter.postalCode = this.filterByPostalCode ? this.filterByPostalCode : searchText;
+
+  //   // if (!isGeneralSearch) {
+  //   //   return filter;
+  //   // }
+
+  //   // filter.city = this.filterByCity ? this.filterByCity : searchText;
+
+
+  //   return filter;
+  // }
+
+
+  // ##################################################################
+  // Helpers
+  // ##################################################################
 
   /** Whether number of selected rows matches total number of rows. */
   isAllSelected(): boolean {
-    const selected = this.selection.selected.length;
+    const selected = this.rowSelection.selected.length;
     const all = this.customers.length;
     return selected === all;
   }
@@ -517,8 +577,8 @@ export class CustomerListComponent implements OnInit {
   /** Selects all rows if not all selected; otherwise clears selection. */
   masterToggle() {
     this.isAllSelected() ?
-      this.selection.clear() :
-      this.customers.forEach(customer => this.selection.select(customer));
+      this.rowSelection.clear() :
+      this.customers.forEach(customer => this.rowSelection.select(customer));
   }
   // Selecting the columns to display.
   masterToggle2() {
@@ -526,7 +586,7 @@ export class CustomerListComponent implements OnInit {
       this.columnSelection.clear() :
       this.availableColumns.forEach(column => this.columnSelection.select(column));
   }
-  // Selecting the columns to display.
+  // Selecting the filters to display.
   masterToggle3() {
     this.isAllSelected3() ?
       this.filterSelection.clear() :
@@ -535,15 +595,12 @@ export class CustomerListComponent implements OnInit {
 
 
   /**
-     * ##################################################################
-     * Drag and drop table columns.
-     * ##################################################################
-     */
-
+   * Drag and drop table columns
+   * ##################################################################
+   */
   dragStarted(event: CdkDragStart, index: number) {
     this.previousDragIndex = index;
   }
-
   dropListDropped(event: CdkDropList, index: number) {
     if (event) {
       moveItemInArray(this.availableColumns, this.previousDragIndex, index);
@@ -646,7 +703,7 @@ export class CustomerListComponent implements OnInit {
    */
   updateCustomer(customer?: Customer) {
     if (!customer) {
-      if (this.selection.isEmpty()) {
+      if (this.rowSelection.isEmpty()) {
         this.dialog.open(MessageDialogComponent, {
           data: {
             title: 'Update Selected Customers',
@@ -657,7 +714,7 @@ export class CustomerListComponent implements OnInit {
         });
         return;
       }
-      customer = this.selection.selected[0];
+      customer = this.rowSelection.selected[0];
     }
 
     const dialogConfig = new MatDialogConfig();
@@ -721,7 +778,7 @@ export class CustomerListComponent implements OnInit {
    * ##################################################################
    */
   deleteCustomers() {
-    if (this.selection.isEmpty()) {
+    if (this.rowSelection.isEmpty()) {
       this.dialog.open(MessageDialogComponent, {
         data: {
           title: 'Delete Customers',
@@ -732,7 +789,7 @@ export class CustomerListComponent implements OnInit {
       return;
     }
 
-    const numberOfSelections = this.selection.selected.length;
+    const numberOfSelections = this.rowSelection.selected.length;
     const customer_s = numberOfSelections <= 1 ? 'customer' : `${numberOfSelections} customers`;
 
     const dialogRef = this.dialog.open(MessageDialogComponent, {
@@ -751,7 +808,7 @@ export class CustomerListComponent implements OnInit {
           // Start deleting. Identify selected customers.
           const ids: number[] = [];
           for (let i = 0; i < numberOfSelections; i++) {
-            ids.push(this.selection.selected[i].id);
+            ids.push(this.rowSelection.selected[i].id);
           }
 
           // Delete identified (selected) customers.
@@ -760,7 +817,7 @@ export class CustomerListComponent implements OnInit {
             .subscribe(
               () => {
                 this.getCustomers();
-                this.selection.clear();
+                this.rowSelection.clear();
               },
               // err handled in customerService
             );
@@ -770,3 +827,10 @@ export class CustomerListComponent implements OnInit {
 
 
 }
+
+
+////////////// tests ////////////////
+// import {interval} from 'rxjs';
+// const numbers = interval(1000);
+// numbers.subscribe(x => console.log(x));
+///////////////////////////////////////

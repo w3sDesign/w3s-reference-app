@@ -2,17 +2,17 @@
 
 
   <!-- ############################################################ -->
-  <!-- Filters -->
+  <!-- (1) Filter Section -->
   <!-- ############################################################ -->
 
-  <mat-expansion-panel id="filterContainer">
+
+  <mat-expansion-panel class="###filter-section###">
 
     <!-- ########################################################## -->
-    <!-- Filter header  -->
+    <!-- Filter section header  -->
     <!-- ########################################################## -->
 
     <mat-expansion-panel-header [collapsedHeight]="'58px'" [expandedHeight]="'58px'">
-
 
       <mat-panel-title>
         Search Customers
@@ -20,29 +20,25 @@
       </mat-panel-title>
 
       <mat-panel-description>
-        Currently 2 filters active: Status, Type
+        <div class="special-font" style="display:block;color: rgba(0,0,0,.87); font-size:14px; font-weight: 400">
+
+          Currently {{activeFilters.length}} filters active:
+          <span class="comma" *ngFor="let filter of activeFilters">{{(filter.replace('Filter', '') | titlecase)}}</span>
+        </div>
       </mat-panel-description>
 
     </mat-expansion-panel-header>
 
 
-    <!-- ########################################################## -->
-    <!-- Filter template content  -->
-    <!-- ########################################################## -->
+    <div id="filterButtons" style="align-items: flex-end">
 
-
-
-
-    <div id="filterButtons">
-
-
-      <!-- ========================================================== -->
-      <!-- Selecting a filter template -->
-      <!-- ========================================================== -->
+      <!-- ########################################################## -->
+      <!-- Selecting a filter template  -->
+      <!-- ########################################################## -->
 
       <mat-form-field>
 
-        <mat-select [(value)]="selectedFilterTemplateName" (selectionChange)="renderFilterTemplateForm(selectedFilterTemplateName)">
+        <mat-select [(value)]="selectedFilterTemplateName" (selectionChange)="onSelectFilterTemplate(selectedFilterTemplateName)">
 
           <!-- <mat-option value="standard">Standard</mat-option> -->
           <mat-option *ngFor="let name of filterTemplateNames" value="{{name}}">{{name}}</mat-option>
@@ -54,42 +50,31 @@
 
       </mat-form-field>
 
-      <!-- <mat-form-field appearance="fill">
-      <mat-label>Country</mat-label>
-      <mat-select formControlName="country">
-        <mat-option *ngFor="let country of countries" value="{{country.name}}">{{country.name}}</mat-option>
-      </mat-select>
-      <mat-error>Country is required.</mat-error>
-    </mat-form-field> -->
 
+      <!-- ########################################################## -->
+      <!-- Searching in all fields -->
+      <!-- ########################################################## -->
 
-      <!-- ========================================================== -->
-      <!-- Search input field for searching in all customer fields -->
-      <!-- ========================================================== -->
-
-      <mat-form-field style="padding-bottom: 16px">
-        <input matInput #searchInput placeholder="Search">
+      <!-- placeholder="Search" -->
+      <mat-form-field>
+        <input matInput formControlName="searchInput" #searchInput type="text" matTooltip="tooltip" >
         <mat-hint align="start">
           Search in all fields
         </mat-hint>
       </mat-form-field>
 
 
-
-
-      <!-- ========================================================== -->
-      <!-- Filter template buttons -->
-      <!-- ========================================================== -->
-
+      <!-- ########################################################## -->
+      <!-- Search/Clear/Save/Settings buttons -->
+      <!-- ########################################################## -->
 
       <div class="push-right">
 
-        <button mat-raised-button matTooltip="Start searching customers by applying the provided filters." (click)="searchCustomers()">
+        <button mat-raised-button matTooltip="Start searching customers by applying the provided filters." (click)="getCustomers()">
           Search
         </button>
 
       </div>
-
 
       <button mat-raised-button matTooltip="Clear all filters." (click)="filterTemplateForm.form.reset()">
         Clear
@@ -103,7 +88,6 @@
         Save as
       </button>
 
-
       <button mat-raised-button matTooltip="Select (add/remove) filters." (click)="filterDrawerRef.toggle()">
         Settings
       </button>
@@ -112,43 +96,28 @@
 
 
 
-
-
-
-
-
-
-    <!-- ############################################################## -->
-    <!-- Filter entry -->
-    <!-- ############################################################## -->
-
     <mat-drawer-container>
 
-
+      <!-- ############################################################ -->
+      <!-- Filter drawer -->
       <!-- ############################################################ -->
       <!-- Right drawer for selecting the filters to display -->
-      <!-- ############################################################ -->
 
-      <mat-drawer id="filterDrawer" #filterDrawerRef position="end" mode="side" [opened]="'false'" class="mat-elevation-z8">
+      <mat-drawer class="###filter-drawer### mat-elevation-z8" #filterDrawerRef position="end" mode="side" [opened]="'false'">
 
-
-
-
-
-
-        <table mat-table #selectingFiltersTable [dataSource]="availableFilters">
+        <table mat-table class="###selecting-filters-table###" #selectingFiltersTable [dataSource]="availableFilters">
 
           <ng-container [matColumnDef]="column" *ngFor="let column of ['select3', 'name']; let i = index" matTooltip="Select which filters to display">
 
             <!-- Selection/Checkbox column/cell definition -->
             <ng-container *ngIf="column === 'select3'">
               <th mat-header-cell *matHeaderCellDef>
-                <mat-checkbox (change)="$event ? masterToggle3() : null; setFiltersToDisplay()" [checked]="filterSelection.hasValue() && isAllSelected3()" [indeterminate]="filterSelection.hasValue() && !isAllSelected3()">
+                <mat-checkbox (change)="$event ? masterToggle3() : null; onSelectFilter()" [checked]="filterSelection.hasValue() && isAllSelected3()" [indeterminate]="filterSelection.hasValue() && !isAllSelected3()">
                 </mat-checkbox>
               </th>
               <!-- row from dataSource -->
               <td mat-cell *matCellDef="let row">
-                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? filterSelection.toggle(row) : null; setFiltersToDisplay()" [checked]="filterSelection.isSelected(row)">
+                <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? filterSelection.toggle(row) : null; onSelectFilter()" [checked]="filterSelection.isSelected(row)">
                 </mat-checkbox>
               </td>
             </ng-container>
@@ -178,52 +147,36 @@
       </mat-drawer>
 
 
+      <mat-drawer-content>
 
+        <!-- ########################################################## -->
+        <!-- Filter template form -->
+        <!-- ########################################################## -->
 
-      <!-- ############################################################ -->
-      <!-- Filter template dynamic form. -->
-      <!-- ############################################################ -->
+        <!-- (formSubmit)="onFilterTemplateFormSubmit($event)"> -->
 
-
-      <mat-drawer-content id="filterTemplateForm">
-
-
-
-        <div *ngIf="showTestValues" class="showTestValues">
-
-          <br>##########filterTemplates:<br> {{filterTemplates | json}}
-          <br>##########selectedFilterTemplateName: {{selectedFilterTemplateName}}
-          <br>##########filterTemplateFormValue:<br> {{filterTemplateFormValue | json}}
-          <!-- <br>##########filterTemplateForm.form.value:<br> {{filterTemplateForm.form.value | json}} -->
-
-          <br>##########filterTemplateFormOptions: {{filterTemplateFormOptions | json}}
-
-          <br>##########filterTemplateQuestions:<br> {{filterTemplateQuestions | json}}
-
-
-
-          <br>##########?availableFilters:<br> {{availableFilters | json}}
-
-          <br>##########?filtersToDisplay:<br> {{filtersToDisplay | json}}
-
-
-        </div>
-
-
-        <!-- ========================================================== -->
-        <!-- Generating the customer filter template dynamic form. -->
-        <!-- ========================================================== -->
-
-        <w3s-dynamic-form #filterTemplateForm *ngIf="filterTemplateQuestions" [questions]="filterTemplateQuestions" [options]="filterTemplateFormOptions" (formSubmit)="onFilterTemplateFormSubmit($event)">
+        <w3s-dynamic-form class="###filter-template-form###" #filterTemplateForm *ngIf="filterTemplateQuestions" [questions]="filterTemplateQuestions" [options]="filterTemplateFormOptions" (formSubmit)="getCustomers()">
 
         </w3s-dynamic-form>
 
 
         <div *ngIf="showTestValues" class="showTestValues">
 
-          <br>##########filterTemplateFormValue:<br> {{filterTemplateFormValue | json}}
+          <br>##########filterTemplates:<br> {{filterTemplates | json}}
+
+          <!-- <br>##########filterTemplateFormOptions: {{filterTemplateFormOptions | json}} -->
+
+          <br>##########filterTemplateQuestions:<br> {{filterTemplateQuestions | json}}
+
+          <br>##########availableFilters:<br> {{availableFilters | json}}
+
+          <br>##########filtersToDisplay:<br> {{filtersToDisplay | json}}
+
+          <!-- <br>##########filterTemplateForm.form.value:<br> {{filterTemplateForm.form.value | json}} -->
+          <br>##########filterTemplateForm?.form.value:<br> {{filterTemplateForm?.form.value | json}}
 
         </div>
+
 
 
         <!-- ========================================================== -->
@@ -257,19 +210,23 @@
       </mat-form-field>
      -->
 
-
       </mat-drawer-content>
 
     </mat-drawer-container>
 
 
   </mat-expansion-panel>
-  <!-- The filter expansion panel end -->
 
+
+
+
+  <!-- ############################################################## -->
+  <!-- (2) List Section -->
+  <!-- ############################################################## -->
 
 
   <!-- ############################################################ -->
-  <!-- Main CRUD Create/Update/Delete Buttons -->
+  <!-- Customer Create/Update/Delete/Settings buttons -->
   <!-- ############################################################ -->
 
   <!-- <mat-action-row #crudButtons style="align-items: center; font-size:14px;"> -->
@@ -278,6 +235,7 @@
     <div class="special-font">
       {{dataSource.totalNumberOfItems | async}} customers selected.
     </div>
+
 
     <div class="push-right">
       <button mat-raised-button color="primary" matTooltip="Create new customers" (click)="createCustomer()">
@@ -305,19 +263,17 @@
 
 
 
-  <!-- ############################################################## -->
-  <!-- Main content -->
-  <!-- ############################################################## -->
 
-  <mat-drawer-container id="listContainer">
+  <mat-drawer-container class="###list-section###">
 
+    <!-- ############################################################ -->
+    <!-- Column drawer -->
     <!-- ############################################################ -->
     <!-- Right drawer for selecting the columns to display -->
-    <!-- ############################################################ -->
 
-    <mat-drawer id="columnDrawer" #columnDrawerRef position="end" mode="side" [opened]="'false'" class="mat-elevation-z8">
+    <mat-drawer class="###column-drawer###" #columnDrawerRef position="end" mode="side" [opened]="'false'" class="mat-elevation-z8">
 
-      <table mat-table id="selectingColumnsTable" #selectingColumnsTable [dataSource]="availableColumns">
+      <table mat-table class="###selecting-columns-table###" #selectingColumnsTable [dataSource]="availableColumns">
 
         <ng-container [matColumnDef]="column" *ngFor="let column of ['select2', 'name']; let i = index" matTooltip="Select which columns to display">
 
@@ -354,10 +310,6 @@
     </mat-drawer>
 
 
-    <!-- ############################################################ -->
-    <!-- Main data table with paginator  -->
-    <!-- ############################################################ -->
-
     <mat-drawer-content>
 
       <div *ngIf="showTestValues" class="showTestValues">
@@ -370,19 +322,19 @@
       <!-- Main data table -->
       <!-- ############################################################ -->
 
-      <table mat-table id="mainDataTable" #table matSort cdkDropListGroup [cdkDropListGroupDisabled]="'true'" [dataSource]="dataSource">
+      <table mat-table class="###data-table###" #table matSort cdkDropListGroup [cdkDropListGroupDisabled]="'true'" [dataSource]="dataSource">
 
         <ng-container [matColumnDef]="column" *ngFor="let column of availableColumns; let i = index">
 
           <!-- Selection/Checkbox column/cell definition -->
           <ng-container *ngIf="column === 'select'">
             <th mat-header-cell *matHeaderCellDef>
-              <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()">
+              <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="rowSelection.hasValue() && isAllSelected()" [indeterminate]="rowSelection.hasValue() && !isAllSelected()">
               </mat-checkbox>
             </th>
             <td mat-cell *matCellDef="let row">
               <!-- row from dataSource -->
-              <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+              <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? rowSelection.toggle(row) : null" [checked]="rowSelection.isSelected(row)">
               </mat-checkbox>
             </td>
           </ng-container>
@@ -405,15 +357,14 @@
         </tr>
         <!--
       <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"
-          (click)="selection.toggle(row)">
+          (click)="rowSelection.toggle(row)">
       -->
 
       </table>
-      <!-- End main data table -->
 
 
       <!-- ############################################################ -->
-      <!-- Bottom row with spinner and paginator -->
+      <!-- Spinner and paginator -->
       <!-- ############################################################ -->
       <!-- <div style="display:flex; justify-content:flex-end;"> -->
 
@@ -435,4 +386,4 @@
 
 
 </div>
-<!-- The end of .w3s-list-component -->
+<!-- .w3s-list-component -->

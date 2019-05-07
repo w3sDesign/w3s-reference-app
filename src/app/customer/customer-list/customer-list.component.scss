@@ -11,6 +11,11 @@
 // }
 
 
+.comma:not(:first-child)::before {
+  content: ', ';
+}
+
+
 .nixclose:hover {
   background: #ff4081;
   color: #fff;

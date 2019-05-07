@@ -105,7 +105,17 @@
   <!-- Submit form button -->
   <!-- ########################################################## -->
 
-  <button type="submit" *ngIf="form" mat-raised-button matTooltip="Start Searching" [disabled]="!form.valid">Submit Dyn Form</button>
+  <!-- Note: The submit button is not displayed! -->
+  <!-- But a button of type 'submit' is needed to use the Enter key to start searching. -->
+
+  <!-- Angular / reactive forms / saving data:  -->
+  <!-- The submit event is emitted by the form tag using the native DOM event.  -->
+  <!-- You trigger the event by clicking a button with submit type.  -->
+  <!-- This allows the user to press the Enter key to submit the completed form. -->
+
+  <!-- ########################################################## -->
+
+  <button style="display: none" type="submit" *ngIf="form" mat-raised-button matTooltip="Start Searching" [disabled]="!form.valid">Submit</button>
 
 
 </form>

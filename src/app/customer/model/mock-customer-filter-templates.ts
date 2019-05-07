@@ -1,6 +1,6 @@
 import { CustomerFilterTemplate } from './customer-filter-template';
 
-export const mockCustomerFilterTemplates: CustomerFilterTemplate[] = [
+export const mockCustomerFilterTemplates: any[] = [
   {
     id: 0,
     name: 'standard',
@@ -12,8 +12,8 @@ export const mockCustomerFilterTemplates: CustomerFilterTemplate[] = [
 
     // TODO if country === 'disabled' set form control = disabled
     // country: 'disabled',
-    postalCodeFilter: '',
-    cityFilter: '',
+    // postalCodeFilter: '',
+    // cityFilter: '',
     // streetFilter: 'disabled',
 
     // Contacts
