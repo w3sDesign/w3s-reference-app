@@ -2,15 +2,13 @@
 
 
   <!-- ############################################################ -->
+  <!-- ############################################################ -->
   <!-- (1) Filter Section -->
+  <!-- ############################################################ -->
   <!-- ############################################################ -->
 
 
   <mat-expansion-panel class="###filter-section###">
-
-    <!-- ########################################################## -->
-    <!-- Filter section header  -->
-    <!-- ########################################################## -->
 
     <mat-expansion-panel-header [collapsedHeight]="'58px'" [expandedHeight]="'58px'">
 
@@ -20,9 +18,14 @@
       </mat-panel-title>
 
       <mat-panel-description>
+
+        <!-- ########################################################## -->
+        <!-- Active filters -->
+        <!-- ########################################################## -->
+
         <div class="special-font" style="display:block;color: rgba(0,0,0,.87); font-size:14px; font-weight: 400">
 
-          Currently {{activeFilters.length}} filters active:
+          {{activeFiltersText}}
           <span class="comma" *ngFor="let filter of activeFilters">{{(filter.replace('Filter', '') | titlecase)}}</span>
         </div>
       </mat-panel-description>
@@ -33,31 +36,12 @@
     <div id="filterButtons" style="align-items: flex-end">
 
       <!-- ########################################################## -->
-      <!-- Selecting a filter template  -->
-      <!-- ########################################################## -->
-
-      <mat-form-field>
-
-        <mat-select [(value)]="selectedFilterTemplateName" (selectionChange)="onSelectFilterTemplate(selectedFilterTemplateName)">
-
-          <!-- <mat-option value="standard">Standard</mat-option> -->
-          <mat-option *ngFor="let name of filterTemplateNames" value="{{name}}">{{name}}</mat-option>
-        </mat-select>
-
-        <mat-hint align="start">
-          Select Filter Template
-        </mat-hint>
-
-      </mat-form-field>
-
-
-      <!-- ########################################################## -->
-      <!-- Searching in all fields -->
+      <!-- SearchInput - searching in all fields -->
       <!-- ########################################################## -->
 
       <!-- placeholder="Search" -->
       <mat-form-field>
-        <input matInput formControlName="searchInput" #searchInput type="text" matTooltip="tooltip" >
+        <input matInput #searchInput type="text" matTooltip="tooltip">
         <mat-hint align="start">
           Search in all fields
         </mat-hint>
@@ -65,7 +49,7 @@
 
 
       <!-- ########################################################## -->
-      <!-- Search/Clear/Save/Settings buttons -->
+      <!-- Search/Clear/Save filter buttons -->
       <!-- ########################################################## -->
 
       <div class="push-right">
@@ -76,7 +60,7 @@
 
       </div>
 
-      <button mat-raised-button matTooltip="Clear all filters." (click)="filterTemplateForm.form.reset()">
+      <button mat-raised-button matTooltip="Clear all filters." (click)="onClearFilters()">
         Clear
       </button>
 
@@ -94,12 +78,32 @@
 
     </div>
 
+    <div id="filterButtons">
 
+      <!-- ########################################################## -->
+      <!-- Select a filter template  -->
+      <!-- ########################################################## -->
+
+      <mat-form-field>
+
+        <mat-select [(value)]="selectedFilterTemplateName" (selectionChange)="onSelectFilterTemplate(selectedFilterTemplateName)">
+
+          <!-- <mat-option value="standard">Standard</mat-option> -->
+          <!-- <mat-option value=""></mat-option> -->
+          <mat-option *ngFor="let name of filterTemplateNames" value="{{name}}">{{name}}</mat-option>
+        </mat-select>
+
+        <mat-hint align="start">
+          Select Filter Template
+        </mat-hint>
+
+      </mat-form-field>
+    </div>
 
     <mat-drawer-container>
 
       <!-- ############################################################ -->
-      <!-- Filter drawer -->
+      <!-- Select filters -->
       <!-- ############################################################ -->
       <!-- Right drawer for selecting the filters to display -->
 
@@ -162,19 +166,22 @@
 
         <div *ngIf="showTestValues" class="showTestValues">
 
-          <br>##########filterTemplates:<br> {{filterTemplates | json}}
+          <br>########## filterTemplates = <br> {{filterTemplates | json}}
 
-          <!-- <br>##########filterTemplateFormOptions: {{filterTemplateFormOptions | json}} -->
+          <br>########## filterTemplateQuestions = <br> {{filterTemplateQuestions | json}}
 
-          <br>##########filterTemplateQuestions:<br> {{filterTemplateQuestions | json}}
+          <br>########## availableFilters = <br> {{availableFilters | json}}
 
-          <br>##########availableFilters:<br> {{availableFilters | json}}
+          <br>########## filtersToDisplay = <br> {{filtersToDisplay | json}}
 
-          <br>##########filtersToDisplay:<br> {{filtersToDisplay | json}}
 
-          <!-- <br>##########filterTemplateForm.form.value:<br> {{filterTemplateForm.form.value | json}} -->
-          <br>##########filterTemplateForm?.form.value:<br> {{filterTemplateForm?.form.value | json}}
+          <!-- <div *ngIf="filterTemplateForm?.form?.value !== null"> -->
+            <!-- Reference to the filter template form not set before AfterViewInit. -->
 
+            <!-- This causes ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked.  -->
+            <!-- <br>########## filterTemplateForm?.form?.value = <br> {{filterTemplateForm?.form?.value | json}} -->
+
+          <!-- </div> -->
         </div>
 
 
@@ -220,13 +227,18 @@
 
 
 
+
+
+
+  <!-- ############################################################## -->
   <!-- ############################################################## -->
   <!-- (2) List Section -->
+  <!-- ############################################################## -->
   <!-- ############################################################## -->
 
 
   <!-- ############################################################ -->
-  <!-- Customer Create/Update/Delete/Settings buttons -->
+  <!-- Create/Update/Delete customers buttons -->
   <!-- ############################################################ -->
 
   <!-- <mat-action-row #crudButtons style="align-items: center; font-size:14px;"> -->
@@ -267,7 +279,7 @@
   <mat-drawer-container class="###list-section###">
 
     <!-- ############################################################ -->
-    <!-- Column drawer -->
+    <!-- Select columns -->
     <!-- ############################################################ -->
     <!-- Right drawer for selecting the columns to display -->
 
@@ -313,13 +325,13 @@
     <mat-drawer-content>
 
       <div *ngIf="showTestValues" class="showTestValues">
-        <br>##########availableColumns: {{availableColumns | json}}
-        <br>##########columnsToDisplay: {{columnsToDisplay | json}}
+        <br>########## availableColumns = <br> {{availableColumns | json}}
+        <br>########## columnsToDisplay = <br> {{columnsToDisplay | json}}
       </div>
 
 
       <!-- ############################################################ -->
-      <!-- Main data table -->
+      <!-- Customer list - main data table -->
       <!-- ############################################################ -->
 
       <table mat-table class="###data-table###" #table matSort cdkDropListGroup [cdkDropListGroupDisabled]="'true'" [dataSource]="dataSource">

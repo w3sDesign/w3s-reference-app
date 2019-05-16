@@ -2,7 +2,7 @@ import { CustomerFilterTemplate } from './customer-filter-template';
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
 
 ////////////////////////////////////////////////////////////////////
-/// Not used! is generated!
+/// NIX used! - is generated!
 ////////////////////////////////////////////////////////////////////
 
 export const mockCustomerFilterTemplateQuestions: QuestionBase[] = [

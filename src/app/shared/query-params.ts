@@ -1,5 +1,6 @@
 export class QueryParams {
-  filter: any = {};
+  filter: any = ''; // = {};
+  searchTerm = '';  // searching in all fields
   sortOrder: 'asc' | 'desc' | '' = 'asc';
   sortField = '';
   pageNumber = 0;

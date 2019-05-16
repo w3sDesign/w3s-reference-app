@@ -11,6 +11,8 @@ import { JsonPipe } from '@angular/common';
 
 export class HttpUtilsService {
 
+  showTestValues = true;
+
 
   ///////////////////////////////////////////////
   getFindHttpParams(queryParams): HttpParams {
@@ -31,10 +33,14 @@ export class HttpUtilsService {
   }
 
 
+
+
+
+
+
   /**
-   * ## @method filterAndSort()
+   * Client side filtering and sorting.
    * ##################################################################
-   * - Client side filtering and sorting.
    *
    * @param items         The items (customers) array to be filtered and sorted.
    * @param queryParams   The params for filtering, sorting, and paginating.
@@ -44,16 +50,72 @@ export class HttpUtilsService {
 
   filterAndSort(items: any[], queryParams: QueryParams): QueryResult {
 
+    let filteredItems: any[] = items; // [];
+
+
     // ==================================================================
-    // (1) Filtering - setting filtered items.
+    // (1) Filtering items.
     // ==================================================================
 
-    /** Filtered items have passed all filter tests. */
-    let filteredItems: any[];
+    if (queryParams.filter) {
 
-    const filterTemplate = queryParams.filter;
+      filteredItems = this.filterItems(items, queryParams.filter);
 
-    filteredItems = items.filter(item => { // JS array.filter() method
+    }
+
+
+    // ================================================================
+    // (2) Sorting filtered items.
+    // ================================================================
+
+    if (queryParams.sortField) {
+
+      filteredItems = this.sortItems(filteredItems, queryParams.sortField, queryParams.sortOrder);
+
+    }
+
+
+    // ================================================================
+    // (3) Paginating filtered (and sorted) items.
+    // ================================================================
+
+    const totalCount = filteredItems.length;
+    const initialPos = queryParams.pageNumber * queryParams.pageSize;
+
+    filteredItems = filteredItems.slice(initialPos, initialPos + queryParams.pageSize);
+
+
+    // ================================================================
+    // (4) Returning the queryResult.
+    // ================================================================
+
+    const queryResult = new QueryResult();
+
+    queryResult.items = filteredItems;
+    queryResult.totalCount = totalCount;
+    // console.log('##########http-utils-service / queryResult: ' + JSON.stringify(queryResult));
+
+    return queryResult;
+
+
+  } // filterAndSort().
+
+
+
+
+
+
+  /**
+   * ##################################################################
+   * Filtering routine.
+   * ##################################################################
+   */
+
+  filterItems(items: any[], filters: any[]): any[] {
+
+    const filterTemplate = filters;
+
+    const filteredItems = items.filter(item => { // JS array.filter() method
 
       let testFailed = false;
 
@@ -80,9 +142,11 @@ export class HttpUtilsService {
 
           if (typeof (value) === 'string') {
 
-            if (value.toLocaleLowerCase().indexOf(filter) === -1) {
+            if (value.toLowerCase().indexOf(filter) === -1) {
               testFailed = true;
             }
+
+            // other tests ...
 
           }
 
@@ -98,13 +162,19 @@ export class HttpUtilsService {
               case '=':
                 if (value !== +filter.substring(1)) { testFailed = true; }
                 break;
+
+              // other tests ...
+
               default:
                 if (value !== +filter) { testFailed = true; }
             }
 
           }
 
-          // other tests ...
+          // Only string and numbers!!
+          // customers AdditionalAddresses have value = object array!
+          // error => server returned undefined
+
         }
 
       });
@@ -115,67 +185,22 @@ export class HttpUtilsService {
 
     });
 
+    return filteredItems;
 
-    // ================================================================
-    // (2) Sorting filtered items.
-    // ================================================================
-
-    if (queryParams.sortField) {
-      filteredItems = this.arraySort(
-        filteredItems,
-        queryParams.sortField,
-        queryParams.sortOrder
-      );
-    }
-
-
-    // ================================================================
-    // (3) Paginating filtered (and sorted) items.
-    // ================================================================
-
-    const totalCount = filteredItems.length;
-    const initialPos = queryParams.pageNumber * queryParams.pageSize;
-    filteredItems = filteredItems.slice(
-      initialPos,
-      initialPos + queryParams.pageSize
-    );
-
-
-    // ================================================================
-    // (4) Returning the queryResult.
-    // ================================================================
-
-    const queryResult = new QueryResult();
-
-    queryResult.items = filteredItems;
-
-    queryResult.totalCount = totalCount;
-
-    // console.log('##########http-utils-service / queryResult: ' + JSON.stringify(queryResult));
-
-    return queryResult;
-
-
-  } // The end of filterAndSort().
-
+  }
 
 
   /**
    * ##################################################################
-   * Client side sorting.
+   * Sorting routine.
    * ##################################################################
    */
-  arraySort(
-    incomingArray: any[],
-    sortField: string = '',
-    sortOrder: string = 'asc'): any[] {
+  sortItems(items: any[], sortField: string = '', sortOrder: string = 'asc'): any[] {
 
-    if (!sortField) {
-      return incomingArray;
-    }
+    if (!sortField) { return items; }
 
     let result: any[] = [];
-    result = incomingArray.sort((a, b) => {
+    result = items.sort((a, b) => {
       if (a[sortField] < b[sortField]) {
         return sortOrder === 'asc' ? -1 : 1;
       }
@@ -186,16 +211,181 @@ export class HttpUtilsService {
 
       return 0;
     });
+
     return result;
   }
+
+
+
+
+
+  /**
+   * Client side searching.
+   * ##################################################################
+   *
+   * @param items         The items (customers) array to be filtered and sorted.
+   * @param queryParams   The params for searching (queryParams.searchTerm).
+   *
+   * @return queryResult  The searched items array.
+   */
+
+  searchInAllFields(items: any[], queryParams: QueryParams): QueryResult {
+
+    let searchedItems: any[] = items; // [];
+
+
+    // ==================================================================
+    // (1) Searching items.
+    // ==================================================================
+
+    if (queryParams.searchTerm) {
+
+      searchedItems = this.searchItems(items, queryParams.searchTerm);
+
+      // if (this.showTestValues) {
+      console.log('%c########## searchedItems [searchInAllFields()] = \n' +
+        JSON.stringify(searchedItems), 'color: darkgreen');
+      // }
+
+
+    }
+
+
+    // ================================================================
+    // (2) Sorting searched items.
+    // ================================================================
+
+    if (queryParams.sortField) {
+
+      searchedItems = this.sortItems(searchedItems, queryParams.sortField, queryParams.sortOrder);
+
+    }
+
+
+    // ================================================================
+    // (3) Paginating searched (and sorted) items.
+    // ================================================================
+
+    const totalCount = searchedItems.length;
+    const initialPos = queryParams.pageNumber * queryParams.pageSize;
+
+    searchedItems = searchedItems.slice(initialPos, initialPos + queryParams.pageSize);
+
+
+    // ================================================================
+    // (4) Returning the queryResult.
+    // ================================================================
+
+    const queryResult = new QueryResult();
+
+    queryResult.items = searchedItems;
+    queryResult.totalCount = totalCount;
+    // console.log('##########http-utils-service / queryResult: ' + JSON.stringify(queryResult));
+
+    return queryResult;
+
+
+  }
+
+
+
+
+  /**
+   * ##################################################################
+   * Searching routine.
+   * ##################################################################
+   */
+
+  searchItems(items: any[], term: string): any[] {
+
+    const searchTerm = term.trim().toLowerCase();
+
+    // ################################################################
+
+    const searchedItems = items.filter(item => { // JS array.filter() method
+
+      let hasItemPassedTests = false;
+
+      /**
+       * For example:
+       * item = customer : { "id"      : "20018",  "name"      : "Vehicle Risus Foundation" }
+       * searchTerm      : "found"
+       */
+      Object.keys(item).forEach(key => {
+
+        const value = item[key];
+        let str: string;
+
+
+        if (typeof (value) === 'string') {
+
+          str = value.trim().toLowerCase();
+
+          // if (this.showTestValues) {
+          //   console.log('%c########## item[key] [searchItems()] = \n' +
+          //     JSON.stringify(item[key]), 'color: darkgreen');
+
+          //   console.log('%c########## let str [searchItems()] = \n' +
+          //     JSON.stringify(str), 'color: darkgreen');
+          // }
+
+          if (str.indexOf(searchTerm) !== -1) {
+            hasItemPassedTests = true;
+          }
+
+        }
+
+
+        if (typeof (value) === 'number') {
+
+          str = value.toString();
+
+          if (str.indexOf(searchTerm) !== -1) {
+            hasItemPassedTests = true;
+          }
+
+        }
+
+        // Only string and numbers!!
+        // customers AdditionalAddresses have value = object array!
+        // error => server returned undefined
+
+      });
+
+      // If an item has passed the tests return true
+      // to the array.filter method; else return false.
+      return hasItemPassedTests;
+
+    });
+
+    // ################################################################
+
+    if (this.showTestValues) {
+      console.log('%c########## searchedItems [searchItems()] = \n' +
+        JSON.stringify(searchedItems), 'color: darkgreen');
+    }
+
+    return searchedItems;
+
+
+  }
+
+
 
 
 } // The end.
 
 
+
+
+
+
+
+
+
   // /**
   //  * ##################################################################
-  //  * OLD Client side filtering.
+  //  * OLD Search Client side filtering.
   //  * ##################################################################
   //  */
   // arraySearch(

@@ -41,6 +41,8 @@ const cudOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/jso
 @Injectable()
 export class HttpCustomerService extends CustomerService {
 
+  showTestValues = true;
+
   private handleError: HandleError;
 
   private filterTemplate: CustomerFilterTemplate;
@@ -104,7 +106,16 @@ export class HttpCustomerService extends CustomerService {
    * It switches whenever a new value is emitted.
    */
   getCustomers(queryParams?: QueryParams): Observable<QueryResult> {
-    if (queryParams) {
+
+
+    if (queryParams.filter) {
+
+      if (this.showTestValues) {
+        console.log('%c#1######### queryParams [getCustomers()] = \n' +
+          JSON.stringify(queryParams), 'color: darkgreen');
+      }
+
+      // Filters are set.
       return this.http.get<Customer[]>(this.customersUrl)
         .pipe(
           mergeMap(res => {
@@ -115,19 +126,47 @@ export class HttpCustomerService extends CustomerService {
           }),
           catchError(this.handleError('getCustomers with queryParams', new QueryResult()))
         );
+
+    } else if (queryParams.searchTerm) {
+
+      if (this.showTestValues) {
+        console.log('%c#2######### queryParams [getCustomers()] = \n' +
+          JSON.stringify(queryParams), 'color: darkgreen');
+      }
+
+      // Search term (for searching in all fields) is set.
+      return this.http.get<Customer[]>(this.customersUrl)
+        .pipe(
+          mergeMap(res => {
+            // ===============================================================
+            const queryResult = this.httpUtils.searchInAllFields(res, queryParams);
+            // ===============================================================
+            return of(queryResult);
+          }),
+          catchError(this.handleError('getCustomers with search term', new QueryResult()))
+        );
+
+    } else {
+
+      if (this.showTestValues) {
+        console.log('%c#3######### queryParams [getCustomers()] = \n' +
+          JSON.stringify(queryParams), 'color: darkgreen');
+      }
+
+      // No queryParams, all customers returned.
+      return this.http.get<Customer[]>(this.customersUrl)
+        .pipe(
+          mergeMap(res => {
+            const queryResult = new QueryResult();
+            queryResult.items = res;
+            queryResult.totalCount = queryResult.items.length;
+            return of(queryResult);
+          }),
+          catchError(this.handleError('getCustomers', new QueryResult()))
+        );
+
     }
 
-    // No queryParams, all customers returned.
-    return this.http.get<Customer[]>(this.customersUrl)
-      .pipe(
-        mergeMap(res => {
-          const queryResult = new QueryResult();
-          queryResult.items = res;
-          queryResult.totalCount = queryResult.items.length;
-          return of(queryResult);
-        }),
-        catchError(this.handleError('getCustomers', new QueryResult()))
-      );
   }
 
 
@@ -160,23 +199,6 @@ export class HttpCustomerService extends CustomerService {
   }
 
 
-  /**
-   * ##################################################################
-   * TODO
-   * ##################################################################
-   */
-  searchCustomers(term: string): Observable<Customer[]> {
-    term = term.trim();
-    // add safe, encoded search parameter if term is present
-    const options = term ?
-      { params: new HttpParams().set('name', term) } : {};
-
-    return this.http.get<Customer[]>(this.customersUrl, options)
-      .pipe(
-        catchError(this.handleError<Customer[]>('Search customers'))
-      );
-  }
-
 
   /**
    * ##################################################################
@@ -192,7 +214,7 @@ export class HttpCustomerService extends CustomerService {
         tap(() => this.openSnackBar(message)),
         tap(() => this.log(message)),
         catchError(this.handleError<Customer>(message.replace('has been', 'has not been'))),
-        );
+      );
   }
 
   /**

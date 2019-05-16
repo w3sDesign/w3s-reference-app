@@ -1,7 +1,12 @@
-/**
- * Initial version based on Metronic 5.5.5.
- */
-import { Component, ElementRef, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+
+//
+// Change log
+// ####################################################################
+// Update activeFilters - moved to getCustomers()
+// ####################################################################
+
+
+import { Component, ElementRef, OnInit, ViewChild, ViewContainerRef, AfterViewInit } from '@angular/core';
 
 import { MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTable } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -9,7 +14,7 @@ import { CdkDragStart, CdkDropList, CdkDragDrop, moveItemInArray } from '@angula
 
 import { fromEvent, merge, Observable } from 'rxjs';
 //
-import { debounceTime, distinctUntilChanged, tap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, tap, switchMap } from 'rxjs/operators';
 
 import { CustomerDataSource } from '../model/customer.datasource';
 import { MessageDialogComponent } from '../../shared/message-dialog/message-dialog.component';
@@ -38,11 +43,9 @@ import { InputDialogComponent } from '../../shared/input-dialog/input-dialog.com
 
 import { DynamicFormOptions } from '../../shared/dynamic-form/dynamic-form-options';
 import { DynamicFormGroupService } from '../../shared/dynamic-form/dynamic-form-group.service';
+import { mockCustomers } from '../model/mock-customers';
 
 
-// ####################################################################
-// CustomerListComponent
-// ####################################################################
 
 @Component({
   selector: 'app-customer-list',
@@ -50,19 +53,16 @@ import { DynamicFormGroupService } from '../../shared/dynamic-form/dynamic-form-
   styleUrls: ['./customer-list.component.scss']
 })
 
-export class CustomerListComponent implements OnInit {
+export class CustomerListComponent implements OnInit, AfterViewInit {
 
   showTestValues = true;
+  // consoleLogStyle = 'color: blue; font-weight: 500; line-height: 20px;';
 
   // ##################################################################
   // (1) Filter section related properties.
   // ##################################################################
 
-  /** Available filters != available columns.  */
-
-  // availableFilters: string[] = this.availableColumns;
-
-  /** Filters that are possible. */
+  /** All possible filters. */
   availableFilters: string[] =
     [
       'idFilter', 'nameFilter',
@@ -71,18 +71,20 @@ export class CustomerListComponent implements OnInit {
       'phoneFilter', 'emailFilter'
     ];
 
-  /** Filters that should be displayed in the filter templates. */
+  /** Filters that should be displayed in the filter template form. */
   filtersToDisplay: string[] = [];
-    // [
-    //   'idFilter', 'nameFilter',
-    // ];
+  // [
+  //   'idFilter', 'nameFilter',
+  // ];
 
-  /** Filters that are displayed and have input values. */
+  /** Active filters used by last data load [getCustomers()] */
   activeFilters: string[] = [];
+  activeFiltersText = '';
 
 
   /**
    * Reference to the filter template form.
+   * Not set before AfterViewInit.
    */
   @ViewChild('filterTemplateForm')
   filterTemplateForm: DynamicFormComponent;
@@ -154,29 +156,24 @@ export class CustomerListComponent implements OnInit {
 
 
   /** Data table paginator */
-  @ViewChild(MatPaginator)
-  paginator: MatPaginator;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   /** Sorting table columns */
-  @ViewChild(MatSort)
-  sort: MatSort;
+  @ViewChild(MatSort) sort: MatSort;
 
   /** Searching in all fields */
-  @ViewChild('searchInput')
-  searchInput: ElementRef;
+  @ViewChild('searchInput') searchInput: ElementRef;
 
   /** Selection handling - data table rows. */
   rowSelection = new SelectionModel<Customer>(true, []);
 
 
   /** Create/Update/Delete buttons */
-  @ViewChild('crudButtons', { read: ViewContainerRef })
-  crudButtons;
+  @ViewChild('crudButtons', { read: ViewContainerRef }) crudButtons;
 
 
   /** Table for selecting the columns to display. */
-  @ViewChild('selectingColumnsTable')
-  selectingColumnsTable: MatTable<string[]>;
+  @ViewChild('selectingColumnsTable') selectingColumnsTable: MatTable<string[]>;
 
 
   /** Selection handling - columns to display. */
@@ -190,7 +187,7 @@ export class CustomerListComponent implements OnInit {
 
 
   // ##################################################################
-  // constructor()
+  // Constructor
   // ##################################################################
 
   constructor(
@@ -204,14 +201,34 @@ export class CustomerListComponent implements OnInit {
   }
 
 
+
+  ngAfterViewInit() {
+
+    if (this.showTestValues) {
+      console.log('%c########## this.filterTemplateForm.form.value [ngAfterViewInit()] = \n' +
+        JSON.stringify(this.filterTemplateForm.form.value), 'color: blue');
+    }
+
+  }
+
+
   // ##################################################################
-  // ngOnInit()
+  // OnInit
   // ##################################################################
 
   ngOnInit() {
 
-    // Getting filter templates and performing onSelectFilterTemplate(name).
+    // this.onFilterTemplateFormValueChanges();
+
+    if (this.showTestValues) {
+      console.log('%c########## this.activeFilters [ngOnInit()] = \n' +
+        JSON.stringify(this.activeFilters), 'color: blue');
+    }
+
+
+    // Get filter templates.
     // ################################################################
+    // Getting filter templates and performing onSelectFilterTemplate(name).
 
     this.customerService.getCustomerFilterTemplates()
       .subscribe(
@@ -226,33 +243,48 @@ export class CustomerListComponent implements OnInit {
       );
 
 
-    // Subscribing/Listening to keyup events emitted from searchInput when searching in all fields.
+    // Subscribing to searchInput changes.
     // ################################################################
-    // Whenever a 'keyup' event is emitted, a data load will be triggered (getCustomers()).
+    // Creating an observable from searchInput keyup events and
+    // Whenever a 'keyup' event is emitted, a data load will be triggered.
 
     fromEvent(this.searchInput.nativeElement, 'keyup')
       .pipe(
-        debounceTime(150), // limiting server requests to one every 150ms
-        distinctUntilChanged() // eliminating duplicate values
-        // tap(() => {
-        //   this.paginator.pageIndex = 0;
+        // Wait 300ms after each keystroke before considering the term.
+        debounceTime(300),
+
+        // ignore new term if same as previous term
+        // eliminating duplicate values
+        distinctUntilChanged(),
+
+        // switchMap((res) => {
+
         //   this.getCustomers();
+        //   // Reset to first page.
+        //   this.paginator.pageIndex = 0;
+
         // })
+
+        tap(() => {
+          this.paginator.pageIndex = 0;
+          this.getCustomers();
+        })
       )
-      .subscribe(() => {
+      .subscribe();
 
-        // TODO  onSearchInput:   getCustomers without setting QueryParams!
+    // .subscribe(() => {
 
-        this.getCustomers();
-        /** Reset to first page */
-        this.paginator.pageIndex = 0;
-      });
+    //   // getCustomers without queryParams.
+    //   // this.onClearFilters();
+    //   this.getCustomers();
+    //   // Reset to first page.
+    //   this.paginator.pageIndex = 0;
+    // });
 
 
-    // Subscribing/Listening to sort/page change events.
+    // Subscribing to sort and page changes.
     // ################################################################
-    // Sorting and paginating the data table.
-    // Whenever a sort/page change event is emitted, a data load will be triggered (getCustomers()).
+    // Whenever a sort/page change event is emitted, a data load will be triggered.
 
     this.sort.sortChange
       .subscribe(() => {
@@ -265,13 +297,13 @@ export class CustomerListComponent implements OnInit {
       .subscribe(() => this.getCustomers());
 
 
-    // Performing initial customer data load.
+    // Performing initial data load.
     // ################################################################
     // Delegating data access to the CustomerDataSource object.
 
     const queryParams = new QueryParams();
     // queryParams.filter = this.filterConfig(false);
-    queryParams.filter = {};
+    // queryParams.filter = {};
 
     this.dataSource = new CustomerDataSource(this.customerService);
 
@@ -293,6 +325,31 @@ export class CustomerListComponent implements OnInit {
   // Methods
   // ####################################################################
 
+
+
+  NIXonFilterTemplateFormValueChanges() {
+
+    if (this.showTestValues) {
+      console.log('%c########## this.filterTemplateForm.form.value [onFilterTemplateFormValueChanges()] = \n' +
+        JSON.stringify(this.filterTemplateForm.form.value), 'color: blue');
+    }
+
+
+    // Update activeFilters when a form control value changes.
+    // Updates too often - moved to getCustomers()!
+
+    this.filterTemplateForm.form.valueChanges.subscribe(val => {
+
+      this.activeFilters = [];
+      // const obj = this.filterTemplateForm.form.value;
+      for (const key in val) {
+        if (val[key]) {
+          this.activeFilters.push(key);
+        }
+      }
+    });
+
+  }
 
   /**
    * Handles selecting a filter.
@@ -325,6 +382,13 @@ export class CustomerListComponent implements OnInit {
   }
 
 
+  onClearFilters() {
+    // this.filterTemplateForm.form.reset();
+    this.onSelectFilterTemplate('');
+
+  }
+
+
   /**
    * Handles selecting a filter template.
    * ##################################################################
@@ -338,39 +402,62 @@ export class CustomerListComponent implements OnInit {
    */
   onSelectFilterTemplate(name: string) {
 
+    // if (name) {
+
     // (1) Setting filtersToDisplay from selected filter template.
     const filterTemplate = this.filterTemplates.find(ft => ft.name === name);
     if (!filterTemplate) { return; }
-    //
+
     this.filtersToDisplay = [];
     Object.keys(filterTemplate).forEach((filterKey) => { // idFilter, nameFilter
       if (filterKey.includes('Filter')) {
         this.filtersToDisplay.push(filterKey);
       }
     });
-    console.log('##########onSelectFilterTemplate() / filtersToDisplay = ' + JSON.stringify(this.filtersToDisplay));
 
+    if (this.showTestValues) {
+      console.log('%c########## this.filtersToDisplay [onSelectFilterTemplate(name)] = \n' +
+        JSON.stringify(this.filtersToDisplay), 'color: blue');
+      // console.dir(this.filtersToDisplay);
+      // console.table(this.filtersToDisplay);
+      // this.consoleLog('JSON.stringify(this.filtersToDisplay)');
+    }
 
     // (2) Generating filterTemplate questions.
     this.filterTemplateQuestions = this.generateFilterTemplateQuestions();
-    //
-    // tslint:disable-next-line:max-line-length
-    console.log('####################onSelectFilterTemplate() / this.filterTemplateQuestions = ' + JSON.stringify(this.filterTemplateQuestions));
 
+    if (this.showTestValues) {
+      console.log('%c########## this.filterTemplateQuestions [onSelectFilterTemplate(name)] = \n' +
+        JSON.stringify(this.filterTemplateQuestions), 'color: blue');
+      // this.consoleLog('JSON.stringify(this.filterTemplateQuestions)');
+    }
 
     // (3) Generating filterTemplateForm.
     this.generateFilterTemplateForm(this.filterTemplateQuestions);
 
-
     // (4) Setting form values and get (search) customers.
     this.renderFilterTemplateForm(name);
-
 
     // (5) Setting selected filters.
     this.filterSelection.clear();
     this.filtersToDisplay.forEach(filter => this.filterSelection.select(filter));
 
     this.selectingFiltersTable.renderRows();
+
+    // } else {
+
+    //   // Handling empty filter template.
+
+    //   // this.onClearFilters();
+
+    //   this.selectedFilterTemplateName = '';
+
+    //   this.filterTemplateForm.form.reset();
+
+    //   this.activeFilters = [];
+
+    //   this.getCustomers();  // get all customers
+    // }
 
   }
 
@@ -389,14 +476,6 @@ export class CustomerListComponent implements OnInit {
     this.filterTemplateForm.setFormValue(filterTemplate);
     this.getCustomers();
 
-    // new Setting activeFilters
-    this.activeFilters = [];
-    const obj = this.filterTemplateForm.form.value;
-    for (const key in obj) {
-      if (obj[key]) { // value   TODO obj.key?
-        this.activeFilters.push(key);
-      }
-    }
   }
 
 
@@ -416,7 +495,7 @@ export class CustomerListComponent implements OnInit {
 
 
   /**
-   * Generates the filter template questions from the customer questions.
+   * Generates the filter template questions from customer questions.
    * ##################################################################
    */
   // generateFilterTemplateQuestions(fromQuestions: QuestionBase[]): QuestionBase[] {
@@ -443,23 +522,21 @@ export class CustomerListComponent implements OnInit {
       // newObj['inputType'] = 'textarea';
       newObj['inputType'] = 'text';
 
-      newObj['label'] = '';
+      // newObj['label'] = '';
       newObj['hint'] = 'Filter by ' + q.label;
-      newObj['toolTip'] = '';
       // TODO
       if (q.inputType === 'number') {
         newObj['toolTip'] = 'For example: 1000 (equal), <1000 (lower), >1000 (greater), 1000-2000 (between)';
+      } else {
+        newObj['toolTip'] = '';
       }
 
       return newObj;
 
     });
 
-    console.log('##########generateFilterTemplateQuestions() / this.filtersToDisplay = ' + JSON.stringify(this.filtersToDisplay));
-    console.log('##########generateFilterTemplateQuestions() / mockCustomerQuestions = ' + JSON.stringify(mockCustomerQuestions));
-    console.log('##########generateFilterTemplateQuestions() / fromQuestions = ' + JSON.stringify(fromQuestions));
-    console.log('##########generateFilterTemplateQuestions() / questions = ' + JSON.stringify(questions));
-    console.log('##########generateFilterTemplateQuestions() / filterTemplateQuestions = ' + JSON.stringify(filterTemplateQuestions));
+    // shown in onSelectFilterTemplate()
+    // this.consoleLog('JSON.stringify(this.filterTemplateQuestions)');
 
     return filterTemplateQuestions as QuestionBase[];
   }
@@ -475,6 +552,13 @@ export class CustomerListComponent implements OnInit {
     this.filterTemplateForm.createForm(questions);
 
     // this.getCustomers();
+
+    if (this.showTestValues) {
+      console.log('%c########## this.filterTemplateForm.form.value [generateFilterTemplateForm()] = \n' +
+        JSON.stringify(this.filterTemplateForm.form.value), 'color: blue');
+    }
+
+    // this.onFilterTemplateFormValueChanges();
   }
 
 
@@ -495,26 +579,64 @@ export class CustomerListComponent implements OnInit {
 
 
   /**
-   * Sets the current query parameters and gets (searches) the customers.
+   * Setting query parameters and getting  customers.
    * ##################################################################
    */
   getCustomers() {
-    const queryParams = new QueryParams();
 
-    // Setting the current filters from the filter template form
-    // queryParams.filter = this.filterTemplateFormValue;
-    queryParams.filter = this.filterTemplateForm.form.value;
+    // Test
+    if (this.filterTemplateForm.form.value) {
 
-    queryParams.sortOrder = this.sort.direction;
-    // The id of the column being sorted.
-    queryParams.sortField = this.sort.active;
-    queryParams.pageNumber = this.paginator.pageIndex;
-    queryParams.pageSize = this.paginator.pageSize;
 
-    // Delegating to the customer data source.
-    this.dataSource.getCustomers(queryParams);
 
-    this.rowSelection.clear();
+      // (1) Setting queryParams.
+      const queryParams = new QueryParams();
+
+      // Setting filters from the filter template form.
+      const obj = this.filterTemplateForm.form.value;
+      let isEmpty = true;
+      Object.keys(obj).forEach(key => {
+        if (obj[key]) { isEmpty = false; }
+      });
+      if (isEmpty) {
+        // queryParams.filter = {};
+        queryParams.searchTerm = this.searchInput.nativeElement.value;
+      } else {
+        queryParams.filter = this.filterTemplateForm.form.value;
+      }
+
+      if (this.showTestValues) {
+        console.log('%c########## queryParams [getCustomers()] = \n' +
+          JSON.stringify(queryParams), 'color: darkblue');
+      }
+
+      queryParams.sortOrder = this.sort.direction;
+      // The id of the column being sorted.
+      queryParams.sortField = this.sort.active;
+      queryParams.pageNumber = this.paginator.pageIndex;
+      queryParams.pageSize = this.paginator.pageSize;
+
+      // (2) Getting customers.
+      // Delegating to the customer data source.
+      this.dataSource.getCustomers(queryParams);
+
+
+      // (3) Update activeFilters.
+      this.activeFilters = [];
+      const obj1 = queryParams.filter; // = this.filterTemplateForm.form.value;
+      for (const key in obj1) {
+        if (obj1[key]) {
+          this.activeFilters.push(key);
+        }
+      }
+
+      const nr = this.activeFilters.length;
+      this.activeFiltersText = (nr === 0) ? 'Currently no filters active.'
+        : (nr === 1) ? 'Currently 1 filter active: ' : `Currently ${nr} filters active: `;
+
+      this.rowSelection.clear();
+
+    }
   }
 
 
@@ -662,7 +784,7 @@ export class CustomerListComponent implements OnInit {
                   .subscribe(
                     (res) => {
                       this.filterTemplates = res;
-                      // console.log('#######this.filterTemplates = ' + JSON.stringify(this.filterTemplates));
+                      // this.consoleLog('JSON.stringify(this.filterTemplates');
 
                       this.filterTemplateNames = [];
                       for (let i = 0; i < res.length; i++) {
@@ -826,7 +948,20 @@ export class CustomerListComponent implements OnInit {
   }
 
 
+
 }
+
+  // consoleLog(value: string) {
+  //   if (this.showTestValues) {
+  //     // console.log('%c##########' + value + ' = ' + eval(message), this.logStyle);
+
+  //     console.log('%c########## ' + value + ' = ', 'color: blue; font-weight: 500;');
+
+  //     // Does not appear in production code.
+  //     // tslint:disable-next-line:no-eval
+  //     console.log('%c' + eval(value), 'color: blue; font-weight: 400;');
+  //   }
+  // }
 
 
 ////////////// tests ////////////////

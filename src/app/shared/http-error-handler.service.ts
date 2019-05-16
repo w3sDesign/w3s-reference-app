@@ -1,8 +1,3 @@
-/**
- *  Based on angular docu
- *  angular/aio/content/examples/http/src/app/http-error-handler.service.ts
- */
-
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -13,11 +8,7 @@ import { MessageService } from './message.service';
 import { MatSnackBar } from '@angular/material';
 
 
-/**
- * ####################################################################
- * Handles HttpClient errors
- * ####################################################################
- */
+
 @Injectable({ providedIn: 'root' })
 export class HttpErrorHandler {
 
@@ -26,12 +17,16 @@ export class HttpErrorHandler {
     private snackBar: MatSnackBar
   ) { }
 
+
   /**
    * Returns a function that handles Http operation failures.
+   * ##################################################################
    * This error handler lets the app continue to run as if no error occurred.
-   * @param serviceName = name of the data service that attempted the operation
-   * @param operation - name of the operation that failed
-   * @param result - optional value to return as the observable result
+   * See also angular/aio/content/examples/http/src/app/http-error-handler.service.ts
+   *
+   * @param serviceName Name of the data service that attempted the operation
+   * @param operation   Name of the operation that failed
+   * @param result      Optional value to return as the observable result
    */
   handleError<T>(serviceName = '', operation = 'operation', result = {} as T) {
 
@@ -44,13 +39,15 @@ export class HttpErrorHandler {
         // : `Server returned code ${error.status} (${error.statusText}) with body "${error.error}"`;
         : `Server returned code ${error.status} (${error.statusText}).`;
 
-      // Showing the error.
+      // Showing the error message.
       this.openSnackBar(message);
 
-      // Logging the error.
+      // Logging the error message.
       this.messageService.add(`${serviceName}: ${operation} failed: ${message}`);
 
       // console.log(message);
+      console.log(`%c########## ${serviceName}: ${operation} failed: \n*** ${message} ***`, 'color: blue');
+
 
       // Let the app keep running by returning a safe (empty) result.
       return of(result);
@@ -61,14 +58,13 @@ export class HttpErrorHandler {
   }
 
 
-  /**
-   * ##################################################################
-   * Helper functions
-   * ##################################################################
-   */
+  // ##################################################################
+  // Helper functions
+  // ##################################################################
+
 
   /**
-   * Showing a user friendly error message (on a snack bar).
+   * Showing a user friendly error message on a snack bar.
    */
   private openSnackBar(message: string) {
     this.snackBar.openFromComponent(MessageSnackBarComponent, {

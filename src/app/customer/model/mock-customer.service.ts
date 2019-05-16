@@ -32,7 +32,7 @@ export class MockCustomerService extends CustomerService {
 
   private customers: Customer[] = mockCustomers;
   private customerFilterTemplates: CustomerFilterTemplate[] = mockCustomerFilterTemplates;
-  private customerFilterTemplateQuestions: QuestionBase[] = mockCustomerFilterTemplateQuestions;
+  // private customerFilterTemplateQuestions: QuestionBase[] = mockCustomerFilterTemplateQuestions;
 
   lastResult: Observable<any>;
 
@@ -52,11 +52,6 @@ export class MockCustomerService extends CustomerService {
     queryResult.items = this.customers;
 
     return this.lastResult = asyncData(queryResult);
-  }
-
-
-  searchCustomers(term: string): Observable<Customer[]> {
-    throw new Error('Search method not implemented');
   }
 
 

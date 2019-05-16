@@ -21,7 +21,7 @@ export abstract class CustomerService {
 
   abstract getCustomers (queryParams?: QueryParams): Observable<QueryResult>;
 
-  abstract searchCustomers(term: string): Observable<Customer[]>;
+  // abstract searchCustomers(term: string): Observable<Customer[]>;
 
   abstract createCustomer (customer: Customer): Observable<Customer>;
 

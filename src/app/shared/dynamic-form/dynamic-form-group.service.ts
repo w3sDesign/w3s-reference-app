@@ -28,8 +28,10 @@ export class DynamicFormGroupService {
       }
     });
 
-    console.log('############## questions = ' + JSON.stringify(questions));
-    console.log('############## group = ' + JSON.stringify(group));
+    // console.log('########### questions = ' + JSON.stringify(questions));
+    // console.log('########### group = ' + JSON.stringify(group));
+
+
 
     return new FormGroup(group);
   }
