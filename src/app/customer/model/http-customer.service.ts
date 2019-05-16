@@ -5,7 +5,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable, forkJoin, of } from 'rxjs';
-import { tap, mergeMap, catchError } from 'rxjs/operators';
+import { tap, mergeMap, catchError, switchMap } from 'rxjs/operators';
 
 import { Customer } from './customer';
 import { CustomerService } from './customer.service';
@@ -118,7 +118,7 @@ export class HttpCustomerService extends CustomerService {
       // Filters are set.
       return this.http.get<Customer[]>(this.customersUrl)
         .pipe(
-          mergeMap(res => {
+          switchMap(res => {
             // ===============================================================
             const queryResult = this.httpUtils.filterAndSort(res, queryParams);
             // ===============================================================
@@ -137,7 +137,7 @@ export class HttpCustomerService extends CustomerService {
       // Search term (for searching in all fields) is set.
       return this.http.get<Customer[]>(this.customersUrl)
         .pipe(
-          mergeMap(res => {
+          switchMap(res => {
             // ===============================================================
             const queryResult = this.httpUtils.searchInAllFields(res, queryParams);
             // ===============================================================
@@ -156,7 +156,7 @@ export class HttpCustomerService extends CustomerService {
       // No queryParams, all customers returned.
       return this.http.get<Customer[]>(this.customersUrl)
         .pipe(
-          mergeMap(res => {
+          switchMap(res => {
             const queryResult = new QueryResult();
             queryResult.items = res;
             queryResult.totalCount = queryResult.items.length;

@@ -61,6 +61,11 @@ export class HttpUtilsService {
 
       filteredItems = this.filterItems(items, queryParams.filter);
 
+      if (this.showTestValues) {
+        console.log('%c########## filteredItems [filterAndSort()] = \n' +
+          JSON.stringify(filteredItems), 'color: darkgreen');
+      }
+
     }
 
 
@@ -185,6 +190,12 @@ export class HttpUtilsService {
 
     });
 
+    if (this.showTestValues) {
+      console.log('%c########## filteredItems [filterItems()] = \n' +
+        JSON.stringify(filteredItems), 'color: darkgreen');
+    }
+
+
     return filteredItems;
 
   }
@@ -242,10 +253,10 @@ export class HttpUtilsService {
 
       searchedItems = this.searchItems(items, queryParams.searchTerm);
 
-      // if (this.showTestValues) {
+      if (this.showTestValues) {
       console.log('%c########## searchedItems [searchInAllFields()] = \n' +
         JSON.stringify(searchedItems), 'color: darkgreen');
-      // }
+      }
 
 
     }
