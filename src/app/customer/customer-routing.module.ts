@@ -24,15 +24,6 @@ const customerRoutes: Routes = [
         //   }
         // ]
       },
-      // {
-      //   path: 'filter-templates',
-      //   component: FilterTemplateListComponent
-      // },
-      // {
-      //   path: 'templates',
-      //   component: FilterTemplateDetailComponent
-      // },
-
       {
         path: ':id',
         component: CustomerDetailComponent

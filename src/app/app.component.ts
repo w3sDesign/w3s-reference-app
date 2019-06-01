@@ -82,8 +82,8 @@ export class AppComponent implements OnInit {
     // url.subscribe(url2 => console.log(url2));
 
     this.isSmallScreen.subscribe(event => {
-      event ? this.description = 'Data Entry & Data Maintenance'
-        : this.description = 'High Performance Data Entry & Data Maintenance Applications';
+      event ? this.description = 'Data Entry & Data Management'
+        : this.description = 'High Performance Web Applications - Data Entry & Data Management';
     });
 
   }

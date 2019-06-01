@@ -15,10 +15,6 @@ const routes: Routes = [
 
     loadChildren: () => CustomerModule
   },
-  // {
-  //   path: 'filter-templates',
-  //   loadChildren: './filter-template/filter-template.module#FilterTemplateModule'
-  // },
   {
     path: '', component: HomeComponent
   },

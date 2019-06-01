@@ -7,8 +7,6 @@ import { CustomerFilterTemplate } from './customer-filter-template';
 
 import { mockCustomers } from './mock-customers';
 import { mockCustomerFilterTemplates } from './mock-customer-filter-templates';
-import { mockCustomerFilterTemplateQuestions } from './mock-customer-filter-template-questions';
-import { QuestionBase } from '../../shared/dynamic-form/question-base';
 
 @Injectable()
 export class CustomerInMemoryDataService implements InMemoryDbService {
@@ -18,9 +16,7 @@ export class CustomerInMemoryDataService implements InMemoryDbService {
 
     const customerFilterTemplates: CustomerFilterTemplate[] = mockCustomerFilterTemplates;
 
-    const customerFilterTemplateQuestions: QuestionBase[] = mockCustomerFilterTemplateQuestions;
-
-    return { customers, customerFilterTemplates, customerFilterTemplateQuestions };
+    return { customers, customerFilterTemplates };
   }
 
   // Overrides the genId method to ensure that a hero always has an id.
@@ -34,4 +30,16 @@ export class CustomerInMemoryDataService implements InMemoryDbService {
   //     ? Math.max(...heroes.map(hero => hero.id)) + 1
   //     : 11;
   // }
+
+  // genId(customers: Customer[]): number {
+  //   return customers.length > 0
+  //   ? Math.max(...customers.map(customer => customer.id)) + 1
+  //   : 20000;
+  // }
+
+  genId(templates: CustomerFilterTemplate[]): number {
+    return templates.length > 0
+    ? Math.max(...templates.map(template => template.id)) + 1
+    : 1;
+  }
 }

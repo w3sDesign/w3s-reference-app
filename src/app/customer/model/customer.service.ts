@@ -7,30 +7,34 @@ import { CustomerFilterTemplate } from './customer-filter-template';
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
 
 /**
- * Customer data access service - Interface
+ * Data Service - Accessing and maintaining `Customer` data - Interface.
+ * ####################################################################
  */
+
 export abstract class CustomerService {
 
-  /** REST WEB APIs */
-  customersUrl = 'api/customers';
-  customerFilterTemplatesUrl = 'api/customerFilterTemplates';
-  customerFilterTemplateQuestionsUrl = 'api/customerFilterTemplateQuestions';
+  // /** TODO Move to http-customer service! HTTP REST APIs */
+  // customersUrl = 'api/customers';
+  // customerFilterTemplatesUrl = 'api/customerFilterTemplates';
 
-  /** Customer */
+  /** Get the customer with the specified id. */
   abstract getCustomer(id: number): Observable<Customer>;
 
+  /** Get the customers with the specified QueryParams. */
   abstract getCustomers (queryParams?: QueryParams): Observable<QueryResult>;
 
-  // abstract searchCustomers(term: string): Observable<Customer[]>;
-
+  /** Create the specified customer. */
   abstract createCustomer (customer: Customer): Observable<Customer>;
 
+  /** Update the specified customer. */
   abstract updateCustomer (customer: Customer): Observable<Customer>;
 
+  /** Delete the customer with the specified id. */
   abstract deleteCustomer (id: number): Observable<{}>;
 
 
   /** Customer filter templates */
+
   abstract getCustomerFilterTemplate (id: number): Observable<CustomerFilterTemplate>;
   abstract getCustomerFilterTemplates (): Observable<CustomerFilterTemplate[]>;
 

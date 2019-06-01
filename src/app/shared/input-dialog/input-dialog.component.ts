@@ -18,7 +18,7 @@ export class InputDialogComponent {
   ) { }
 
 
-  onNoClick(): void {
+  onCancel(): void {
     this.dialogRef.close();
   }
 }

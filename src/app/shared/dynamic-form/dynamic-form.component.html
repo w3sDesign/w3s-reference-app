@@ -88,7 +88,7 @@
 
       <ng-container *ngFor="let question of questions">
 
-        <w3s-dynamic-form-question [question]="question" [options]="options" [form]="form">
+        <w3s-dynamic-form-question [class.hide]="question.isDisabled" [question]="question" [options]="options" [form]="form">
 
         </w3s-dynamic-form-question>
 

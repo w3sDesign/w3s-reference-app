@@ -34,6 +34,24 @@ export class DynamicFormComponent implements OnInit {
 
   payLoad = '';
 
+
+
+  /** Whether form is empty (= all enabled controls are empty). */
+  get isEmpty() {
+
+    const obj = this.form.value;
+    let empty = true;
+
+    Object.keys(obj).forEach(key => {
+      if (obj[key]) { empty = false; }
+    });
+
+    return empty;
+  }
+
+
+
+
   /**
    * Note that input properties (like questions and options)
    * are set *after* construction (but before OnInit).

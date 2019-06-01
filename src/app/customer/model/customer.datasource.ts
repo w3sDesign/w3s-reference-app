@@ -10,7 +10,7 @@ import { QueryParams } from '../../shared/query-params';
 import { QueryResult } from '../../shared/query-result';
 
 import { Customer } from './customer';
-import { CustomerService } from './http-customer.service';
+import { HttpCustomerService as CustomerService } from './http-customer.service';
 import { HttpErrorHandler } from '../../shared/http-error-handler.service';
 
 

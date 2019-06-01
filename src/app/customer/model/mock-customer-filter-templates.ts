@@ -1,6 +1,6 @@
 import { CustomerFilterTemplate } from './customer-filter-template';
 
-export const mockCustomerFilterTemplates: any[] = [
+export const mockCustomerFilterTemplates: CustomerFilterTemplate[] = [
   {
     id: 0,
     name: '',

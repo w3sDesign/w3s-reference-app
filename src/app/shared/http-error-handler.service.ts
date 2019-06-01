@@ -9,6 +9,13 @@ import { MatSnackBar } from '@angular/material';
 
 
 
+/**
+ * Method Service - Handling ?client and HTTP server errors.
+ * ####################################################################
+ *
+ * - See also https://github.com/angular/in-memory-web-api/blob/master/src/app/http-client-hero.service.ts
+ */
+
 @Injectable({ providedIn: 'root' })
 export class HttpErrorHandler {
 
@@ -22,19 +29,23 @@ export class HttpErrorHandler {
    * Returns a function that handles Http operation failures.
    * ##################################################################
    * This error handler lets the app continue to run as if no error occurred.
-   * See also angular/aio/content/examples/http/src/app/http-error-handler.service.ts
    *
-   * @param serviceName Name of the data service that attempted the operation
-   * @param operation   Name of the operation that failed
-   * @param result      Optional value to return as the observable result
+   * See also https://github.com/angular/angular/blob/master/aio/content/examples/http/src/app/http-error-handler.service.ts
+   *
+   * @param service     Name of the data service that attempted the operation.
+   * @param operation   Name of the operation that failed.
+   * @param result      Optional value to return as the observable result.
    */
-  handleError<T>(serviceName = '', operation = 'operation', result = {} as T) {
+
+  handleError<T>(service = 'service', operation = 'operation', result = {} as T) {
 
     return (error: HttpErrorResponse): Observable<T> => {
 
       const message = (error.error instanceof ErrorEvent)
+
         // Client side error
         ? error.error.message
+
         // Server side error
         // : `Server returned code ${error.status} (${error.statusText}) with body "${error.error}"`;
         : `Server returned code ${error.status} (${error.statusText}).`;
@@ -43,29 +54,29 @@ export class HttpErrorHandler {
       this.openSnackBar(message);
 
       // Logging the error message.
-      this.messageService.add(`${serviceName}: ${operation} failed: ${message}`);
+      this.messageService.add(`${service}: ${operation} failed: ${message}`);
 
       // console.log(message);
-      console.log(`%c########## ${serviceName}: ${operation} failed: \n*** ${message} ***`, 'color: blue');
+      console.log(`%c########## [http-error-handler / handleError()] \n
+        ${service}: ${operation} failed: \n*** ${message} ***`, 'color: red');
 
+
+      // return throwError(error);
 
       // Let the app keep running by returning a safe (empty) result.
       return of(result);
 
-      // return throwError(error);
     };
 
   }
 
 
   // ##################################################################
-  // Helper functions
+  // Helpers
   // ##################################################################
 
 
-  /**
-   * Showing a user friendly error message on a snack bar.
-   */
+  /** Showing a user friendly error message. */
   private openSnackBar(message: string) {
     this.snackBar.openFromComponent(MessageSnackBarComponent, {
       data: message,
@@ -76,18 +87,16 @@ export class HttpErrorHandler {
   }
 
 
-  /**
-   * Create a convenience handleError function that already
-   * knows the service name.
-   */
-  createHandleError = (serviceName = '') => <T>
-    (operation = 'operation', result = {} as T) => this.handleError(serviceName, operation, result)
+  /** Create a convenience handleError function that already knows the service name. */
+  // createHandleError = (service = '') => <T>
+  //   (operation = 'operation', result = {} as T) => this.handleError(service, operation, result)
 
 }
 
+
 /** Type of the convenience handleError function */
-export type HandleError =
-  <T> (operation?: string, result?: T) => (error: HttpErrorResponse) => Observable<T>;
+// export type HandleError =
+//   <T> (operation?: string, result?: T) => (error: HttpErrorResponse) => Observable<T>;
 
 
 

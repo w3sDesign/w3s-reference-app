@@ -16,6 +16,7 @@ import {
   CustomerDetailDialogComponent
 } from './customer-detail/customer-detail.component';
 import { HttpCustomerService } from './model/http-customer.service';
+import { CustomerFilterTemplateComponent } from './customer-filter-template/customer-filter-template.component';
 // import { questionsConfig, customerConfig } from './model/nix.customer.config';
 
 
@@ -46,6 +47,7 @@ import { HttpCustomerService } from './model/http-customer.service';
     CustomerListComponent,
     CustomerDetailComponent,
     CustomerDetailDialogComponent,
+    CustomerFilterTemplateComponent,
   ],
 
   entryComponents: [

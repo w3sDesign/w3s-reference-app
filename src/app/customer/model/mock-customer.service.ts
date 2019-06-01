@@ -14,25 +14,23 @@ import { mockCustomerFilterTemplates } from './mock-customer-filter-templates';
 
 import { QueryParams } from '../../shared/query-params';
 import { QueryResult } from '../../shared/query-result';
-import { mockCustomerFilterTemplateQuestions } from './mock-customer-filter-template-questions';
+
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
 
 
 
 /**
+ * # @class MockCustomerService
  * ####################################################################
- * Mock Customer Service pretends to make real http requests.
- *
- * Based on angular/angular/aio/content/examples/testing
- * /src/app/model/testing/test-hero.service.ts
- * ####################################################################
+ * - Is an injectable service that pretends to make real http requests.
+ * - See also: https://github.com/angular/angular/blob/master/aio/content/examples/testing/src/app/model/testing/test-hero.service.ts
  */
+
 @Injectable()
 export class MockCustomerService extends CustomerService {
 
   private customers: Customer[] = mockCustomers;
   private customerFilterTemplates: CustomerFilterTemplate[] = mockCustomerFilterTemplates;
-  // private customerFilterTemplateQuestions: QuestionBase[] = mockCustomerFilterTemplateQuestions;
 
   lastResult: Observable<any>;
 

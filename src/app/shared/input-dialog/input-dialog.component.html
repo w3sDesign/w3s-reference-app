@@ -16,6 +16,21 @@
 
 <br />
 
+
+<div mat-dialog-actions>
+
+  <button mat-button (click)="onCancel()">Cancel</button>
+
+  <!-- cdkFocusInitial -->
+  <!-- The mat-dialog-close directive optionally accepts a value
+  as a result for the dialog. -->
+  <button mat-button [disabled]="data.name ? false : true" [mat-dialog-close]="data.name" >OK</button>
+
+</div>
+
+
+
+
 <!-- <div mat-dialog-actions *ngIf="data.showActions" style="margin:0"> -->
 
   <!-- <button mat-button mat-dialog-close>No</button> -->
@@ -25,20 +40,3 @@
   <!-- <button mat-button [mat-dialog-close]="true">Yes</button> -->
 
 <!-- </div> -->
-
-
-
-
-
-
-
-
-<div mat-dialog-actions>
-
-  <button mat-button (click)="onNoClick()">Cancel</button>
-
-  <!-- The mat-dialog-close directive optionally accepts a value
-  as a result for the dialog. -->
-  <button mat-button [mat-dialog-close]="data.name" cdkFocusInitial>OK</button>
-
-</div>

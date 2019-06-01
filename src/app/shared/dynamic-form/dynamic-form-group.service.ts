@@ -23,17 +23,33 @@ export class DynamicFormGroupService {
       } else {
 
         group[question.name] = question.isRequired
-          ? new FormControl(question.defaultValue || '', Validators.required)
-          : new FormControl(question.defaultValue || '');
+          ? new FormControl({value: question.defaultValue || '', disabled: question.isDisabled }, Validators.required)
+          : new FormControl({value: question.defaultValue || '', disabled: question.isDisabled });
+
+          // ? new FormControl(question.defaultValue || '', Validators.required)
+          // : new FormControl(question.defaultValue || '');
       }
     });
 
     // console.log('########### questions = ' + JSON.stringify(questions));
     // console.log('########### group = ' + JSON.stringify(group));
 
+    // const form = new FormGroup({
+    //   id: new FormControl(''),
+    //   name: new FormControl(''),
+    //   idFilter: new FormControl(''),
+    //   idName: new FormControl(''),
+    //   // ...
+    // });
 
+    const form = new FormGroup(group);
 
-    return new FormGroup(group);
+    // form.reset({
+    //   id: { disabled: true },
+    //   name: { disabled: true }
+    // });
+
+    return form;
   }
 
 }
