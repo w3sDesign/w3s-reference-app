@@ -5,6 +5,7 @@ import { QueryParams } from './query-params';
 import { QueryResult } from './query-result';
 import * as _ from 'lodash';
 import { JsonPipe } from '@angular/common';
+import { MessageService } from './message.service';
 
 
 @Injectable({ providedIn: 'root' })
@@ -12,6 +13,11 @@ import { JsonPipe } from '@angular/common';
 export class HttpUtilsService {
 
   showTestValues = true;
+
+
+  constructor(
+    private messageService: MessageService
+  ) { }
 
 
   ///////////////////////////////////////////////
@@ -61,9 +67,13 @@ export class HttpUtilsService {
 
       filteredItems = this.filterItems(items, queryParams.filter);
 
+      this.log(
+        `[filteredItems [filterAndSort()] = \n ${JSON.stringify(filteredItems)}`
+      );
+
       if (this.showTestValues) {
         console.log('%c########## filteredItems [filterAndSort()] = \n' +
-          JSON.stringify(filteredItems), 'color: darkgreen');
+          JSON.stringify(filteredItems), 'color: blue');
       }
 
     }
@@ -190,9 +200,13 @@ export class HttpUtilsService {
 
     });
 
+    this.log(
+      `[filterItems()] filteredItems = \n ${JSON.stringify(filteredItems)}`
+    );
+
     if (this.showTestValues) {
       console.log('%c########## filteredItems [filterItems()] = \n' +
-        JSON.stringify(filteredItems), 'color: darkgreen');
+        JSON.stringify(filteredItems), 'color: blue');
     }
 
 
@@ -253,9 +267,13 @@ export class HttpUtilsService {
 
       searchedItems = this.searchItems(items, queryParams.searchTerm);
 
+      this.log(
+        `[searchInAllFields()] searchedItems = \n ${JSON.stringify(searchedItems)}`
+      );
+
       if (this.showTestValues) {
-      console.log('%c########## searchedItems [searchInAllFields()] = \n' +
-        JSON.stringify(searchedItems), 'color: darkgreen');
+        console.log('%c########## searchedItems [searchInAllFields()] = \n' +
+          JSON.stringify(searchedItems), 'color: blue');
       }
 
 
@@ -371,9 +389,13 @@ export class HttpUtilsService {
 
     // ################################################################
 
+    this.log(
+      `[searchedItems()] searchedItems = \n ${JSON.stringify(searchedItems)}`
+    );
+
     if (this.showTestValues) {
       console.log('%c########## searchedItems [searchItems()] = \n' +
-        JSON.stringify(searchedItems), 'color: darkgreen');
+        JSON.stringify(searchedItems), 'color: blue');
     }
 
     return searchedItems;
@@ -382,6 +404,10 @@ export class HttpUtilsService {
   }
 
 
+  /** Logging error message to console. */
+  private log(message: string) {
+    return this.messageService.logMessage('[http-utils.service.ts] ' + message);
+  }
 
 
 } // The end.

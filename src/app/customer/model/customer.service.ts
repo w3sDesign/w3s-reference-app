@@ -7,7 +7,7 @@ import { CustomerFilterTemplate } from './customer-filter-template';
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
 
 /**
- * Data Service - Accessing and maintaining `Customer` data - Interface.
+ * Service interface for accessing and maintaining `Customer` data.
  * ####################################################################
  */
 

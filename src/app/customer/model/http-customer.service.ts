@@ -26,7 +26,7 @@ import { CustomerFilterTemplate } from './customer-filter-template';
 
 
 /**
- * Data Service - Accessing and maintaining `Customer` data on a remote
+ * Service for accessing and maintaining `Customer` data on a remote
  * http server (via HTTP REST API).
  * ####################################################################
  *
@@ -43,7 +43,7 @@ export class HttpCustomerService extends CustomerService {
   private customersUrl = 'api/customers';
   private customerFilterTemplatesUrl = 'api/customerFilterTemplates';
 
-  /** Http Headers for Create/Update/Delete methods */
+  /** Http Header for create/update/delete methods */
   private cudOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
 
@@ -70,7 +70,7 @@ export class HttpCustomerService extends CustomerService {
 
 
   // ##################################################################
-  // CREATE methods - HTTP post
+  // CREATE methods
   // ##################################################################
 
 
@@ -87,7 +87,7 @@ export class HttpCustomerService extends CustomerService {
 
     return this.http.post<Customer>(this.customersUrl, customer, this.cudOptions)
       .pipe(
-        tap(() => this.openSnackBar(message)),
+        tap(() => this.show(message)),
         tap(() => this.log(message)),
         catchError(this.handleError<Customer>(message.replace('has been', 'can not be'))),
       );
@@ -107,7 +107,7 @@ export class HttpCustomerService extends CustomerService {
 
     return this.http.post<CustomerFilterTemplate>(this.customerFilterTemplatesUrl, filterTemplate, this.cudOptions)
       .pipe(
-        tap(() => this.openSnackBar(message)),
+        tap(() => this.show(message)),
         tap(() => this.log(message)),
         catchError(this.handleError<CustomerFilterTemplate>(message.replace('has been', 'can not be'))),
       );
@@ -116,7 +116,7 @@ export class HttpCustomerService extends CustomerService {
 
 
   // ##################################################################
-  // DELETE methods - HTTP delete
+  // DELETE methods
   // ##################################################################
 
 
@@ -135,7 +135,7 @@ export class HttpCustomerService extends CustomerService {
 
     return this.http.delete(this.customersUrl + `/${id}`, this.cudOptions)
       .pipe(
-        tap(() => this.openSnackBar(message)),
+        tap(() => this.show(message)),
         tap(() => this.log(message)),
         catchError(this.handleError<Customer>(`Customer ${id} can not be deleted.`)),
       );
@@ -164,7 +164,7 @@ export class HttpCustomerService extends CustomerService {
 
     return forkJoin(tasks$)
       .pipe(
-        tap(() => this.openSnackBar(message)),
+        tap(() => this.show(message)),
         tap(() => this.log(message)),
         catchError(this.handleError<Customer>('deleteCustomers(ids)')),
       );
@@ -182,7 +182,7 @@ export class HttpCustomerService extends CustomerService {
 
 
   // ##################################################################
-  // GET methods - HTTP get
+  // GET methods
   // ##################################################################
 
 
@@ -227,9 +227,13 @@ export class HttpCustomerService extends CustomerService {
 
     if (queryParams.searchTerm) {
 
+      this.log(
+        `[getCustomers(queryParams) / searchTerm] queryParams = \n ${JSON.stringify(queryParams)}`
+      );
+
       if (this.showTestValues) {
         console.log('%c# SearchTerm ######### queryParams [getCustomers()] = \n' +
-          JSON.stringify(queryParams), 'color: darkgreen');
+          JSON.stringify(queryParams), 'color: blue');
       }
 
       // Search term (for searching in all fields) is set.
@@ -246,9 +250,13 @@ export class HttpCustomerService extends CustomerService {
 
     } else {
 
+      this.log(
+        `[getCustomers(queryParams) / filters] queryParams = \n ${JSON.stringify(queryParams)}`
+      );
+
       if (this.showTestValues) {
         console.log('%c# With/Without Filters ######### queryParams [getCustomers()] = \n' +
-          JSON.stringify(queryParams), 'color: darkgreen');
+          JSON.stringify(queryParams), 'color: blue');
       }
 
       // Filters are set (or empty = select all).
@@ -298,23 +306,7 @@ export class HttpCustomerService extends CustomerService {
 
 
   // ##################################################################
-  // Handling errors
-  // ##################################################################
-
-
-  /**
-   * Handling error - delegated to the httpErrorHandler service.
-   * ##################################################################
-   */
-
-  private handleError<T>(operationFailed: string) {
-    return this.httpErrorHandler.handleError<T>('http-customer.service.ts', operationFailed);
-  }
-
-
-
-  // ##################################################################
-  // UPDATE methods - HTTP put
+  // UPDATE methods
   // ##################################################################
 
 
@@ -333,7 +325,7 @@ export class HttpCustomerService extends CustomerService {
 
     return this.http.put<Customer>(this.customersUrl, customer, this.cudOptions)
       .pipe(
-        tap(() => this.openSnackBar(message)),
+        tap(() => this.show(message)),
         tap(() => this.log(message)),
 
         catchError(this.handleError<Customer>(message.replace('has been', 'can not be'))),
@@ -352,12 +344,12 @@ export class HttpCustomerService extends CustomerService {
 
     // const httpHeader = this.httpUtils.getHttpHeaders();
 
-    const message = `CustomerFilterTemplate with id = ${customerFilterTemplate.id} and
-        name = "${customerFilterTemplate.name}" has been updated.`;
+    const message = `CustomerFilterTemplate with id = ${customerFilterTemplate.id}
+ and name = "${customerFilterTemplate.name}" has been updated.`;
 
     return this.http.put<CustomerFilterTemplate>(this.customerFilterTemplatesUrl, customerFilterTemplate, this.cudOptions)
       .pipe(
-        tap(() => this.openSnackBar(message)),
+        tap(() => this.show(message)),
         tap(() => this.log(message)),
 
         catchError(this.handleError<CustomerFilterTemplate>(message.replace('has been', 'can not be'))),
@@ -367,34 +359,50 @@ export class HttpCustomerService extends CustomerService {
 
 
   // ##################################################################
-  // Helpers
+  // Private helper methods
   // ##################################################################
 
 
-  private openSnackBar(message: string) {
-    this.snackBar.openFromComponent(MessageSnackBarComponent, {
-      data: message,
-      duration: 5000,
-      verticalPosition: 'top',
-      panelClass: 'w3s-snack-bar', // adds to snack-bar-container
-    });
+  /**
+   * Handling http errors.
+   * ##################################################################
+   * Delegating to the httpErrorHandler service.
+   */
+
+  private handleError<T>(operationFailed: string) {
+    return this.httpErrorHandler.handleError<T>('http-customer.service.ts', operationFailed);
   }
 
+  /**
+   * Logging / showing messages.
+   * ##################################################################
+   * Delegating to the message service.
+   */
 
-  private openSnackBarSimple(message: string, action: string) {
-    this.snackBar.open(message, action, {
-      duration: 3000,
-      verticalPosition: 'top',
-      panelClass: 'w3s-snack-bar', /* added to snack-bar-container */
-    });
-  }
-
-
-  /** Log a CustomerService message */
+  /** Logging message to console. */
   private log(message: string) {
-    this.messageService.add('HttpCustomerService: ' + message);
-    // console.log('CustomerService: ' + message);
+    return this.messageService.logMessage('[http-customer.service.ts] ' + message);
   }
+
+  /** Showing a user friendly message. */
+  private show(message: string) {
+    return this.messageService.showMessage(message);
+  }
+
+// Moved to message.service
+  // private openSnackBar(message: string) {
+  //   this.snackBar.openFromComponent(MessageSnackBarComponent, {
+  //     data: message,
+  //     duration: 5000,
+  //     verticalPosition: 'top',
+  //     panelClass: 'w3s-snack-bar', // adds to snack-bar-container
+  //   });
+  // }
+
+
+
+
+
 
 
   // UPDATE Status

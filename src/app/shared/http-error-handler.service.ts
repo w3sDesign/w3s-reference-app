@@ -10,7 +10,7 @@ import { MatSnackBar } from '@angular/material';
 
 
 /**
- * Method Service - Handling ?client and HTTP server errors.
+ * Service for handling HTTP server errors.
  * ####################################################################
  *
  * - See also https://github.com/angular/in-memory-web-api/blob/master/src/app/http-client-hero.service.ts
@@ -21,7 +21,6 @@ export class HttpErrorHandler {
 
   constructor(
     private messageService: MessageService,
-    private snackBar: MatSnackBar
   ) { }
 
 
@@ -51,14 +50,14 @@ export class HttpErrorHandler {
         : `Server returned code ${error.status} (${error.statusText}).`;
 
       // Showing the error message.
-      this.openSnackBar(message);
+      // this.openSnackBar(message);
+      this.show(message);
 
       // Logging the error message.
-      this.messageService.add(`${service}: ${operation} failed: ${message}`);
-
-      // console.log(message);
-      console.log(`%c########## [http-error-handler / handleError()] \n
-        ${service}: ${operation} failed: \n*** ${message} ***`, 'color: red');
+      // console.log(`%c########## [http-error-handler / handleError()] \n
+      //   ${service}: ${operation} failed: \n*** ${message} ***`, 'color: red');
+      this.log(`[http-error-handler / handleError()] \n
+        ${service}: ${operation} failed: \n ${message}`);
 
 
       // return throwError(error);
@@ -76,15 +75,32 @@ export class HttpErrorHandler {
   // ##################################################################
 
 
-  /** Showing a user friendly error message. */
-  private openSnackBar(message: string) {
-    this.snackBar.openFromComponent(MessageSnackBarComponent, {
-      data: message,
-      duration: 5000,
-      verticalPosition: 'top',
-      panelClass: 'w3s-snack-bar', // adds to snack-bar-container
-    });
+  /**
+ * Logging / showing messages.
+ * ##################################################################
+ * Delegating to the message service.
+ */
+
+  /** Logging error message to console. */
+  private log(message: string) {
+    return this.messageService.logMessage(message);
   }
+
+  /** Showing a user friendly error message. */
+  private show(message: string) {
+    return this.messageService.showMessage(message);
+  }
+
+// Moved to message service
+  // /** Showing a user friendly error message. */
+  // private openSnackBar(message: string) {
+  //   this.snackBar.openFromComponent(MessageSnackBarComponent, {
+  //     data: message,
+  //     duration: 5000,
+  //     verticalPosition: 'top',
+  //     panelClass: 'w3s-snack-bar', // adds to snack-bar-container
+  //   });
+  // }
 
 
   /** Create a convenience handleError function that already knows the service name. */

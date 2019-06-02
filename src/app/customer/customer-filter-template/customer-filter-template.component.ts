@@ -44,6 +44,7 @@ import { InputDialogComponent } from '../../shared/input-dialog/input-dialog.com
 import { DynamicFormOptions } from '../../shared/dynamic-form/dynamic-form-options';
 import { DynamicFormGroupService } from '../../shared/dynamic-form/dynamic-form-group.service';
 import { mockCustomers } from '../model/mock-customers';
+import { MessageService } from '../../shared/message.service';
 
 
 
@@ -146,6 +147,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
     private router: Router,
     private formGroupService: DynamicFormGroupService,
     private dialog: MatDialog,
+    private messageService: MessageService,
   ) {
 
     this.filterTemplateQuestions = this.generateFilterTemplateQuestions();
@@ -157,6 +159,10 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
 
+    this.logMessage(
+      `[ngAfterViewInit()] this.filterTemplateForm.form.value = \n ${JSON.stringify(this.filterTemplateForm.form.value)}`
+    );
+
     if (this.showTestValues) {
       console.log('%c########## [customer-filter-template / ngAfterViewInit()] this.filterTemplateForm.form.value = \n' +
         JSON.stringify(this.filterTemplateForm.form.value), 'color: blue');
@@ -166,12 +172,32 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
 
 
 
+/**
+   * Logging / showing messages.
+   * ##################################################################
+   * Delegating to the message service.
+   */
+
+  /** Logging message to console. */
+  private logMessage(message: string) {
+    return this.messageService.logMessage('[customer-filter-template.component.ts] ' + message);
+  }
+
+  /** Showing a user friendly message. */
+  private showMessage(message: string) {
+    return this.messageService.showMessage('*** ' + message + ' ***');
+  }
+
 
   // ##################################################################
   // OnInit
   // ##################################################################
 
   ngOnInit() {
+
+    this.logMessage(
+      `[ngOnInit()] this.activeFilters = \n ${JSON.stringify(this.activeFilters)}`
+    );
 
     if (this.showTestValues) {
       console.log('%c########## [customer-filter-template / ngOnInit()] this.activeFilters = \n' +
@@ -298,6 +324,10 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
         queryParams.filter = this.filterTemplateForm.form.value;
       }
 
+      this.logMessage(
+        `[emitQueryParams()] queryParams = \n ${JSON.stringify(queryParams)}`
+      );
+
       if (this.showTestValues) {
         console.log('%c########## [customer-filter-template / emitQueryParams()] queryParams = \n' +
           JSON.stringify(queryParams), 'color: blue');
@@ -366,6 +396,10 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
 
   // ? onFilterCheckboxChange
   onSelectFilter(event) {
+
+    this.logMessage(
+      `[onSelectFilter()] event.checked = \n ${JSON.stringify(event.checked)}`
+    );
 
     if (this.showTestValues) {
       console.log('%c########## [customer-filter-template / onSelectFilter()] event.checked = \n' +
@@ -441,6 +475,10 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
       }
     });
 
+    this.logMessage(
+      `[onSelectFilterTemplate(name)] this.filtersToDisplay = \n ${JSON.stringify(this.filtersToDisplay)}`
+    );
+
     if (this.showTestValues) {
       console.log('%c########## [customer-filter-template / onSelectFilterTemplate(name)] this.filtersToDisplay = \n' +
         JSON.stringify(this.filtersToDisplay), 'color: blue');
@@ -452,6 +490,10 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
 
     // (2) Generating filterTemplate questions.
     this.filterTemplateQuestions = this.generateFilterTemplateQuestions();
+
+    this.logMessage(
+      `[onSelectFilterTemplate(name)] this.filterTemplateQuestions = \n ${JSON.stringify(this.filterTemplateQuestions)}`
+    );
 
     if (this.showTestValues) {
       console.log('%c########## [customer-filter-template / onSelectFilterTemplate(name)] this.filterTemplateQuestions = \n' +
@@ -586,6 +628,10 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
     this.filterTemplateForm.createForm(questions);
 
     // this.getCustomers();
+
+    this.logMessage(
+      `[generateFilterTemplateForm()] this.filterTemplateForm.form.value = \n ${JSON.stringify(this.filterTemplateForm.form.value)}`
+    );
 
     if (this.showTestValues) {
       console.log('%c########## [customer-filter-template / generateFilterTemplateForm()] this.filterTemplateForm.form.value = \n' +
@@ -828,7 +874,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
 
 
 
-// ##################################################################
+  // ##################################################################
   // Helpers
   // ##################################################################
 
