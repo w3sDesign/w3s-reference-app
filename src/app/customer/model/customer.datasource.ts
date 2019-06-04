@@ -1,28 +1,22 @@
-/**
- * Initial version based on Metronic 5.5.5.
- */
 import { CollectionViewer, DataSource } from '@angular/cdk/collections';
+
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { of } from 'rxjs';
-import { catchError, finalize, tap } from 'rxjs/operators';
+import { Customer } from './customer';
+import { CustomerService } from './customer.service';
+
 import { QueryParams } from '../../shared/query-params';
 import { QueryResult } from '../../shared/query-result';
-
-import { Customer } from './customer';
-import { HttpCustomerService as CustomerService } from './http-customer.service';
-import { HttpErrorHandler } from '../../shared/http-error-handler.service';
-
-
 
 
 /**
  * The CustomerDataSource class provides the data for the data table
  * in the CustomerListComponent.
- *
+ * ####################################################################
  * The data table listens (subscribes) to the customers data stream
  * and automatically triggers an update every time new data is emitted.
  */
+
 export class CustomerDataSource implements DataSource<any> {
 
   // customers: Customer[];
@@ -44,20 +38,26 @@ export class CustomerDataSource implements DataSource<any> {
   hasItems = false;
 
 
-  constructor(private customerService: CustomerService) {
+  constructor(
+    private customerService: CustomerService
+  ) {
     this.totalNumberOfItems.subscribe(nr => (this.hasItems = nr > 0));
   }
 
 
   /**
-   * Connecting the data table by returning the customers observable.
+   * Connecting the data table by providing the customers to render.
+   * ##################################################################
    * The data table renders a row for each object in the data array.
    */
   connect(collectionViewer: CollectionViewer): Observable<any[]> {
     return this.customers.asObservable();
   }
 
-  /** Disconnecting the data table. */
+  /**
+   * Disconnecting the data table.
+   * ##################################################################
+   */
   disconnect(collectionViewer: CollectionViewer): void {
     this.customers.complete();
     this.isLoading.complete();
@@ -100,6 +100,7 @@ export class CustomerDataSource implements DataSource<any> {
 
   getCustomers(queryParams: QueryParams) {
     this.isLoading.next(true);
+
     /**
      * Delegating to customer service which returns a query result observable.
      * ###########################################

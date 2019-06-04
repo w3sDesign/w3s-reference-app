@@ -10,7 +10,6 @@ import { debounceTime, distinctUntilChanged, tap, switchMap } from 'rxjs/operato
 
 import { Customer } from '../model/customer';
 import { CustomerDataSource } from '../model/customer.datasource';
-import { HttpCustomerService as CustomerService } from '../model/http-customer.service';
 
 import { DynamicFormGroupService } from '../../shared/dynamic-form/dynamic-form-group.service';
 import { QueryParams } from '../../shared/query-params';
@@ -34,6 +33,10 @@ import { InputDialogComponent } from '../../shared/input-dialog/input-dialog.com
 
 import { DynamicFormOptions } from '../../shared/dynamic-form/dynamic-form-options';
 import { mockCustomers } from '../model/mock-customers';
+
+
+import { CustomerService } from '../model/customer.service';
+import { HttpCustomerService } from '../model/http-customer.service';
 
 
 

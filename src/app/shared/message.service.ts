@@ -8,8 +8,9 @@ import { MessageSnackBarComponent } from './message-snack-bar/message-snack-bar.
  * ####################################################################
  */
 
-@Injectable({ providedIn: 'root' })
+ @Injectable({ providedIn: 'root' })
 export class MessageService {
+
   // messages: string[] = [];
 
   constructor(
@@ -17,32 +18,25 @@ export class MessageService {
   ) { }
 
 
-
   /** Logging message to console. */
   logMessage(message: string) {
-
     // if (this.showTestValues) {
     if (!environment.production) {
-
       console.log(`%c########## ${message}`, `color: darkblue`);
     }
-
   }
+
 
   /** Logging error message to console. */
   logErrorMessage(message: string) {
-
     if (!environment.production) {
-
       console.log('%c########## ' + message + ', color: darkred');
     }
-
   }
 
 
   /** Showing a user friendly message. */
   showMessage(message: string) {
-
     this.snackBar.openFromComponent(MessageSnackBarComponent, {
       data: message,
       duration: 5000,
@@ -50,12 +44,11 @@ export class MessageService {
       // Extra CSS classes to be added to snack-bar-container.
       panelClass: 'w3s-snack-bar',
     });
-
   }
+
 
   /** Showing a user friendly error message. */
   showErrorMessage(message: string) {
-
     this.snackBar.openFromComponent(MessageSnackBarComponent, {
       data: message,
       duration: 5000,
@@ -63,7 +56,6 @@ export class MessageService {
       // Extra CSS classes to be added to snack-bar-container.
       panelClass: 'w3s-snack-bar',
     });
-
   }
 
 

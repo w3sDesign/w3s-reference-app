@@ -27,7 +27,7 @@ import { QuestionBase } from '../../shared/dynamic-form/question-base';
  */
 
 @Injectable()
-export class MockCustomerService extends CustomerService {
+export class MockCustomerService { // TODOD    extends CustomerService {
 
   private customers: Customer[] = mockCustomers;
   private customerFilterTemplates: CustomerFilterTemplate[] = mockCustomerFilterTemplates;
@@ -35,7 +35,7 @@ export class MockCustomerService extends CustomerService {
   lastResult: Observable<any>;
 
   constructor() {
-    super();
+    // super();
   }
 
 

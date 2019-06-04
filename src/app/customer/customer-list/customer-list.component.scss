@@ -1,20 +1,11 @@
-// .w3s-list-component .mat-expansion-panel {
-//   // @extend %flex-box;
-//   // padding: 0 8px 16px 0;
-//   width: 100%;
-//   align-items: xbaseline;
-
-//   .mat-form-field,
-//   button {
-//     margin-right: 30px;
-//   }
-// }
-
+mat-drawer {
+  width: 180px;
+//   min-height: 300px;
+}
 
 .comma:not(:first-child)::before {
   content: ', ';
 }
-
 
 .nixclose:hover {
   background: #ff4081;
@@ -43,16 +34,6 @@
 //   cursor: move;
 // }
 
-// .example-handle {
-//   position: relative;
-//   left: -20px;
-//   // top: 10px;
-//   // right: 10px;
-//   color: #777;
-//   cursor: move;
-//   width: 24px;
-//   height: 24px;
-// }
 
 #filterButtons {
   @extend %flex-box;
@@ -66,22 +47,6 @@
   width: 100%;
 }
 
-// form {
-//   display: flex !important;
-
-//   flex-direction: row;
-//   align-items: center; // vertical
-//   justify-content: flex-start; // horizontal
-//   flex-wrap: wrap; // default = nowrap
-
-//   font-size: 14px;
-//   padding: 16px 8px 16px 24px;
-
-//   .mat-form-field,
-//   button {
-//     margin-right: 30px;
-//   }
-// }
 
 %flex-box {
 
@@ -129,26 +94,6 @@ table {
   text-shadow: 0 0 0.125rem #ffffff;
 }
 
-// .mat-column-checkbox {
-// 	flex: 0 0 68px;
-// }
-
-// .mat-column-id {
-// 	flex: 0 0 78px;
-// }
-
-// .mat-column-name {
-// 	flex: 2 0 200px;
-// }
-
-// .mat-column-main {
-// 	flex: 0 0 568px;
-// }
-
-// .mat-column-actions {
-// 	flex: 0 0 160px;
-// }
-
 
 .special-font {
   font-family: monospace;
@@ -169,13 +114,6 @@ and so the block is pushed into the middle. */
 
 
 
-
-
-// .mat-expansion-panel-header-description,
-// .mat-expansion-panel-header-title {
-//   align-items: center; //baseline; //align-x bei flex+row = vertical !!
-//   font-size: 14px;
-// }
 
 
 

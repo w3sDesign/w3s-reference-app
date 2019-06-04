@@ -4,6 +4,7 @@
 
       <mat-expansion-panel-header [collapsedHeight]="'58px'" [expandedHeight]="'58px'">
 
+
         <mat-panel-title>
           Search Customers
           <!-- <mat-icon color="primary">info</mat-icon> -->
@@ -20,13 +21,15 @@
             {{activeFiltersText}}
             <span class="comma" *ngFor="let filter of activeFilters">{{(filter.replace('Filter', '') | titlecase)}}</span>
           </div>
+
         </mat-panel-description>
+
 
       </mat-expansion-panel-header>
 
 
 
-      <div id="filterButtons" style="align-items: flex-end">
+      <div class="row-container" style="align-items: flex-end">
 
         <!-- ########################################################## -->
         <!-- SearchInput - searching in all fields -->
@@ -69,9 +72,13 @@
           Settings
         </button>
 
+
       </div>
 
-      <div id="filterButtons">
+
+
+
+      <div class="row-container">
 
         <!-- ########################################################## -->
         <!-- Select a filter template  -->
@@ -91,9 +98,14 @@
           </mat-hint>
 
         </mat-form-field>
+
       </div>
 
+
+
+
       <mat-drawer-container>
+
 
         <!-- ############################################################ -->
         <!-- Select filters -->
@@ -144,7 +156,9 @@
         </mat-drawer>
 
 
-        <mat-drawer-content>
+
+        <!-- Set min-height when drawer is opened -->
+        <mat-drawer-content [class.drawer-open]="filterDrawerRef.opened">
 
           <!-- ########################################################## -->
           <!-- Filter template form -->
@@ -152,7 +166,7 @@
 
           <!-- (formSubmit)="onFilterTemplateFormSubmit($event)"> -->
 
-          <w3s-dynamic-form class="###filter-template-form###" #filterTemplateForm *ngIf="filterTemplateQuestions" [questions]="filterTemplateQuestions" [options]="filterTemplateFormOptions" (formSubmit)="emitQueryParams()">
+          <w3s-dynamic-form #filterTemplateForm *ngIf="filterTemplateQuestions" [questions]="filterTemplateQuestions" [options]="filterTemplateFormOptions" (formSubmit)="emitQueryParams()">
 
           </w3s-dynamic-form>
 
@@ -170,22 +184,32 @@
 
             <!-- <div *ngIf="filterTemplateForm?.form?.value !== null"> -->
             <!-- <div *ngIf="filterTemplateForm"> -->
-              <!-- Reference to the filter template form not set before AfterViewInit. -->
+            <!-- Reference to the filter template form not set before AfterViewInit. -->
 
-              <!-- This causes ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked.  -->
+            <!-- This causes ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked.  -->
 
-              <br>########## filterTemplateForm?.form?.value = <br> {{filterTemplateForm?.form?.value | json}}
+            <br>########## filterTemplateForm?.form?.value = <br> {{filterTemplateForm?.form?.value | json}}
 
-              <br>########## filterTemplateForm?.form?.getRawValue() = <br> {{filterTemplateForm?.form?.getRawValue() | json}}
+            <br>########## filterTemplateForm?.form?.getRawValue() = <br> {{filterTemplateForm?.form?.getRawValue() | json}}
 
             <!-- </div> -->
 
           </div>
 
+        </mat-drawer-content>
 
 
-          <!-- ========================================================== -->
-          <!-- OLD
+      </mat-drawer-container>
+
+
+    </mat-expansion-panel>
+
+
+
+
+
+    <!-- ========================================================== -->
+    <!-- OLD
           <mat-form-field>
             <input matInput [(ngModel)]="filterById" (change)="getCustomers()">
             <mat-error></mat-error>
@@ -214,10 +238,3 @@
             </mat-hint>
           </mat-form-field>
          -->
-
-        </mat-drawer-content>
-
-      </mat-drawer-container>
-
-
-    </mat-expansion-panel>

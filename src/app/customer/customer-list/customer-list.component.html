@@ -64,16 +64,16 @@
 
 
 
-  <mat-drawer-container class="###list-section###">
+  <mat-drawer-container>
 
     <!-- ############################################################ -->
     <!-- Select columns -->
     <!-- ############################################################ -->
     <!-- Right drawer for selecting the columns to display -->
 
-    <mat-drawer class="###column-drawer###" #columnDrawerRef position="end" mode="side" [opened]="'false'" class="mat-elevation-z8">
+    <mat-drawer #columnDrawerRef position="end" mode="side" [opened]="'false'" class="mat-elevation-z8">
 
-      <table mat-table class="###selecting-columns-table###" #selectingColumnsTable [dataSource]="availableColumns">
+      <table mat-table #selectingColumnsTable [dataSource]="availableColumns">
 
         <ng-container [matColumnDef]="column" *ngFor="let column of ['select2', 'name']; let i = index" matTooltip="Select which columns to display">
 
@@ -119,10 +119,10 @@
 
 
       <!-- ############################################################ -->
-      <!-- Customer list - main data table -->
+      <!-- Main customer data table -->
       <!-- ############################################################ -->
 
-      <table mat-table class="###data-table###" #table matSort cdkDropListGroup [cdkDropListGroupDisabled]="'true'" [dataSource]="dataSource">
+      <table mat-table #table matSort cdkDropListGroup [cdkDropListGroupDisabled]="'true'" [dataSource]="dataSource">
 
         <ng-container [matColumnDef]="column" *ngFor="let column of availableColumns; let i = index">
 

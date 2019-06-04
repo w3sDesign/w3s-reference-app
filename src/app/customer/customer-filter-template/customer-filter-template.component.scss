@@ -12,18 +12,40 @@
 }
 
 
-
-#filterButtons {
+.row-container {
   @extend %flex-box;
-  padding: 0 0 16px 24px; //30px 8px 16px 0px;
+  padding: 0 8px 16px 24px;
   width: 100%;
+
 }
 
-#crudButtons {
-  @extend %flex-box;
-  padding: 16px 8px 16px 24px;
-  width: 100%;
+mat-drawer-container {
+  padding: 0 8px 30px 24px;
+  // min-height: 300px;
 }
+
+.drawer-open {
+  min-height: 300px;
+}
+
+mat-drawer {
+  width: 180px;
+//   min-height: 300px;
+}
+
+
+
+// #filterButtons {
+//   @extend %flex-box;
+//   // padding: 0 0 16px 24px; //30px 8px 16px 0px;
+//   // width: 100%;
+// }
+
+// #crudButtons {
+//   @extend %flex-box;
+//   padding: 16px 8px 16px 24px;
+//   width: 100%;
+// }
 
 
 
@@ -54,9 +76,9 @@ table {
   width: 100%;
 }
 
-.mat-spinner {
-  margin: 16px 10px;
-}
+// .mat-spinner {
+//   margin: 16px 10px;
+// }
 
 .mat-cell,
 .mat-header-cell,

@@ -22,7 +22,6 @@ import { MessageDialogComponent } from '../../shared/message-dialog/message-dial
 import { Customer } from '../model/customer';
 import { QueryParams } from '../../shared/query-params';
 
-import { HttpCustomerService as CustomerService } from '../model/http-customer.service';
 import { HttpErrorHandler } from '../../shared/http-error-handler.service';
 
 import { CustomerDetailDialogComponent } from '../customer-detail/customer-detail.component';
@@ -46,6 +45,8 @@ import { DynamicFormGroupService } from '../../shared/dynamic-form/dynamic-form-
 import { mockCustomers } from '../model/mock-customers';
 import { MessageService } from '../../shared/message.service';
 
+import { CustomerFilterTemplateService } from '../model/customer-filter-template.service';
+
 
 
 @Component({
@@ -56,7 +57,7 @@ import { MessageService } from '../../shared/message.service';
 
 export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
 
-  private showTestValues = true;
+  showTestValues = false;
   // consoleLogStyle = 'color: blue; font-weight: 500; line-height: 20px;';
 
   // ##################################################################
@@ -68,7 +69,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
 
 
   /** All possible filters. */
-  private availableFilters: string[] =
+  availableFilters: string[] =
     [
       'idFilter', 'nameFilter',
       'typeFilter', 'statusFilter', 'commentFilter', 'creationDateFilter',
@@ -94,7 +95,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
    * Not set before AfterViewInit.
    */
   @ViewChild('filterTemplateForm')
-  private filterTemplateForm: DynamicFormComponent;
+  filterTemplateForm: DynamicFormComponent;
 
   // filterTemplateFormValue: any = {};
   // filterTemplateForm.form.value used instead!
@@ -143,7 +144,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
   // ##################################################################
 
   constructor(
-    private customerService: CustomerService,
+    private customerFTService: CustomerFilterTemplateService,
     private router: Router,
     private formGroupService: DynamicFormGroupService,
     private dialog: MatDialog,
@@ -208,7 +209,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
     // Getting filter templates and performing onSelectFilterTemplate(name).
     // ################################################################
 
-    this.customerService.getCustomerFilterTemplates()
+    this.customerFTService.getCustomerFilterTemplates()
       .subscribe(
         res => {
           this.filterTemplates = res;
@@ -730,10 +731,10 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
           filterTemplate.id = Math.max(...this.filterTemplates.map(template => template.id)) + 1;
 
           // Create filter template.
-          this.customerService.createCustomerFilterTemplate(filterTemplate)
+          this.customerFTService.createCustomerFilterTemplate(filterTemplate)
             .subscribe(
               () => {
-                this.customerService.getCustomerFilterTemplates()
+                this.customerFTService.getCustomerFilterTemplates()
                   .subscribe(
                     (res) => {
                       this.filterTemplates = res;
@@ -760,7 +761,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
                       // const idx = this.filterTemplates.findIndex(element => element.id === filterTemplate.id);
                       // this.filterTemplates[idx] = filterTemplate;
                     },
-                    // err handled in customerService
+                    // err handled in customerFTService
                   );
               }
             );
@@ -851,14 +852,14 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
 
 
 
-    this.customerService.updateCustomerFilterTemplate(filterTemplate)
+    this.customerFTService.updateCustomerFilterTemplate(filterTemplate)
       .subscribe(
         () => {
           // MOck: update the in memory filter templates (this.filterTemplates).
           // const idx = this.filterTemplates.findIndex(element => element.id === filterTemplate.id);
           // this.filterTemplates[idx] = filterTemplate;
 
-          this.customerService.getCustomerFilterTemplates()
+          this.customerFTService.getCustomerFilterTemplates()
             .subscribe(
               (res) => {
                 this.filterTemplates = res;

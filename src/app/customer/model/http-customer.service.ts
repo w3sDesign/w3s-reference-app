@@ -1,72 +1,44 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { MatSnackBar } from '@angular/material';
 
 import { Observable, forkJoin, of } from 'rxjs';
 import { tap, mergeMap, catchError, switchMap } from 'rxjs/operators';
 
 import { Customer } from './customer';
 import { CustomerService } from './customer.service';
+import { HttpErrorHandler } from '../../shared/http-error-handler.service';
+import { HttpUtilsService } from '../../shared/http-utils.service';
+import { MessageService } from '../../shared/message.service';
 import { QueryParams } from '../../shared/query-params';
 import { QueryResult } from '../../shared/query-result';
-import { HttpUtilsService } from '../../shared/http-utils.service';
-import { HttpErrorHandler } from '../../shared/http-error-handler.service';
-import { MessageService } from '../../shared/message.service';
-import { MessageSnackBarComponent } from '../../shared/message-snack-bar/message-snack-bar.component';
-
-import { CustomerFilterTemplate } from './customer-filter-template';
-
-// /**
-//  * Re-exporting HttpCustomerService as CustomerService,
-//  * making client code independent of a concrete implementation
-//  * (by importing CustomerService from http-customer.service).
-//  */
-// export { HttpCustomerService as CustomerService };
-
 
 
 /**
- * Service for accessing and maintaining `Customer` data on a remote
- * http server (via HTTP REST API).
+ * Service for accessing and maintaining `Customer` data
+ * on a remote http server (via HTTP REST API).
  * ####################################################################
  *
  * - See also https://github.com/angular/in-memory-web-api/blob/master/src/app/http-client-hero.service.ts
- *
  */
 
 @Injectable()
 export class HttpCustomerService extends CustomerService {
 
-  private showTestValues = true;
-
-  /** Http REST APIs */
+  /** Http REST API */
   private customersUrl = 'api/customers';
-  private customerFilterTemplatesUrl = 'api/customerFilterTemplates';
 
   /** Http Header for create/update/delete methods */
   private cudOptions = { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) };
 
 
-  // private handleError: HandleError;
-
-  // private filterTemplate: CustomerFilterTemplate;
-
-
   constructor(
     private http: HttpClient,
     private httpErrorHandler: HttpErrorHandler,
-
     private httpUtils: HttpUtilsService,
     private messageService: MessageService,
-    private snackBar: MatSnackBar,
-    // private overlay: Overlay,
   ) {
     super();
-
-    /** Create a convenience handleError function that already knows the service name.*/
-    // this.handleError = httpErrorHandler.createHandleError('HttpCustomerService');
   }
-
 
 
   // ##################################################################
@@ -94,26 +66,6 @@ export class HttpCustomerService extends CustomerService {
   }
 
 
-  /**
-   * Create the specified customer filter template on the http server.
-   * ##################################################################
-   *
-   * HTTP POST
-   */
-
-  createCustomerFilterTemplate(filterTemplate: CustomerFilterTemplate): Observable<CustomerFilterTemplate> {
-
-    const message = `Filter template with id = ${filterTemplate.id} and name = "${filterTemplate.name}" has been created.`;
-
-    return this.http.post<CustomerFilterTemplate>(this.customerFilterTemplatesUrl, filterTemplate, this.cudOptions)
-      .pipe(
-        tap(() => this.show(message)),
-        tap(() => this.log(message)),
-        catchError(this.handleError<CustomerFilterTemplate>(message.replace('has been', 'can not be'))),
-      );
-  }
-
-
 
   // ##################################################################
   // DELETE methods
@@ -126,7 +78,6 @@ export class HttpCustomerService extends CustomerService {
    * Returns an empty object.
    *
    * HTTP DELETE - Null response expected.
-   * TODO: should we report customer.id NOT FOUND?
    */
 
   deleteCustomer(id: number): Observable<{}> {
@@ -148,7 +99,6 @@ export class HttpCustomerService extends CustomerService {
    * Returns an empty object.
    *
    * HTTP DELETE - Null response expected.
-   * TODO: should we report customer.id NOT FOUND?
    */
 
   deleteCustomers(ids: number[] = []): Observable<any> {
@@ -208,19 +158,19 @@ export class HttpCustomerService extends CustomerService {
    * @return queryResult  The filtered and sorted items (customer) array.
    *
    * - This code emulates real server response by getting all customers
-   * from the server and performs client-side filtering, sorting, and paginating.
+   *   from the server and performing client-side filtering, sorting, and paginating.
    *
-   * - Note: getCustomers() returns QueryResult Observable;
-   *       http.get()     returns Customer[] Observable.
+   * - Note: getCustomers() returns a QueryResult Observable;
+   *         http.get()     returns a Customer[] Observable.
    *
    * - mergeMap
-   * maps each value (Customer[]) emitted by the source observable
-   * to a new observable (queryResult) which is merged in the output observable.
+   *   maps each value (Customer[]) emitted by the source observable
+   *   to a new observable (queryResult) which is merged in the output observable.
    *
-   * - TODO?  switchMap
-   * maps the *most recent*  value (Customer[]) emitted by source observable
-   * to a new observable (queryResult) which is merged in the output observable.
-   * It switches whenever a new value is emitted.
+   * - switchMap
+   *   maps the *most recent*  value (Customer[]) emitted by source observable
+   *   to a new observable (queryResult) which is merged in the output observable.
+   *   It switches whenever a new value is emitted.
    */
 
   getCustomers(queryParams?: QueryParams): Observable<QueryResult> {
@@ -230,11 +180,6 @@ export class HttpCustomerService extends CustomerService {
       this.log(
         `[getCustomers(queryParams) / searchTerm] queryParams = \n ${JSON.stringify(queryParams)}`
       );
-
-      if (this.showTestValues) {
-        console.log('%c# SearchTerm ######### queryParams [getCustomers()] = \n' +
-          JSON.stringify(queryParams), 'color: blue');
-      }
 
       // Search term (for searching in all fields) is set.
       return this.http.get<Customer[]>(this.customersUrl)
@@ -254,11 +199,6 @@ export class HttpCustomerService extends CustomerService {
         `[getCustomers(queryParams) / filters] queryParams = \n ${JSON.stringify(queryParams)}`
       );
 
-      if (this.showTestValues) {
-        console.log('%c# With/Without Filters ######### queryParams [getCustomers()] = \n' +
-          JSON.stringify(queryParams), 'color: blue');
-      }
-
       // Filters are set (or empty = select all).
       return this.http.get<Customer[]>(this.customersUrl)
         .pipe(
@@ -273,34 +213,6 @@ export class HttpCustomerService extends CustomerService {
 
     }
 
-  }
-
-
-  /**
-   * Get the customer filter template with the specified id.
-   * ##################################################################
-   */
-
-  getCustomerFilterTemplate(id: number): Observable<CustomerFilterTemplate> {
-
-    return this.http.get<CustomerFilterTemplate>(this.customerFilterTemplatesUrl + `/${id}`)
-      .pipe(
-        catchError(this.handleError<CustomerFilterTemplate>(`Get customerFilterTemplate id=${id}`))
-      );
-  }
-
-
-  /**
-   * Get all customer filter templates.
-   * ##################################################################
-   */
-
-  getCustomerFilterTemplates(): Observable<CustomerFilterTemplate[]> {
-
-    return this.http.get<CustomerFilterTemplate[]>(this.customerFilterTemplatesUrl)
-      .pipe(
-        catchError(this.handleError<CustomerFilterTemplate[]>('getCustomerFilterTemplates()'))
-      );
   }
 
 
@@ -329,30 +241,6 @@ export class HttpCustomerService extends CustomerService {
         tap(() => this.log(message)),
 
         catchError(this.handleError<Customer>(message.replace('has been', 'can not be'))),
-      );
-  }
-
-
-  /**
-   * Update the specified customer filter template on the http server.
-   * ##################################################################
-   *
-   * HTTP PUT
-   */
-
-  updateCustomerFilterTemplate(customerFilterTemplate: CustomerFilterTemplate): Observable<CustomerFilterTemplate> {
-
-    // const httpHeader = this.httpUtils.getHttpHeaders();
-
-    const message = `CustomerFilterTemplate with id = ${customerFilterTemplate.id}
- and name = "${customerFilterTemplate.name}" has been updated.`;
-
-    return this.http.put<CustomerFilterTemplate>(this.customerFilterTemplatesUrl, customerFilterTemplate, this.cudOptions)
-      .pipe(
-        tap(() => this.show(message)),
-        tap(() => this.log(message)),
-
-        catchError(this.handleError<CustomerFilterTemplate>(message.replace('has been', 'can not be'))),
       );
   }
 
@@ -388,35 +276,6 @@ export class HttpCustomerService extends CustomerService {
   private show(message: string) {
     return this.messageService.showMessage(message);
   }
-
-// Moved to message.service
-  // private openSnackBar(message: string) {
-  //   this.snackBar.openFromComponent(MessageSnackBarComponent, {
-  //     data: message,
-  //     duration: 5000,
-  //     verticalPosition: 'top',
-  //     panelClass: 'w3s-snack-bar', // adds to snack-bar-container
-  //   });
-  // }
-
-
-
-
-
-
-
-  // UPDATE Status
-  // updateStatusForCustomer(
-  //   customers: Customer[],
-  //   status: number
-  // ): Observable<any> {
-  //   const tasks$ = [];
-  //   for (let i = 0; i < customers.length; i++) {
-  //     const customer = customers[i];
-  //     customer.status = status;
-  //     tasks$.push(this.updateCustomer(customer));
-  //   }
-  //   return forkJoin(tasks$);
 
 
 }
