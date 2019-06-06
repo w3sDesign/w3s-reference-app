@@ -13,7 +13,7 @@ import { MessageService } from '../../shared/message.service';
 
 
 /**
- * Service for accessing and maintaining `CustomerFilterTemplate` data
+ * Service for accessing and maintaining customer filter templates
  * on a remote http server (via HTTP REST API).
  * ####################################################################
  */

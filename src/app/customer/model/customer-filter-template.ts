@@ -1,3 +1,36 @@
+/**
+ * Customer filter template data definition.
+ * ####################################################################
+ * Includes all fields from `Customer`.
+ */
+
+export class CustomerFilterTemplate {
+
+  id = 0;
+  name = '';
+
+  // Basic Data
+  idFilter ?= '';
+  nameFilter ?= '';
+  typeFilter ?= '';
+  statusFilter ?= '';
+  commentFilter ?= '';
+  creationDateFilter ?= '';
+
+  // Main Address
+  countryFilter ?= '';
+  postalCodeFilter ?= '';
+  cityFilter ?= '';
+  streetFilter ?= '';
+
+  // Main contact
+  departmentFilter ?= '';
+  personFilter ?= '';
+  phoneFilter ?= '';
+  emailFilter ?= '';
+}
+
+
 // export const customerFilterMap = {
 //   customerId: 'id',
 //   customerName: 'name',
@@ -8,50 +41,4 @@
 // };
 
 
-// export class CustomerFilterTemplate {
-
-//   id = 0;
-//   name = '';
-
-//   customerId = '';
-//   customerName = '';
-
-//   // Addresses
-//   // customerStreet = '';
-//   customerPostalCode = '';
-//   customerCity = '';
-//   // customerCountry = '';
-
-//   // Contacts
-//   // customerDepartment = '';
-//   // customerPerson = '';
-//   // customerPhone = '';
-//   // customerEmail = '';
-
-//   // customerStatus = '';
-// }
-
-
-export class CustomerFilterTemplate {
-
-  id = 0;
-  name = '';
-
-  idFilter ?= '';
-  nameFilter ?= '';
-
-  // Addresses
-  // streetFilter = '';
-  postalCodeFilter ?= '';
-  cityFilter ?= '';
-  // countryFilter = '';
-
-  // Contacts
-  // departmentFilter = '';
-  // personFilter = '';
-  // phoneFilter = '';
-  // emailFilter = '';
-
-  // statusFilter = '';
-}
 

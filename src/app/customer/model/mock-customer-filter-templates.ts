@@ -3,7 +3,7 @@ import { CustomerFilterTemplate } from './customer-filter-template';
 export const mockCustomerFilterTemplates: CustomerFilterTemplate[] = [
   {
     id: 0,
-    name: '',
+    name: '', // empty template
 
     idFilter: '',
     nameFilter: '',
@@ -15,22 +15,15 @@ export const mockCustomerFilterTemplates: CustomerFilterTemplate[] = [
     idFilter: '>20010',
     nameFilter: 'Foundation',
 
-    // country: '',
-    // postalCodeFilter: '',
-    // cityFilter: '',
-    // streetFilter: '',
-
-    // statusFilter: ''
   },
 
   {
     id: 2,
     name: 'myTemplate',
 
-    idFilter: '',
-    nameFilter: 'w3sdesign',
+    nameFilter: 'consulting',
+    countryFilter: 'state',
     postalCodeFilter: '',
-    cityFilter: 'vienna',
   },
 
 ];

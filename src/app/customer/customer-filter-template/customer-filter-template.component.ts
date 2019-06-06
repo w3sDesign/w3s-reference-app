@@ -1,7 +1,7 @@
 //
 // Change log
 // ####################################################################
-// Update activeFilters - moved to emitQueryParams()
+// Update activeFilterNames - moved to emitQueryParams()
 // ####################################################################
 
 
@@ -55,16 +55,18 @@ import { CustomerFilterTemplateService } from '../model/customer-filter-template
   styleUrls: ['./customer-filter-template.component.scss']
 })
 
+/**
+ * Reusable component for filter template data entry and management.
+ * ####################################################################
+ * Emits a `QueryParam` object on user changes.
+ */
+
 export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
 
-  showTestValues = false;
+  showTestValues = true;
   // consoleLogStyle = 'color: blue; font-weight: 500; line-height: 20px;';
 
-  // ##################################################################
-  // (1) Filter section related properties.
-  // ##################################################################
-
-  /** Child emits a queryParamsChange event to which parents can listen. */
+  /** Emitting a queryParamsChange event for which parents can listen. */
   @Output() queryParamsChange = new EventEmitter<any>();
 
 
@@ -74,19 +76,20 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
       'idFilter', 'nameFilter',
       'typeFilter', 'statusFilter', 'commentFilter', 'creationDateFilter',
       'countryFilter', 'postalCodeFilter', 'cityFilter', 'streetFilter',
-      'phoneFilter', 'emailFilter'
+      'departmentFilter', 'personFilter', 'phoneFilter', 'emailFilter'
     ];
 
   availableFiltersText: string[]; // 'Id', 'Name', ...
 
-  /** Filters that should be displayed in the filter template form. */
+  /** = selected filters!
+   * Filters that should be displayed in the filter template form. */
   filtersToDisplay: string[] = [];
   // [
   //   'idFilter', 'nameFilter',
   // ];
 
   /** Active filters used by the most recent search. */
-  activeFilters: string[] = [];
+  activeFilterNames: string[] = [];
   activeFiltersText = '';
 
 
@@ -173,11 +176,11 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
 
 
 
-/**
-   * Logging / showing messages.
-   * ##################################################################
-   * Delegating to the message service.
-   */
+  /**
+     * Logging / showing messages.
+     * ##################################################################
+     * Delegating to the message service.
+     */
 
   /** Logging message to console. */
   private logMessage(message: string) {
@@ -197,12 +200,12 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
   ngOnInit() {
 
     this.logMessage(
-      `[ngOnInit()] this.activeFilters = \n ${JSON.stringify(this.activeFilters)}`
+      `[ngOnInit()] this.activeFilterNames = \n ${JSON.stringify(this.activeFilterNames)}`
     );
 
     if (this.showTestValues) {
-      console.log('%c########## [customer-filter-template / ngOnInit()] this.activeFilters = \n' +
-        JSON.stringify(this.activeFilters), 'color: blue');
+      console.log('%c########## [customer-filter-template / ngOnInit()] this.activeFilterNames = \n' +
+        JSON.stringify(this.activeFilterNames), 'color: blue');
     }
 
 
@@ -281,108 +284,116 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
     }
   }
 
-  /** Whether all filters are empty.  */
-  isFilterTemplateFormEmpty() {
-    // Setting filters from the filter template form.
-    const obj = this.filterTemplateForm.form.value;
+  // /** Whether all filters are empty.  */
+  // allFiltersEmpty() {
 
-    let empty = true;
-    Object.keys(obj).forEach(key => {
-      if (obj[key]) { empty = false; }
-    });
-    return empty;
+  //   const obj = this.filterTemplateForm.form.value;
 
-  }
+  //   let empty = true;
+  //   Object.keys(obj).forEach(key => {
+  //     if (obj[key + 'Filter']) {
+  //       empty = false; }
+  //   });
+  //   return empty;
+
+  // }
 
 
   /**
-   * Child emits query parameters for which parents can listen.
+   * Emitting query parameters for which parents can listen.
    * ##################################################################
+   * This is the only way for parent components to get the query parameters.
    */
+
   emitQueryParams() {
 
-    // Test
-    if (this.filterTemplateForm.form.value) {
+    this.activeFilterNames = [];
 
-      // (1) Setting queryParams.
+    // Problems with this.filterTemplateForm.form.value:
+    // Includes disabled controls (id, name) when no enabled controls exist!
 
-      const queryParams = new QueryParams();
+    // { "idFilter": ">20010", "nameFilter": "Foundation" }
 
-      // Setting filters from the filter template form.
-      // const obj = this.filterTemplateForm.form.value;
+    const obj = this.filterTemplateForm.form.value;
+    // let allFiltersEmpty = true;
 
-      // let isFormEmpty = true;
-      // Object.keys(obj).forEach(key => {
-      //   if (obj[key]) { isFormEmpty = false; }
-      // });
-
-      if (this.isFilterTemplateFormEmpty()) {
-        // queryParams.filter = {};
-        // queryParams.searchTerm = this.searchInput.nativeElement.value;
-
-        queryParams.searchTerm = this.searchInputModel;
-      } else {
-        queryParams.filter = this.filterTemplateForm.form.value;
+    // Object.keys(obj).forEach(key => {
+    for (const key in obj) {
+      if (key.includes('Filter') && obj[key]) {
+        this.activeFilterNames.push(key);
+        // Replaced by activeFilterNames.length === 0
+        // allFiltersEmpty = false;
       }
-
-      this.logMessage(
-        `[emitQueryParams()] queryParams = \n ${JSON.stringify(queryParams)}`
-      );
-
-      if (this.showTestValues) {
-        console.log('%c########## [customer-filter-template / emitQueryParams()] queryParams = \n' +
-          JSON.stringify(queryParams), 'color: blue');
-      }
+    }
 
 
-      // (2) Emitting queryParams.
 
-      this.queryParamsChange.emit(queryParams);
-      ////////////////////////////////////////
+    // (1) Setting queryParams.
+
+    const queryParams = new QueryParams();
+
+    if (this.activeFilterNames.length !== 0) {
+      queryParams.filter = this.filterTemplateForm.form.value;
+      this.searchInputModel = '';
+    } else {
+      // allFiltersEmpty()
+      queryParams.searchTerm = this.searchInputModel;
+    }
 
 
-      // (3) Update activeFilters.
+    // if (this.searchInputModel) {
+    //   queryParams.searchTerm = this.searchInputModel;
+    // } else {
+    //   // TO TEST if === 0 empty filter should return all customers
+    //   if (this.activeFilterNames.length !== 0) {
+    //     queryParams.filter = this.filterTemplateForm.form.value;
+    //   }
+    // }
 
 
-      this.activeFilters = [];
-      this.activeFiltersText = 'Currently no filters active.';
+    this.logMessage(
+      `[emitQueryParams()] queryParams = \n ${JSON.stringify(queryParams)}`
+    );
 
-      if (queryParams.filter) {
 
-        const obj1 = queryParams.filter; // = this.filterTemplateForm.form.value;
-        for (const key in obj1) {
-          if (obj1[key]) {
-            this.activeFilters.push(key);
-          }
-        }
+    // (2) Emitting queryParams.
 
-        const nr = this.activeFilters.length;
-        this.activeFiltersText = (nr === 0) ? 'Currently no filters active.'
-          : (nr === 1) ? 'Currently 1 filter active: ' : `Currently ${nr} filters active: `;
+    this.queryParamsChange.emit(queryParams);
+    ////////////////////////////////////////
 
-      }
 
-      if (queryParams.searchTerm) {
-        this.activeFiltersText = `Currently active search term: "${queryParams.searchTerm}"`;
-      }
+    // (3) Helper function.
+
+    this.activeFiltersText = 'Currently no filters active.';
+
+    if (queryParams.filter) {
+
+      const nr = this.activeFilterNames.length;
+      this.activeFiltersText = (nr === 0) ? 'Currently no filters active.'
+        : (nr === 1) ? 'Currently 1 filter active: ' : `Currently ${nr} filters active: `;
 
     }
+
+    if (queryParams.searchTerm) {
+      this.activeFiltersText = `Searching in all fields: "${queryParams.searchTerm}"`;
+    }
+
   }
 
 
 
   NIXonFilterTemplateFormValueChanges() {
 
-    // Update activeFilters when a form control value changes.
+    // Update activeFilterNames when a form control value changes.
     // Updates too often - moved to emitQueryParams()!
 
     this.filterTemplateForm.form.valueChanges.subscribe(val => {
 
-      this.activeFilters = [];
+      this.activeFilterNames = [];
       // const obj = this.filterTemplateForm.form.value;
       for (const key in val) {
         if (val[key]) {
-          this.activeFilters.push(key);
+          this.activeFilterNames.push(key);
         }
       }
     });
@@ -392,20 +403,18 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
   /**
    * Event Handler that reacts on `mat-checkbox` `change` events.
    * ##################################################################
-   * The `change` event is emitted when the checkbox's `checked` value changes.
+   * The event is emitted when the checkbox's `checked` value changes.
    */
 
-  // ? onFilterCheckboxChange
   onSelectFilter(event) {
 
-    this.logMessage(
-      `[onSelectFilter()] event.checked = \n ${JSON.stringify(event.checked)}`
-    );
+    // this.logMessage(
+    //   `[onSelectFilter()] event.checked = \n ${JSON.stringify(event.checked)}`
+    // );
 
-    if (this.showTestValues) {
-      console.log('%c########## [customer-filter-template / onSelectFilter()] event.checked = \n' +
-        JSON.stringify(event.checked), 'color: blue');
-    }
+
+    this.searchInputModel = '';
+
 
     // (1) Set filtersToDisplay from selected filters.
     this.filtersToDisplay = [];
@@ -415,6 +424,21 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
       }
     });
     // this.selectingFiltersTable.renderRows();//?
+
+    this.logMessage(
+      `(1)[onSelectFilter()] this.filtersToDisplay = \n ${JSON.stringify(this.filtersToDisplay)}`
+    );
+
+    // if (this.filtersToDisplay.length === 0) { // no filters selected (checked)
+    //   this.logMessage(
+    //     `(2)[onSelectFilter()] this.filtersToDisplay = \n ${JSON.stringify(this.filtersToDisplay)}`
+    //   );
+
+    //   // Emit QueryParams
+    //   this.emitQueryParams();
+
+    //   return;
+    // }
 
 
     // (2) Generate filterTemplateQuestions.
@@ -460,8 +484,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
 
   onSelectFilterTemplate(name: string) {
 
-    // Either searching or filtering.
-    if (name !== '') {
+    if (name) {
       this.searchInputModel = '';
     }
 
@@ -480,14 +503,6 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
       `[onSelectFilterTemplate(name)] this.filtersToDisplay = \n ${JSON.stringify(this.filtersToDisplay)}`
     );
 
-    if (this.showTestValues) {
-      console.log('%c########## [customer-filter-template / onSelectFilterTemplate(name)] this.filtersToDisplay = \n' +
-        JSON.stringify(this.filtersToDisplay), 'color: blue');
-
-      // console.dir(this.filtersToDisplay);
-      // console.table(this.filtersToDisplay);
-      // this.consoleLog('JSON.stringify(this.filtersToDisplay)');
-    }
 
     // (2) Generating filterTemplate questions.
     this.filterTemplateQuestions = this.generateFilterTemplateQuestions();
@@ -496,20 +511,18 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
       `[onSelectFilterTemplate(name)] this.filterTemplateQuestions = \n ${JSON.stringify(this.filterTemplateQuestions)}`
     );
 
-    if (this.showTestValues) {
-      console.log('%c########## [customer-filter-template / onSelectFilterTemplate(name)] this.filterTemplateQuestions = \n' +
-        JSON.stringify(this.filterTemplateQuestions), 'color: blue');
-      // this.consoleLog('JSON.stringify(this.filterTemplateQuestions)');
-    }
 
     // (3) Generating filterTemplateForm.
     this.generateFilterTemplateForm(this.filterTemplateQuestions);
 
+
     // (4) Render filter template form.
     this.renderFilterTemplateForm(name);
 
+
     // (5) Emit QueryParams
     this.emitQueryParams();
+
 
     // (6) Set selected filters.
     this.filterSelection.clear();
@@ -517,20 +530,6 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
 
     this.selectingFiltersTable.renderRows();
 
-    // } else {
-
-    //   // Handling empty filter template.
-
-    //   // this.onClearFilters();
-
-    //   this.selectedFilterTemplateName = '';
-
-    //   this.filterTemplateForm.form.reset();
-
-    //   this.activeFilters = [];
-
-    //   this.getCustomers();  // get all customers
-    // }
 
   }
 
@@ -553,19 +552,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
   }
 
 
-  /**
-   * Sets which columns to display in the data table.
-   * ##################################################################
-   */
-  // setColumnsToDisplay() {
-  //   this.columnsToDisplay = [];
-  //   this.availableColumns.forEach((column, index) => {
-  //     if (this.columnSelection.isSelected(column)) {
-  //       this.columnsToDisplay.push(column);
-  //     }
-  //   });
-  //   this.selectingColumnsTable.renderRows();
-  // }
+
 
 
   /**
@@ -575,6 +562,10 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
   // generateFilterTemplateQuestions(fromQuestions: QuestionBase[]): QuestionBase[] {
 
   generateFilterTemplateQuestions(): QuestionBase[] {
+
+    // if (!this.filtersToDisplay) {
+    //   return {} as QuestionBase[];
+    // }
 
     const fromQuestions = mockCustomerQuestions.filter(q => {
       return this.filtersToDisplay.includes(q.name + 'Filter');
@@ -614,6 +605,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
     const obj2 = { name: 'name', controlType: 'textbox', inputType: 'string', isDisabled: true };
 
     filterTemplateQuestions.unshift(obj1, obj2); // add to the beginning
+
 
     return filterTemplateQuestions as QuestionBase[];
   }
@@ -880,15 +872,15 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit {
   // ##################################################################
 
   /** Whether number of selected filters matches total number of filters. */
-  private isAllSelected3(): boolean {
+  allFiltersSelected(): boolean {
     const selected = this.filterSelection.selected.length;
     const all = this.availableFilters.length;
     return selected === all;
   }
 
   /** Selects all filters if not all selected; otherwise clears selection. */
-  private masterToggle3() {
-    this.isAllSelected3() ?
+  masterToggle3() {
+    this.allFiltersSelected() ?
       this.filterSelection.clear() :
       this.availableFilters.forEach(filter => this.filterSelection.select(filter));
   }

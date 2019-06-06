@@ -10,7 +10,7 @@ import { MatSnackBar } from '@angular/material';
 
 
 /**
- * Service for handling HTTP server errors.
+ * Reusable service for handling HTTP server errors.
  * ####################################################################
  *
  * - See also https://github.com/angular/in-memory-web-api/blob/master/src/app/http-client-hero.service.ts

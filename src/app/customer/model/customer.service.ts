@@ -5,9 +5,9 @@ import { QueryResult } from '../../shared/query-result';
 
 
 /**
- * Service interface for accessing and maintaining `Customer` data.
+ * Service interface for accessing and maintaining customers.
  * ####################################################################
- * 100% abstract class (= interface)
+ * 100% abstract class (= interface).
  */
 
 export abstract class CustomerService {

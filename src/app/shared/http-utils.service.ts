@@ -68,13 +68,9 @@ export class HttpUtilsService {
       filteredItems = this.filterItems(items, queryParams.filter);
 
       this.log(
-        `[filteredItems [filterAndSort()] = \n ${JSON.stringify(filteredItems)}`
+        `[filterAndSort()] filteredItems = \n ${JSON.stringify(filteredItems)}`
       );
 
-      if (this.showTestValues) {
-        console.log('%c########## filteredItems [filterAndSort()] = \n' +
-          JSON.stringify(filteredItems), 'color: blue');
-      }
 
     }
 
@@ -404,13 +400,19 @@ export class HttpUtilsService {
   }
 
 
+
+
+  // ##################################################################
+  // Helpers
+  // ##################################################################
+
   /** Logging error message to console. */
   private log(message: string) {
     return this.messageService.logMessage('[http-utils.service.ts] ' + message);
   }
 
 
-} // The end.
+}
 
 
 

@@ -1,7 +1,9 @@
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
 
 // TODO? mockCustomerDetailQuestions for CustomerDetailComponent
+
 export const mockCustomerQuestions: QuestionBase[] = [
+
   // Group 1: Basic Data
 
   {
@@ -13,7 +15,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     inputType: 'number',
     group: 1,
     groupName: 'Basic Data',
-    order: 110,
+    order: 100,
     isRequired: true,
     // isDisabled: false,
     isReadonly: true,
@@ -27,13 +29,90 @@ export const mockCustomerQuestions: QuestionBase[] = [
     inputType: 'text',
     group: 1,
     groupName: 'Basic Data',
-    order: 120,
+    order: 110,
     isRequired: true,
     // isDisabled: false,
   },
 
+
+  // TODO type + status dropdown ?readOnly
+  {
+    name: 'type',
+    defaultValue: '',
+    label: 'Customer Type',
+    controlType: 'dropdown',
+    inputType: '',
+    group: 1,
+    groupName: 'Basic Data',
+    order: 120,
+
+    options: [
+      { key: 'business', value: 'Business' },
+      { key: 'individual', value: 'Individual' },
+      { key: 'other', value: 'Other' },
+    ],
+  },
+
+  {
+    name: 'status',
+    defaultValue: '',
+    label: 'Customer Status',
+    controlType: 'dropdown',
+    inputType: '',
+    group: 1,
+    groupName: 'Basic Data',
+    order: 130,
+
+    options: [
+      { key: 'active', value: 'Active' },
+      { key: 'suspended', value: 'Suspended' },
+      { key: 'pending', value: 'Pending' },
+      // { key: 'unproven', value: 'Unproven' }
+    ],
+  },
+
+
+  {
+    name: 'comment',
+    defaultValue: '',
+    label: 'Comment',
+    controlType: 'textbox',
+    inputType: 'text',
+    group: 1,
+    groupName: 'Basic Data',
+    order: 150,
+  },
+
+
+
+  {
+    name: 'creationDate',
+    defaultValue: '',
+    label: 'Creation Date',
+    controlType: 'textbox',
+    inputType: 'text',
+    group: 1,
+    groupName: 'Basic Data',
+    order: 160,
+  },
+
+
+
+
   // Group 2: Main Address and Additional Addresses
 
+  {
+    name: 'country',
+    defaultValue: '',
+    label: 'Country',
+    controlType: 'textbox',
+    inputType: 'text',
+    group: 2,
+    groupName: 'Addresses',
+    order: 200,
+    // isRequired: false,
+    // isDisabled: false,
+  },
   {
     name: 'street',
     defaultValue: '',
@@ -71,7 +150,9 @@ export const mockCustomerQuestions: QuestionBase[] = [
     isDisabled: false,
   },
 
+
   // Additional Addresses
+
   {
     name: 'addAddresses',
     defaultValue: '',
@@ -115,24 +196,56 @@ export const mockCustomerQuestions: QuestionBase[] = [
     ]
   },
 
+
+  // Group 4: Main Contact and additional Contacts
+
+  {
+    name: 'department',
+    defaultValue: '',
+    label: 'Contact Department',
+    controlType: 'textbox',
+    inputType: 'text',
+    group: 4,
+    groupName: 'Contacts',
+    order: 400,
+  },
+
+  {
+    name: 'person',
+    defaultValue: '',
+    label: 'Contact Person',
+    controlType: 'textbox',
+    inputType: 'text',
+    group: 4,
+    groupName: 'Contacts',
+    order: 410,
+  },
+
+  {
+    name: 'phone',
+    defaultValue: '',
+    label: 'Phone',
+    controlType: 'textbox',
+    inputType: 'text',
+    group: 4,
+    groupName: 'Contacts',
+    order: 420,
+  },
+
+  {
+    name: 'email',
+    defaultValue: '',
+    label: 'Email',
+    controlType: 'textbox',
+    inputType: 'text',
+    group: 4,
+    groupName: 'Contacts',
+    order: 430,
+  },
+
+
 ];
 
-  // {
-  //   name: 'customerStatus',
-  //   defaultValue: '',
-  //   label: 'Filter by Status',
-  //   controlType: 'dropdown',
-  //   inputType: '',
-  //   order: 50,
-  //   isRequired: false,
-
-  //   options: [
-  //     { key: 'solid', value: 'Solid' },
-  //     { key: 'great', value: 'Great' },
-  //     { key: 'good', value: 'Good' },
-  //     { key: 'unproven', value: 'Unproven' }
-  //   ],
-  // }
 
 
 

@@ -19,7 +19,7 @@
           <div class="special-font" style="display:block;color: rgba(0,0,0,.87); font-size:14px; font-weight: 400">
 
             {{activeFiltersText}}
-            <span class="comma" *ngFor="let filter of activeFilters">{{(filter.replace('Filter', '') | titlecase)}}</span>
+            <span class="comma" *ngFor="let filter of activeFilterNames">{{(filter.replace('Filter', '') | titlecase)}}</span>
           </div>
 
         </mat-panel-description>
@@ -108,7 +108,7 @@
 
 
         <!-- ############################################################ -->
-        <!-- Select filters -->
+        <!-- Select filters table -->
         <!-- ############################################################ -->
         <!-- Right drawer for selecting the filters to display -->
 
@@ -121,7 +121,7 @@
               <!-- Selection/Checkbox column/cell definition -->
               <ng-container *ngIf="column === 'select3'">
                 <th mat-header-cell *matHeaderCellDef>
-                  <mat-checkbox (change)="$event ? masterToggle3() : null; onSelectFilter($event)" [checked]="filterSelection.hasValue() && isAllSelected3()" [indeterminate]="filterSelection.hasValue() && !isAllSelected3()">
+                  <mat-checkbox (change)="$event ? masterToggle3() : null; onSelectFilter($event)" [checked]="filterSelection.hasValue() && allFiltersSelected()" [indeterminate]="filterSelection.hasValue() && !allFiltersSelected()">
                   </mat-checkbox>
                 </th>
                 <!-- row from dataSource -->
@@ -188,9 +188,21 @@
 
             <!-- This causes ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked.  -->
 
+
             <br>########## filterTemplateForm?.form?.value = <br> {{filterTemplateForm?.form?.value | json}}
 
             <br>########## filterTemplateForm?.form?.getRawValue() = <br> {{filterTemplateForm?.form?.getRawValue() | json}}
+
+
+
+            <br>########## filterTemplateForm?.form?.getRawValue().id = {{filterTemplateForm?.form?.getRawValue()?.id}}
+
+            <br>########## filterTemplateForm?.form?.get('id').disabled = {{filterTemplateForm?.form?.get('id')?.disabled}}
+
+            <br>########## filterTemplateForm?.form?.id.disabled = {{filterTemplateForm?.form?.id?.disabled}}
+
+            <br>########## filterTemplateForm?.form?.disabled = {{filterTemplateForm?.form?.disabled}}
+
 
             <!-- </div> -->
 

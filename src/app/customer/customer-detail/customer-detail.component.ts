@@ -284,8 +284,8 @@ export class CustomerDetailComponent implements OnInit {
 
     preparedCustomer.id = this.customer.id;
     preparedCustomer.name = controls['name'].value;
-    preparedCustomer.type = +controls['type'].value;
-    preparedCustomer.status = +controls['status'].value;
+    preparedCustomer.type = controls['type'].value;
+    preparedCustomer.status = controls['status'].value;
     // Addresses
     preparedCustomer.country = controls['country'].value;
     preparedCustomer.postalCode = controls['postalCode'].value;

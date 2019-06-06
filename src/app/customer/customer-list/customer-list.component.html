@@ -80,7 +80,7 @@
           <!-- Selection/Checkbox column/cell definition -->
           <ng-container *ngIf="column === 'select2'">
             <th mat-header-cell *matHeaderCellDef>
-              <mat-checkbox (change)="$event ? masterToggle2() : null; setColumnsToDisplay()" [checked]="columnSelection.hasValue() && isAllSelected2()" [indeterminate]="columnSelection.hasValue() && !isAllSelected2()">
+              <mat-checkbox (change)="$event ? masterToggle2() : null; setColumnsToDisplay()" [checked]="columnSelection.hasValue() && allColumnsSelected()" [indeterminate]="columnSelection.hasValue() && !allColumnsSelected()">
               </mat-checkbox>
             </th>
             <!-- row from dataSource -->
@@ -129,7 +129,7 @@
           <!-- Selection/Checkbox column/cell definition -->
           <ng-container *ngIf="column === 'select'">
             <th mat-header-cell *matHeaderCellDef>
-              <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="rowSelection.hasValue() && isAllSelected()" [indeterminate]="rowSelection.hasValue() && !isAllSelected()">
+              <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="rowSelection.hasValue() && allRowsSelected()" [indeterminate]="rowSelection.hasValue() && !allRowsSelected()">
               </mat-checkbox>
             </th>
             <td mat-cell *matCellDef="let row">

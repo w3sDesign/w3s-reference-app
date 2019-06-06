@@ -10,7 +10,7 @@ export class QuestionBase {
   tooltip ? = '';
   controlType = '';
   inputType ? = '';
-  group?: 0 | 1 | 2 | 3 = 0; // 0 = no grouping; 1,2,3... = grouping
+  group?: 0 | 1 | 2 | 3 | 4 | 5 = 0; // 0 = no grouping; 1,2,3... = grouping
   groupName ? = '';
   order ? = 0;
   isRequired ? = false;

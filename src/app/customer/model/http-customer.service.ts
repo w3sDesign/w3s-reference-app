@@ -14,7 +14,7 @@ import { QueryResult } from '../../shared/query-result';
 
 
 /**
- * Service for accessing and maintaining `Customer` data
+ * Service for accessing and maintaining customers
  * on a remote http server (via HTTP REST API).
  * ####################################################################
  *

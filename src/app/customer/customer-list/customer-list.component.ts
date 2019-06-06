@@ -46,6 +46,11 @@ import { HttpCustomerService } from '../model/http-customer.service';
   styleUrls: ['./customer-list.component.scss']
 })
 
+/**
+ * Main component for customer data entry and management.
+ * ####################################################################
+ */
+
 export class CustomerListComponent implements OnInit, AfterViewInit {
 
   showTestValues = true;
@@ -63,13 +68,16 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
 
   // customerQuestions: QuestionBase[] = mockCustomerQuestions.slice();
 
-  /** All available columns in the data table. */
+  /** All available columns that can be displayed in the data table . */
   // TODO from questions
   availableColumns: string[] = [
-    'select', 'id', 'name', 'type', 'status', 'comment', 'creationDate', 'country', 'postalCode', 'city', 'street', 'phone', 'email'
+    'select', 'id', 'name', 'type', 'status', 'comment', 'creationDate',
+    'country', 'postalCode', 'city', 'street',
+    'department', 'person', 'phone', 'email'
   ];
 
-  /** The columns that should be displayed */
+  /** = selected columns!
+   * The columns that should be displayed in the data table */
   columnsToDisplay: string[] = [
     'select', 'id', 'name', 'country', 'postalCode', 'city', 'phone', 'email'
   ];
@@ -153,10 +161,10 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
       .subscribe(() => this.getCustomers());
 
 
+
     // Performing initial data load.
     // ################################################################
     // Delegating data access to the CustomerDataSource object.
-
 
     this.dataSource = new CustomerDataSource(this.customerService);
 
@@ -265,42 +273,31 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
   // ##################################################################
 
   /** Whether number of selected rows matches total number of rows. */
-  isAllSelected(): boolean {
+  allRowsSelected(): boolean {
     const selected = this.rowSelection.selected.length;
     const all = this.customers.length;
     return selected === all;
   }
   // Selecting the columns to display.
-  isAllSelected2(): boolean {
+  allColumnsSelected(): boolean {
     const selected = this.columnSelection.selected.length;
     const all = this.availableColumns.length;
     return selected === all;
   }
-  // Selecting the filters to display.
-  // isAllSelected3(): boolean {
-  //   const selected = this.filterSelection.selected.length;
-  //   const all = this.availableFilters.length;
-  //   return selected === all;
-  // }
+
 
   /** Selects all rows if not all selected; otherwise clears selection. */
   masterToggle() {
-    this.isAllSelected() ?
+    this.allRowsSelected() ?
       this.rowSelection.clear() :
       this.customers.forEach(customer => this.rowSelection.select(customer));
   }
   // Selecting the columns to display.
   masterToggle2() {
-    this.isAllSelected2() ?
+    this.allColumnsSelected() ?
       this.columnSelection.clear() :
       this.availableColumns.forEach(column => this.columnSelection.select(column));
   }
-  // Selecting the filters to display.
-  // masterToggle3() {
-  //   this.isAllSelected3() ?
-  //     this.filterSelection.clear() :
-  //     this.availableFilters.forEach(filter => this.filterSelection.select(filter));
-  // }
 
 
   /**
@@ -338,69 +335,6 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
     // Update the customer.
     this.updateCustomer(customer);
   }
-
-
-  /**
-   * ##################################################################
-   * Create a filter template.
-   * ##################################################################
-   */
-  // createFilterTemplate(filterTemplate: CustomerFilterTemplate) {
-
-  //   const dialogRef = this.dialog.open(InputDialogComponent, {
-  //     data: {
-  //       title: 'Save as',
-  //       message: `Please enter the filter template name`,
-  //       name: '',
-  //     }
-  //   });
-
-  //   dialogRef.afterClosed()
-  //     .subscribe(
-  //       name => {
-  //         if (!name) { return; }
-
-  //         filterTemplate.name = name;
-  //         filterTemplate.id = null;
-
-  //         /** Delegating to customer service */
-  //         this.customerService.createCustomerFilterTemplate(filterTemplate)
-  //           .subscribe(
-  //             () => {
-  //               this.customerService.getCustomerFilterTemplates()
-  //                 .subscribe(
-  //                   (res) => {
-  //                     this.filterTemplates = res;
-  //                     // this.consoleLog('JSON.stringify(this.filterTemplates');
-
-  //                     this.filterTemplateNames = [];
-  //                     for (let i = 0; i < res.length; i++) {
-  //                       this.filterTemplateNames[i] = res[i].name;
-  //                     }
-
-  //                     this.selectedFilterTemplateName = filterTemplate.name;
-
-  //                     this.renderFilterTemplateForm(this.selectedFilterTemplateName);
-
-
-  //                     // Also update the in memory filter templates (this.filterTemplates)
-  //                     // and filter template names.
-  //                     // TODO
-  //                     // const idx = this.filterTemplates.findIndex(element => element.id === filterTemplate.id);
-  //                     // this.filterTemplates[idx] = filterTemplate;
-  //                   },
-  //                   // err handled in customerService
-  //                 );
-  //             }
-  //           );
-  //       }
-  //     );
-
-  // }
-
-
-
-
 
 
 
@@ -447,28 +381,6 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
         }
       );
   }
-
-
-  /**
-   * ##################################################################
-   * Update a filter template.
-   * ##################################################################
-   */
-  // updateFilterTemplate(filterTemplate: CustomerFilterTemplate) {
-  //   this.customerService.updateCustomerFilterTemplate(filterTemplate)
-  //     .subscribe(
-  //       () => {
-  //         // Also update the in memory filter templates (this.filterTemplates).
-  //         const idx = this.filterTemplates.findIndex(element => element.id === filterTemplate.id);
-  //         this.filterTemplates[idx] = filterTemplate;
-  //       },
-  //       // err handled in customerService
-  //     );
-  // }
-
-
-
-
 
 
 
