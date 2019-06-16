@@ -13,7 +13,8 @@ import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 
-import { HttpCustomerService } from '../model/http-customer.service';
+import { CustomerService } from '../model/customer.service';
+// import { HttpCustomerService } from '../model/http-customer.service';
 import { HttpErrorHandler } from '../../shared/http-error-handler.service';
 
 import { TypesUtilsService } from '../../shared/types-utils.service';
@@ -26,6 +27,7 @@ import { mockCustomerQuestions } from '../model/mock-customer-questions';
 import { DynamicFormGroupService } from '../../shared/dynamic-form/dynamic-form-group.service';
 import { DynamicFormOptions } from '../../shared/dynamic-form/dynamic-form-options';
 // import { questionsConfig } from '../model/customer.config';
+import { MessageService } from '../../shared/message.service';
 
 
 // changeDetection: ChangeDetectionStrategy.OnPush
@@ -34,7 +36,7 @@ import { DynamicFormOptions } from '../../shared/dynamic-form/dynamic-form-optio
   templateUrl: './customer-detail.component.html',
   styleUrls: ['./customer-detail.component.scss']
 })
-export class CustomerDetailComponent implements OnInit {
+export class CustomerDetailComponent implements OnInit, AfterViewInit {
 
   showTestValues = true;
 
@@ -42,7 +44,7 @@ export class CustomerDetailComponent implements OnInit {
   customer$: Observable<Customer>;
   customer: Customer;
 
-  customerForm: FormGroup; // = static form
+  // customerForm: FormGroup; // = static form
   hasErrors = false;
   hasChanged = false;
   title = 'Customer';
@@ -58,8 +60,9 @@ export class CustomerDetailComponent implements OnInit {
 
   /** Reference to the dynamic form component */
   /** Not set before AfterViewInit! */
-  @ViewChild(DynamicFormComponent)
-  dynFormComponent: DynamicFormComponent;
+  @ViewChild('customerForm')
+  customerForm: DynamicFormComponent;
+  customerFormHasChanged = false;
 
   /**
    * Questions for generating the dynamic form:
@@ -85,7 +88,7 @@ export class CustomerDetailComponent implements OnInit {
   /** Filter templates */
   // customers: Customer[]; // mockCustomerFilterTemplates;
 
-  customerFormValue: any = {};
+  // customerFormValue: any = {};
 
   customerFormOptions: DynamicFormOptions = {
     formFieldAppearance: 'fill'
@@ -101,10 +104,11 @@ export class CustomerDetailComponent implements OnInit {
     private formBuilder: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private customerService: HttpCustomerService,
+    private customerService: CustomerService,
     private httpErrorHandler: HttpErrorHandler,
     private typesUtilsService: TypesUtilsService,
     private formGroupService: DynamicFormGroupService,
+    private messageService: MessageService,
   ) {
     /** Setting data group names. */
     for (let i = 0; i < 100; i++) {
@@ -118,79 +122,86 @@ export class CustomerDetailComponent implements OnInit {
 
   /**
    * ##################################################################
-   * Loading data (e.g., from customers/id) and updating form when data arrives.
+   * Loading data (from customers/id) and updating form when data arrives.
    *
-   * Note: @ViewChild dynFormComponent (needed in updateForm()) is not set before AfterViewInit!
+   * Note: @ViewChild customerForm (needed in updateCustomerForm()) is not set before AfterViewInit!
    * But it can be done here because customer$.subscribe() takes time.
    * ##################################################################
    */
   ngOnInit() {
 
+    this.logMessage(
+      `(1)[ngOnInit()] this.route = \n ${this.route}`
+    );
+
     if (this.route) {
       this.customer$ = this.route.paramMap.pipe(
         switchMap((params: ParamMap) =>
-          this.customerService.getCustomer(+params.get('id'))));
+          this.customerService.getCustomer(+params.get('id')))
+      );
 
       this.customer$.subscribe(
         res => {
-          console.log('##################' + JSON.stringify(res));
+
+          this.logMessage(
+            `(2)[ngOnInit()] customer = \n ${JSON.stringify(res)}`
+          );
+
           this.customer = res;
 
-          /** Error handler service (in customer service) returns {} in case of an error (e.g. if customer not found).
-           * So we need to check if the customer is defined, not null, *and* not {}. */
-
+          /** Error handler service (in customer service) returns {}
+           * in case of an error (e.g. if customer not found).
+           * So we need to check if the customer is defined, not null;
+           * and not {} by checking customer.name.
+           */
           if (this.customer && this.customer.name) {
 
-            this.updateForm();
-
-
-            /** Build the static customer form */
-            this.buildForm();
+            this.updateCustomerForm(this.customer);
           }
 
-        }); // End of subscribing customer
+        });
     }
 
-  } // End of ngOnInit()
+  }
 
 
-  // ngAfterViewInit() { }
+  ngAfterViewInit() {
+    this.customerForm.form.valueChanges.subscribe(val => {
+
+      this.customerFormHasChanged = true;
+
+    });
+
+  }
 
 
   /**
    * ##################################################################
-   * Update form and add formArray (if exists) in questions.
+   * Update form and add formArray.
    * ##################################################################
    */
-  updateForm() {
+  updateCustomerForm(customer: Customer) {
 
-    /** Update empty form /Set (patch) values /Render the dynamic customer form */
-    this.dynFormComponent.setFormValue(this.customer);
+    this.customerForm.form.patchValue(customer);
 
-
-    // Analog to DynamicFormQuestionComponent!
+    // Adding the formArray that corresponds to the given customer
+    // (analog to DynamicFormQuestionComponent).
     this.customerQuestions.forEach(question => {
-      if (question.controlType === 'formArray' && this.customer[question.name]) {
+      if (question.controlType === 'formArray' && customer[question.name]) {
 
-        if (this.customer[question.name].length > 0) { // e.g. addAddresses
-
-          const l = this.customer[question.name].length;
+        if (customer[question.name].length > 0) {
+          const l = customer[question.name].length; // e.g. number of add. addresses
           for (let i = 0; i < l; i++) {
 
             /** Creating a FormGroup from the given *nested* questions. */
             const formGroup = this.formGroupService.createFormGroup(question.nestedQuestions);
 
             /** Adding this new FormGroup to the FormArray. */
-            const formArray = this.dynFormComponent.form.get(question.name) as FormArray;
+            const formArray = this.customerForm.form.get(question.name) as FormArray;
             formArray.push(formGroup);
 
           }
-
-          // TODO update only address fields?
-          /** Render the dynamic customer form */
-          this.dynFormComponent.setFormValue(this.customer);
-
-
+          this.customerForm.form.patchValue(customer);
         }
 
       }
@@ -208,16 +219,13 @@ export class CustomerDetailComponent implements OnInit {
    * onDynamicFormSubmit
    * ##################################################################
    */
-  onCustomerFormSubmit(value) {
+  onCustomerFormSubmit() {
 
+    // this.updateCustomer(this.customerForm.form.value);
 
-    // this.updateCustomer(value); // fires too often (to be used for update)!
 
     // this.updateCustomer(this.customer);
 
-    // this.customerFormValue = value;
-    // this.selectedFilterTemplate = value;
-    // this.loadCustomers();
   }
 
 
@@ -226,11 +234,10 @@ export class CustomerDetailComponent implements OnInit {
    *2. SaveDyn button. TO DO Create or update customer.
    * ##################################################################
    */
-  saveDyn() {
-    // this.updateCustomer(value);
-    this.updateCustomer(this.dynFormComponent.form.value);
+  // saveDyn() {
+  //   this.updateCustomer(this.customerForm.form.value);
 
-  }
+  // }
 
 
 
@@ -239,27 +246,27 @@ export class CustomerDetailComponent implements OnInit {
    * OLD Build form (static version).
    * ##################################################################
    */
-  buildForm() {
-    this.title = this.customer.id ? 'Update Customer' : 'Create Customer';
+  // buildForm() {
+  //   this.title = this.customer.id ? 'Update Customer' : 'Create Customer';
 
-    this.customerForm = this.formBuilder.group({
-      id: [this.customer.id],
-      name: [this.customer.name, Validators.required],
-      type: [this.customer.type.toString(), Validators.required],
-      status: [this.customer.status.toString(), Validators.required],
-      // Addresses
-      country: [this.customer.country, Validators.required],
-      postalCode: [this.customer.postalCode, Validators.required],
-      city: [this.customer.city, Validators.required],
-      street: [this.customer.street, Validators.required],
-      // Contacts
-      department: [this.customer.department],
-      person: [this.customer.person],
-      phone: [this.customer.phone, Validators.required],
-      email: [this.customer.email, [Validators.required, Validators.email]]
-    });
-    // this.customer.dob = this.typesUtilsService.getDateFromString(this.customer.dateOfBbirth);
-  }
+  //   this.customerForm = this.formBuilder.group({
+  //     id: [this.customer.id],
+  //     name: [this.customer.name, Validators.required],
+  //     type: [this.customer.type.toString(), Validators.required],
+  //     status: [this.customer.status.toString(), Validators.required],
+  //     // Addresses
+  //     country: [this.customer.country, Validators.required],
+  //     postalCode: [this.customer.postalCode, Validators.required],
+  //     city: [this.customer.city, Validators.required],
+  //     street: [this.customer.street, Validators.required],
+  //     // Contacts
+  //     department: [this.customer.department],
+  //     person: [this.customer.person],
+  //     phone: [this.customer.phone, Validators.required],
+  //     email: [this.customer.email, [Validators.required, Validators.email]]
+  //   });
+  //   // this.customer.dob = this.typesUtilsService.getDateFromString(this.customer.dateOfBbirth);
+  // }
 
   /** UI */
   // getTitle(): string {
@@ -305,9 +312,9 @@ export class CustomerDetailComponent implements OnInit {
 
     this.hasErrors = false;
     // this.loadingAfterSubmit = false;
-    const controls = this.customerForm.controls;
+    const controls = this.customerForm.form.controls;
     /** check form */
-    if (this.customerForm.invalid) {
+    if (this.customerForm.form.invalid) {
       Object.keys(controls).forEach(controlName =>
         controls[controlName].markAsTouched()
       );
@@ -371,6 +378,21 @@ export class CustomerDetailComponent implements OnInit {
   onAlertClose($event) {
     this.hasErrors = false;
   }
+
+
+
+
+
+  /** Logging message to console. */
+  private logMessage(message: string) {
+    return this.messageService.logMessage('[customer-detail.component.ts] ' + message);
+  }
+
+  /** Showing a user friendly message. */
+  private showMessage(message: string) {
+    return this.messageService.showMessage('*** ' + message + ' ***');
+  }
+
 }
 
 
@@ -401,12 +423,13 @@ export class CustomerDetailDialogComponent extends CustomerDetailComponent imple
 
     router: Router,
     route: ActivatedRoute,
-    customerService: HttpCustomerService,
+    customerService: CustomerService,
     httpErrorHandler: HttpErrorHandler,
     typesUtilsService: TypesUtilsService,
     formGroupService: DynamicFormGroupService,
+    messageService: MessageService,
   ) {
-    super(formBuilder, router, route, customerService, httpErrorHandler, typesUtilsService, formGroupService);
+    super(formBuilder, router, route, customerService, httpErrorHandler, typesUtilsService, formGroupService, messageService);
     // this.isDialogComponent = true;
   }
 
@@ -418,10 +441,10 @@ export class CustomerDetailDialogComponent extends CustomerDetailComponent imple
 
     this.customer = this.data.customer;
 
-    // @ViewChild dynFormComponent not set before AfterViewInit!
-    this.updateForm();
+    // @ViewChild customerForm not set before AfterViewInit!
+    this.updateCustomerForm(this.customer);
 
-    this.buildForm();
+    // this.buildForm();
   }
 
 

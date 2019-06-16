@@ -114,18 +114,6 @@ export const mockCustomerQuestions: QuestionBase[] = [
     // isDisabled: false,
   },
   {
-    name: 'street',
-    defaultValue: '',
-    label: 'Street',
-    controlType: 'textbox',
-    inputType: 'text',
-    group: 2,
-    groupName: 'Addresses',
-    order: 210,
-    // isRequired: false,
-    // isDisabled: false,
-  },
-  {
     name: 'postalCode',
     defaultValue: '',
     label: 'Postal Code',
@@ -149,6 +137,18 @@ export const mockCustomerQuestions: QuestionBase[] = [
     isRequired: false,
     isDisabled: false,
   },
+  {
+    name: 'street',
+    defaultValue: '',
+    label: 'Street',
+    controlType: 'textbox',
+    inputType: 'text',
+    group: 2,
+    groupName: 'Addresses',
+    order: 210,
+    // isRequired: false,
+    // isDisabled: false,
+  },
 
 
   // Additional Addresses
@@ -160,17 +160,6 @@ export const mockCustomerQuestions: QuestionBase[] = [
     group: 3,
     groupName: 'Additional Addresses',
     nestedQuestions: [
-      {
-        name: 'street',
-        defaultValue: '',
-        label: 'Street',
-        controlType: 'textbox',
-        inputType: 'text',
-        // group: 2,
-        order: 250,
-        // isRequired: false,
-        // isDisabled: false,
-      },
       {
         name: 'postalCode',
         defaultValue: '',
@@ -190,6 +179,17 @@ export const mockCustomerQuestions: QuestionBase[] = [
         inputType: 'text',
         // group: 2,
         order: 270,
+        // isRequired: false,
+        // isDisabled: false,
+      },
+      {
+        name: 'street',
+        defaultValue: '',
+        label: 'Street',
+        controlType: 'textbox',
+        inputType: 'text',
+        // group: 2,
+        order: 250,
         // isRequired: false,
         // isDisabled: false,
       },

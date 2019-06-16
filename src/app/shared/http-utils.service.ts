@@ -67,9 +67,9 @@ export class HttpUtilsService {
 
       filteredItems = this.filterItems(items, queryParams.filter);
 
-      this.log(
-        `[filterAndSort()] filteredItems = \n ${JSON.stringify(filteredItems)}`
-      );
+      // this.log(
+      //   `[filterAndSort()] filteredItems = \n ${JSON.stringify(filteredItems)}`
+      // );
 
 
     }
@@ -104,12 +104,11 @@ export class HttpUtilsService {
 
     queryResult.items = filteredItems;
     queryResult.totalCount = totalCount;
-    // console.log('##########http-utils-service / queryResult: ' + JSON.stringify(queryResult));
 
     return queryResult;
 
 
-  } // filterAndSort().
+  }
 
 
 
@@ -137,6 +136,7 @@ export class HttpUtilsService {
        *
        * For each key in the filter template object ('idFilter', 'nameFilter').
        */
+
       Object.keys(filterTemplate).forEach(filterKey => {
 
         const itemKey = filterKey.replace('Filter', '');
@@ -196,19 +196,15 @@ export class HttpUtilsService {
 
     });
 
-    this.log(
-      `[filterItems()] filteredItems = \n ${JSON.stringify(filteredItems)}`
-    );
-
-    if (this.showTestValues) {
-      console.log('%c########## filteredItems [filterItems()] = \n' +
-        JSON.stringify(filteredItems), 'color: blue');
-    }
+    // this.log(
+    //   `[filterItems()] filteredItems = \n ${JSON.stringify(filteredItems)}`
+    // );
 
 
     return filteredItems;
 
   }
+
 
 
   /**
@@ -267,11 +263,6 @@ export class HttpUtilsService {
         `[searchInAllFields()] searchedItems = \n ${JSON.stringify(searchedItems)}`
       );
 
-      if (this.showTestValues) {
-        console.log('%c########## searchedItems [searchInAllFields()] = \n' +
-          JSON.stringify(searchedItems), 'color: blue');
-      }
-
 
     }
 
@@ -305,7 +296,6 @@ export class HttpUtilsService {
 
     queryResult.items = searchedItems;
     queryResult.totalCount = totalCount;
-    // console.log('##########http-utils-service / queryResult: ' + JSON.stringify(queryResult));
 
     return queryResult;
 
@@ -333,7 +323,7 @@ export class HttpUtilsService {
 
       /**
        * For example:
-       * item = customer : { "id"      : "20018",  "name"      : "Vehicle Risus Foundation" }
+       * item = customer : { "id": "20018",  "name": "Vehicle Risus Foundation" }
        * searchTerm      : "found"
        */
       Object.keys(item).forEach(key => {
@@ -389,10 +379,6 @@ export class HttpUtilsService {
       `[searchedItems()] searchedItems = \n ${JSON.stringify(searchedItems)}`
     );
 
-    if (this.showTestValues) {
-      console.log('%c########## searchedItems [searchItems()] = \n' +
-        JSON.stringify(searchedItems), 'color: blue');
-    }
 
     return searchedItems;
 

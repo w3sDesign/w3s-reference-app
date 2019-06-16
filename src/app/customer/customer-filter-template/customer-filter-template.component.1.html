@@ -112,14 +112,11 @@
         <!-- ############################################################ -->
         <!-- Right drawer for selecting the filters to display -->
 
-        <!-- no matTooltip on *ngFor! Error on routerLink / destroy tooltip -->
-        <!-- Cannot read property 'remove' of undefined -->
-
         <mat-drawer class="mat-elevation-z8" #filterDrawerRef position="end" mode="side" [opened]="'false'">
 
           <table mat-table #selectingFiltersTable [dataSource]="availableFilterNames">
 
-            <ng-container [matColumnDef]="column" *ngFor="let column of ['select3', 'name']; let i = index">
+            <ng-container [matColumnDef]="column" *ngFor="let column of ['select3', 'name']; let i = index" matTooltip="Select which filters to display">
 
               <!-- 'select3' column definition -->
               <ng-container *ngIf="column === 'select3'">

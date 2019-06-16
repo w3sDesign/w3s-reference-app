@@ -5,22 +5,30 @@ import { HomeComponent } from './home/home.component';
 
 import { CustomerModule } from './customer/customer.module';
 
+// https://angular.io/guide/router#lazy-loading-route-configuration
+
 
 const routes: Routes = [
-  {
-    path: 'customers',
-    // err can't find module CustomerModule!!?
-    // loadChildren: './customer/customer.module#CustomerModule'
-    // loadChildren: '../src/app/customer/customer.module#CustomerModule'
 
-    loadChildren: () => CustomerModule
-  },
-  {
-    path: '', component: HomeComponent
-  },
-  {
-    path: 'home', redirectTo: '', pathMatch: 'full'
-  },
+  // Customers not lazy loaded! Eager loaded with root app
+  // {
+  //   path: 'customers',
+  //   loadChildren: () => import('./customer/customer.module')
+  //     .then(mod => mod.CustomerModule),
+
+  //   // err can't find module CustomerModule!!?
+  //   // loadChildren: './customer/customer.module#CustomerModule'
+  //   // loadChildren: '../src/app/customer/customer.module#CustomerModule'
+  //   // loadChildren: () => CustomerModule
+  // },
+
+
+  // {
+  //   path: 'home', component: HomeComponent
+  // },
+
+  { path: '', redirectTo: '/customers', pathMatch: 'full' },
+
   {
     path: '**', component: HomeComponent
     // { path: '**', component: PageNotFoundComponent }
@@ -29,10 +37,10 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forRoot(
-    routes,
-    {
+    routes, {
       enableTracing: true,
-      preloadingStrategy: PreloadAllModules
+      // Preload all lazy loaded modules.
+      // preloadingStrategy: PreloadAllModules
     })],
   exports: [RouterModule]
 })

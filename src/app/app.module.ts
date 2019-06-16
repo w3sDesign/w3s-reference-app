@@ -8,12 +8,13 @@ import { LayoutModule } from '@angular/cdk/layout';
 // import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 // import { environment } from '../environments/environment';
 
-// import { CustomerModule } from './customers/customer.module';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 
+import { CustomerModule } from './customer/customer.module';
+import { CustomerRoutingModule } from './customer/customer-routing.module';
 
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
 import { MessageSnackBarComponent } from './shared/message-snack-bar/message-snack-bar.component';
@@ -27,7 +28,7 @@ import { SharedMaterialModule } from './shared/shared-material.module';
 
 
 @NgModule({
-
+  // Module import order matters!
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -35,8 +36,11 @@ import { SharedMaterialModule } from './shared/shared-material.module';
     ReactiveFormsModule,
     LayoutModule,
     SharedMaterialModule,
+    CustomerModule,
     // MatSnackBarModule,
-    AppRoutingModule,
+    // Each routing module augments the route configuration in the order of import.
+    CustomerRoutingModule,
+    AppRoutingModule, // must be the last
   ],
 
   declarations: [

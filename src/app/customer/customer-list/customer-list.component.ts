@@ -37,6 +37,7 @@ import { mockCustomers } from '../model/mock-customers';
 
 import { CustomerService } from '../model/customer.service';
 import { HttpCustomerService } from '../model/http-customer.service';
+import { FocusMonitor } from '@angular/cdk/a11y';
 
 
 
@@ -79,7 +80,7 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
   /** = selected columns!
    * The columns that should be displayed in the data table */
   columnsToDisplay: string[] = [
-    'select', 'id', 'name', 'country', 'postalCode', 'city', 'phone', 'email'
+    'select', 'id', 'name', 'country', 'city', 'phone', 'email'
   ];
 
 
@@ -123,6 +124,7 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
     private router: Router,
     private formGroupService: DynamicFormGroupService,
     private dialog: MatDialog,
+    private focusMonitor: FocusMonitor
   ) {
 
     // this.filterTemplateQuestions = this.generateFilterTemplateQuestions();
@@ -136,6 +138,9 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
     //   console.log('%c########## this.filterTemplateForm.form.value [ngAfterViewInit()] = \n' +
     //     JSON.stringify(this.filterTemplateForm.form.value), 'color: blue');
     // }
+
+    this.focusMonitor.stopMonitoring(document.getElementById('testLink1'));
+    this.focusMonitor.stopMonitoring(document.getElementById('test1'));
 
   }
 
@@ -387,7 +392,7 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
   /**
   * Navigate to customer detail.
   */
-  goToCustomerDetail(row: Customer) {
+  navigateToCustomerDetail(row: Customer) {
     this.selectedCustomer = row;
     this.router.navigate(['/customers', row.id]);
   }

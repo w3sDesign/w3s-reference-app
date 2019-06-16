@@ -39,8 +39,8 @@ import { environment } from '../../environments/environment';
           dataEncapsulation: false
         }),
 
-    CustomerRoutingModule,
-    SharedModule,
+        SharedModule,
+        CustomerRoutingModule,
   ],
 
   declarations: [

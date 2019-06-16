@@ -1,7 +1,7 @@
 <div class="w3s-app-component">
 
   <!-- ################################################ -->
-  <!-- Fixed top toolbar -->
+  <!-- mat-toolbar (fixed top toolbar) -->
   <!-- ################################################ -->
 
   <!-- mat-toolbar = flex-box -->
@@ -31,22 +31,21 @@
 
 
 
-  <!-- ############################################################## -->
-  <!-- sidenav container -->
-  <!-- ############################################################## -->
+
 
   <mat-sidenav-container>
 
 
     <!-- ############################################################ -->
-    <!-- Fixed left sidenav -->
+    <!-- mat-sidenav (fixed left sidenav) -->
     <!-- ############################################################ -->
 
     <!-- mat-sidenav mode: over (=default) | push | side (=side by side with main content) -->
     <!-- [mode]="(isSmallScreen | async) ? 'side' : 'side'" -->
     <!-- Open side nav only if not small screen (small = max-width: 1023px). -->
 
-    <mat-sidenav id="sidenav" #sidenavRef fixedInViewport="true" mode="side" [opened]="openSideNav ? !(isSmallScreen | async) : false" [attr.role]="(isSmallScreen | async) ? 'dialog':'navigation'">
+    <mat-sidenav id="sidenav" #sidenavRef fixedInViewport="true" mode="side" [opened]="openSideNav ? !(isSmallScreen | async) : false" >
+    <!-- [attr.role]="(isSmallScreen | async) ? 'dialog':'navigation'"> -->
 
 
       <h6>MASTER DATA</h6>
@@ -61,6 +60,7 @@
 
         <mat-nav-list>
           <a mat-list-item routerLink="/customers">Manage Customers</a>
+          <a mat-list-item [routerLink]="['/customers', 20000]">Only for Test Customer 20000 Detail</a>
           <a mat-list-item routerLink="/customers"> More . . .</a>
         </mat-nav-list>
         <!-- </mat-expansion-panel-body> -->
@@ -94,8 +94,8 @@
         </mat-expansion-panel-header>
 
         <mat-nav-list>
-          <a mat-list-item routerLink="/products">Manage Products</a>
-          <a mat-list-item routerLink="/products"> More . . .</a>
+          <a mat-list-item routerLink="/customers">Manage Products</a>
+          <a mat-list-item routerLink="/customers"> More . . .</a>
         </mat-nav-list>
 
       </mat-expansion-panel>
@@ -114,7 +114,7 @@
 
         <mat-nav-list>
           <a mat-list-item routerLink="/customers">Sales Order</a>
-          <a mat-list-item routerLink="/filter-customers">Line Items</a>
+          <a mat-list-item routerLink="/customers">Line Items</a>
         </mat-nav-list>
 
       </mat-expansion-panel>
@@ -141,17 +141,17 @@
 
 
     <!-- ############################################################ -->
-    <!-- Main content -->
+    <!-- mat-sidenav-content (main content) -->
     <!-- ############################################################ -->
 
     <mat-sidenav-content>
 
 
-      <!-- ########################################################## -->
+    <!-- ########################################################## -->
 
-      <router-outlet></router-outlet>
+    <router-outlet></router-outlet>
 
-      <!-- ########################################################## -->
+    <!-- ########################################################## -->
 
 
     </mat-sidenav-content>

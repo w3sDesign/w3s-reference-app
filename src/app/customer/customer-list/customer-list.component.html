@@ -1,5 +1,9 @@
 <div class="w3s-list-component mat-elevation-z8">
 
+  <a id="testLink1" [routerLink]="['/customers', 20000]">
+    Test routerLink /customers 20000
+  </a>
+  <!-- routerLink="/customers/20000" also ok!? -->
 
   <!-- ############################################################ -->
   <!-- ############################################################ -->
@@ -71,31 +75,41 @@
     <!-- ############################################################ -->
     <!-- Right drawer for selecting the columns to display -->
 
+    <!-- no matTooltip on *ngFor! Error on routerLink / destroy tooltip -->
+    <!-- Cannot read property 'remove' of undefined -->
+
+
     <mat-drawer #columnDrawerRef position="end" mode="side" [opened]="'false'" class="mat-elevation-z8">
 
-      <table mat-table #selectingColumnsTable [dataSource]="availableColumns">
+      <table id="test1" mat-table #selectingColumnsTable [dataSource]="availableColumns">
 
-        <ng-container [matColumnDef]="column" *ngFor="let column of ['select2', 'name']; let i = index" matTooltip="Select which columns to display">
+        <ng-container [matColumnDef]="column" *ngFor="let column of ['select2', 'name']; let i = index">
 
-          <!-- Selection/Checkbox column/cell definition -->
+          <!-- Select column definition -->
           <ng-container *ngIf="column === 'select2'">
+
             <th mat-header-cell *matHeaderCellDef>
               <mat-checkbox (change)="$event ? masterToggle2() : null; setColumnsToDisplay()" [checked]="columnSelection.hasValue() && allColumnsSelected()" [indeterminate]="columnSelection.hasValue() && !allColumnsSelected()">
               </mat-checkbox>
             </th>
+
             <!-- row from dataSource -->
             <td mat-cell *matCellDef="let row">
               <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? columnSelection.toggle(row) : null; setColumnsToDisplay()" [checked]="columnSelection.isSelected(row)">
               </mat-checkbox>
             </td>
+
           </ng-container>
 
-          <!-- All other column/cell definitions -->
+          <!-- All other column definitions -->
           <ng-container *ngIf="column !== 'select2'">
+
             <th mat-header-cell *matHeaderCellDef>
               Select Columns
             </th>
+
             <td mat-cell *matCellDef="let row">{{row | titlecase}}</td>
+
           </ng-container>
 
         </ng-container>
@@ -112,7 +126,7 @@
 
     <mat-drawer-content>
 
-      <div *ngIf="showTestValues" class="showTestValues">
+      <div *ngIf="showTestValues" class="w3s-show-test-values">
         <br>########## availableColumns = <br> {{availableColumns | json}}
         <br>########## columnsToDisplay = <br> {{columnsToDisplay | json}}
       </div>
@@ -126,26 +140,38 @@
 
         <ng-container [matColumnDef]="column" *ngFor="let column of availableColumns; let i = index">
 
-          <!-- Selection/Checkbox column/cell definition -->
+          <!-- Select column definition -->
           <ng-container *ngIf="column === 'select'">
+
             <th mat-header-cell *matHeaderCellDef>
               <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="rowSelection.hasValue() && allRowsSelected()" [indeterminate]="rowSelection.hasValue() && !allRowsSelected()">
               </mat-checkbox>
             </th>
+
+            <!-- row from dataSource -->
             <td mat-cell *matCellDef="let row">
-              <!-- row from dataSource -->
               <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? rowSelection.toggle(row) : null" [checked]="rowSelection.isSelected(row)">
               </mat-checkbox>
             </td>
+
           </ng-container>
 
-          <!-- All other column/cell definitions -->
+          <!-- All other column definitions -->
           <ng-container *ngIf="column !== 'select'">
+
             <th mat-header-cell *matHeaderCellDef mat-sort-header cdkDropList cdkDropListLockAxis="x" cdkDropListOrientation="horizontal" (cdkDropListDropped)="dropListDropped($event, i)" cdkDrag (cdkDragStarted)="dragStarted($event, i)" [cdkDragData]="{name: column, columnIndex: i}">
               {{column | titlecase}}
               <!-- <div class="example-handle" cdkDragHandle></div> -->
             </th>
-            <td mat-cell *matCellDef="let row">{{row[column]}}</td>
+
+            <!-- row from dataSource -->
+            <!-- <td mat-cell *matCellDef="let row" (click)="navigateToCustomerDetail(row)"> -->
+            <td mat-cell *matCellDef="let row">
+              <a [routerLink]="['/customers', row.id]">
+                {{row[column]}}
+              </a>
+            </td>
+
           </ng-container>
 
         </ng-container>
@@ -153,12 +179,13 @@
 
         <!-- Row definitions -->
         <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-        <tr mat-row *matRowDef="let row; columns: columnsToDisplay;" (click)="goToCustomerDetail(row)">
+
+        <!-- <tr mat-row *matRowDef="let row; columns: columnsToDisplay;" (click)="navigateToCustomerDetail(row)">
+        </tr> -->
+
+        <tr mat-row *matRowDef="let row; columns: columnsToDisplay;" (click)="rowSelection.toggle(row)">
         </tr>
-        <!--
-      <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"
-          (click)="rowSelection.toggle(row)">
-      -->
+
 
       </table>
 

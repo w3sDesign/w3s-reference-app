@@ -151,9 +151,11 @@
       <button mat-raised-button color="nixprimary" (click)="addFormGroup()">Add Address</button>
 
 
-      <div *ngIf="showTestValues" class="showTestValues">
-        <br>##########getFormArray() = form.get(this.question.name) as FormArray:<br> {{getFormArray()}}
-        <br>##########question.nestedQuestions:<br> {{question.nestedQuestions | json}}
+      <div *ngIf="showTestValues" class="w3s-show-test-values">
+
+        <br>########## getFormArray().controls = ?form.get(this.question.name) as FormArray:<br> {{getFormArray().controls}}
+        <br>########## question.nestedQuestions = <br> {{question.nestedQuestions | json}}
+
       </div>
 
     </ng-container>
