@@ -1,11 +1,11 @@
-import { Component, ElementRef, OnInit, ViewChild, ViewContainerRef, AfterViewInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, ElementRef, OnInit, ViewChild, ViewContainerRef, AfterViewInit, OnChanges } from '@angular/core';
+import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { CdkDragStart, CdkDropList, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 import { MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTable } from '@angular/material';
 
-import { fromEvent, merge, Observable } from 'rxjs';
+import { fromEvent, merge, Observable, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap, switchMap } from 'rxjs/operators';
 
 import { Customer } from '../model/customer';
@@ -37,7 +37,8 @@ import { mockCustomers } from '../model/mock-customers';
 
 import { CustomerService } from '../model/customer.service';
 import { HttpCustomerService } from '../model/http-customer.service';
-import { FocusMonitor } from '@angular/cdk/a11y';
+import { MessageService } from '../../shared/message.service';
+// import { FocusMonitor } from '@angular/cdk/a11y';
 
 
 
@@ -52,7 +53,7 @@ import { FocusMonitor } from '@angular/cdk/a11y';
  * ####################################################################
  */
 
-export class CustomerListComponent implements OnInit, AfterViewInit {
+export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
 
   showTestValues = true;
   // consoleLogStyle = 'color: blue; font-weight: 500; line-height: 20px;';
@@ -66,22 +67,42 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
 
   customers: Customer[] = [];
   selectedCustomer: Customer;
+  selectedCustomerId: number;
+  // new used instead of customers?
+  // customers$: Observable<Customer[]>;
+
+  /** activated = selected with user input */
+  /** Values set in onQueryParamsChange() from filter-template component */
+  // activatedFilterTemplateId: number;
+  // activatedFilters: any;
+  // activatedSearchTerm: string;
+
+  // Most recently activated query params.
+  activatedQueryParams: QueryParams;
+  //////////////////////////////////
+
+
+  // new From router / activated route
+  // routeCustomerId: number;
+  // routeFilterTemplateId: number;
 
   // customerQuestions: QuestionBase[] = mockCustomerQuestions.slice();
 
-  /** All available columns that can be displayed in the data table . */
-  // TODO from questions
+  /** All possible columns that can be displayed. */
+  // TODO should be generated from questions
   availableColumns: string[] = [
     'select', 'id', 'name', 'type', 'status', 'comment', 'creationDate',
     'country', 'postalCode', 'city', 'street',
     'department', 'person', 'phone', 'email'
   ];
 
-  /** = selected columns!
-   * The columns that should be displayed in the data table */
-  columnsToDisplay: string[] = [
+  /** Columns displayed in the data table */
+  /** = selected in the columnSelection table */
+  displayedColumns: string[] = [
     'select', 'id', 'name', 'country', 'city', 'phone', 'email'
   ];
+
+
 
 
   /** Data table paginator */
@@ -93,177 +114,162 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
   // /** Searching in all fields */
   // @ViewChild('searchInput') searchInput: ElementRef;
 
-  /** Selection handling - data table rows. */
-  rowSelection = new SelectionModel<Customer>(true, []);
+  /** Customer selection handling (selecting data table rows). */
+  customerSelection = new SelectionModel<Customer>(true, []);
+
+  /** Column selection handling (selecting which columns to display). */
+  /** Args: allowMultiSelect, initialSelection */
+  columnSelection = new SelectionModel<string>(true, this.displayedColumns);
+
+  /** Table for column selection. */
+  @ViewChild('columnSelectionTable') columnSelectionTable: MatTable<string[]>;
+
 
 
   /** Create/Update/Delete buttons */
   @ViewChild('crudButtons', { read: ViewContainerRef }) crudButtons;
-
-
-  /** Table for selecting the columns to display. */
-  @ViewChild('selectingColumnsTable') selectingColumnsTable: MatTable<string[]>;
-
-
-  /** Selection handling - columns to display. */
-  /** Args: allowMultiSelect, initialSelection */
-  columnSelection = new SelectionModel<string>(true, this.columnsToDisplay);
-
 
   /** For drag and drop main table columns. */
   previousDragIndex: number;
 
 
 
-  // ##################################################################
-  // Constructor
+
+  // Component constructor.
   // ##################################################################
 
   constructor(
     private customerService: CustomerService,
     private router: Router,
+    private route: ActivatedRoute,
     private formGroupService: DynamicFormGroupService,
     private dialog: MatDialog,
-    private focusMonitor: FocusMonitor
+    private messageService: MessageService,
+    // private focusMonitor: FocusMonitor
   ) {
 
+    this.dataSource = new CustomerDataSource(this.customerService);
     // this.filterTemplateQuestions = this.generateFilterTemplateQuestions();
+
+    this.activatedQueryParams = new QueryParams();
   }
 
 
-
-  ngAfterViewInit() {
-
-    // if (this.showTestValues) {
-    //   console.log('%c########## this.filterTemplateForm.form.value [ngAfterViewInit()] = \n' +
-    //     JSON.stringify(this.filterTemplateForm.form.value), 'color: blue');
-    // }
-
-    this.focusMonitor.stopMonitoring(document.getElementById('testLink1'));
-    this.focusMonitor.stopMonitoring(document.getElementById('test1'));
-
-  }
-
-
+  // Component lifecycle hook.
   // ##################################################################
-  // OnInit
-  // ##################################################################
+  // Called once after creating the component,
+  // but before creating child components.
 
   ngOnInit() {
 
-    // Subscribing to sort and page changes.
-    // ################################################################
-    // Whenever a sort/page change event is emitted, a data load will be triggered.
+    this.logMessage(`[ngOnInit()] ########################################`);
 
+    // Observing if activated route includes query params
+    // (from navigateToList() in CustomerDetailComponent).
+
+    this.route.paramMap.pipe(
+      switchMap((routeParams: ParamMap) => {
+
+        // = 0 when id is null (because + converts null to 0)
+        // this.selectedCustomerId = +this.route.snapshot.paramMap.get('id');
+
+        this.selectedCustomerId = +routeParams.get('id');
+
+
+        const qp = routeParams.get('queryParams');
+
+        this.logMessage(
+          `[ngOnInit()] routeParams.get('queryParams') = ${qp}`
+        );
+
+        if (qp) {
+
+          this.activatedQueryParams = JSON.parse(qp) as QueryParams;
+
+          // this.dataSource.getCustomers(JSON.parse(qp) as QueryParams);
+
+          // } else {
+
+          //   this.dataSource.getCustomers(this.activatedQueryParams);
+
+        }
+
+        this.dataSource.getCustomers(this.activatedQueryParams);
+        ////////////////////////////////////////////////////////
+
+
+        return of(routeParams);
+      })
+    ).subscribe();
+
+
+
+
+
+
+    // Setting this.customers object array.
+    this.dataSource.customers$
+      .subscribe(res => this.customers = res);
+
+  }
+
+
+
+  // Component lifecycle hook.
+  // ##################################################################
+  // Called once after creating the child components.
+
+  ngAfterViewInit() {
+
+    this.logMessage(`[ngAfterViewInit()] ========================================`);
+
+    this.logMessage(
+      `[ngAfterViewInit()] this.customers = \n ${JSON.stringify(this.customers)}`
+    );
+
+
+
+
+
+
+    // Observing if either active sort or sort direction changes.
     this.sort.sortChange
       .subscribe(() => {
-        this.getCustomers();
-        /** Reset to first page */
+
+        this.activatedQueryParams.sortField = this.sort.active;
+        this.activatedQueryParams.sortOrder = this.sort.direction;
+        // Reset to first page.
+        this.activatedQueryParams.pageNumber = 0;
         this.paginator.pageIndex = 0;
+
+        // Load data
+        this.dataSource.getCustomers(this.activatedQueryParams);
       });
 
+    // Observing if either page size or page index changes.
     this.paginator.page
-      .subscribe(() => this.getCustomers());
+      .subscribe(() => {
+
+        this.activatedQueryParams.pageNumber = this.paginator.pageIndex;
+        this.activatedQueryParams.pageSize = this.paginator.pageSize;
+
+        this.dataSource.getCustomers(this.activatedQueryParams);
+      });
 
 
-
-    // Performing initial data load.
-    // ################################################################
-    // Delegating data access to the CustomerDataSource object.
-
-    this.dataSource = new CustomerDataSource(this.customerService);
-
-    // const queryParams = new QueryParams();
-    // this.dataSource.getCustomers(queryParams);
-
-    // this.getCustomers();
-
-    this.dataSource.customers
-      .subscribe(
-        res => this.customers = res
-      );
-
-    // this.setColumnsToDisplay();
-
-  } // ngOnInit()
-
-
-
-
-  // ####################################################################
-  // Methods
-  // ####################################################################
-
-
-
-  /**
-   * Setting query parameters and getting customers from dataSource.
-   * ##################################################################
-   */
-  getCustomers(params?: QueryParams) {
-
-    // Test
-    // if (this.filterTemplateForm.form.value) {
-
-    // (1) Setting queryParams.
-    const queryParams = new QueryParams();
-
-    if (params) {
-      queryParams.searchTerm = params.searchTerm;
-      queryParams.filter = params.filter;
-    }
-
-    // if (this.showTestValues) {
-    //   console.log('%c########## queryParams [getCustomers()] = \n' +
-    //     JSON.stringify(queryParams), 'color: darkblue');
-    // }
-
-    queryParams.sortOrder = this.sort.direction;
-    // The id of the column being sorted.
-    queryParams.sortField = this.sort.active;
-    queryParams.pageNumber = this.paginator.pageIndex;
-    queryParams.pageSize = this.paginator.pageSize;
-
-    // (2) Getting customers from dataSource.
-    this.dataSource.getCustomers(queryParams);
-    /////////////////////////////////////////
-
-
-    // (3) Update activeFilters.
-    // this.activeFilters = [];
-    // const obj1 = queryParams.filter; // = this.filterTemplateForm.form.value;
-    // for (const key in obj1) {
-    //   if (obj1[key]) {
-    //     this.activeFilters.push(key);
-    //   }
-    // }
-
-    // const nr = this.activeFilters.length;
-    // this.activeFiltersText = (nr === 0) ? 'Currently no filters active.'
-    //   : (nr === 1) ? 'Currently 1 filter active: ' : `Currently ${nr} filters active: `;
-
-    this.rowSelection.clear();
-
-    // }
   }
 
 
+  // Component lifecycle hook.
+  // ##################################################################
+  // Called whenever data-bound input properties change.
 
+  ngOnChanges() {
 
+    this.logMessage(
+      `[ngOnChanges()]`
+    );
 
-
-  /**
-   * Sets which columns to display in the data table.
-   * ##################################################################
-   */
-  setColumnsToDisplay() {
-    this.columnsToDisplay = [];
-    this.availableColumns.forEach((column, index) => {
-      if (this.columnSelection.isSelected(column)) {
-        this.columnsToDisplay.push(column);
-      }
-    });
-    this.selectingColumnsTable.renderRows();
   }
 
 
@@ -272,18 +278,21 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
 
 
 
-
   // ##################################################################
-  // Helpers
+  // Component public member methods (in alphabetical order).
   // ##################################################################
 
-  /** Whether number of selected rows matches total number of rows. */
-  allRowsSelected(): boolean {
-    const selected = this.rowSelection.selected.length;
+
+
+  /** Whether number of selected customers matches total number of customers. */
+  allCustomersSelected(): boolean {
+    const selected = this.customerSelection.selected.length;
     const all = this.customers.length;
     return selected === all;
   }
-  // Selecting the columns to display.
+
+
+  /** Whether number of selected columns matches total number of columns. */
   allColumnsSelected(): boolean {
     const selected = this.columnSelection.selected.length;
     const all = this.availableColumns.length;
@@ -291,17 +300,78 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
   }
 
 
-  /** Selects all rows if not all selected; otherwise clears selection. */
-  masterToggle() {
-    this.allRowsSelected() ?
-      this.rowSelection.clear() :
-      this.customers.forEach(customer => this.rowSelection.select(customer));
+  /**
+   * Create a customer (by updating an empty customer).
+   * ##################################################################
+   */
+
+  createCustomer() {
+
+    // Creating an empty customer with id = 0.
+    // const customer = new Customer();
+
+    // Updating this empty customer.
+    // this.updateCustomer(customer);
+
+    this.navigateToDetail(0);
+
   }
-  // Selecting the columns to display.
-  masterToggle2() {
-    this.allColumnsSelected() ?
-      this.columnSelection.clear() :
-      this.availableColumns.forEach(column => this.columnSelection.select(column));
+
+
+
+
+  /**
+   * Delete selected customer(s).
+   * ##################################################################
+   */
+
+  deleteCustomers() {
+    if (this.customerSelection.isEmpty()) {
+      this.dialog.open(MessageDialogComponent, {
+        data: {
+          title: 'Delete Customers',
+          message: `Please select the customer(s) to delete.`,
+          showActions: false
+        }
+      });
+      return;
+    }
+
+    const numberOfSelections = this.customerSelection.selected.length;
+    const customer_s = numberOfSelections <= 1 ? 'customer' : `${numberOfSelections} customers`;
+
+    const dialogRef = this.dialog.open(MessageDialogComponent, {
+      data: {
+        title: 'Delete Customers',
+        message: `Are you sure to permanently delete the selected ${customer_s}?`,
+        showActions: true
+      }
+    });
+
+    dialogRef.afterClosed()
+      .subscribe(
+        ok => {
+          if (!ok) { return; }
+
+          // Start deleting. Identify selected customers.
+          const ids: number[] = [];
+          for (let i = 0; i < numberOfSelections; i++) {
+            ids.push(this.customerSelection.selected[i].id);
+          }
+
+          // Delete identified (selected) customers.
+          /////////////////////////////////////////
+          this.customerService.deleteCustomers(ids)
+            .subscribe(
+              () => {
+                this.paginator.pageIndex = 0;
+                this.dataSource.getCustomers(this.activatedQueryParams);
+                this.customerSelection.clear();
+              },
+              // err handled in customerService
+            );
+        }
+      );
   }
 
 
@@ -309,13 +379,14 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
    * Drag and drop table columns
    * ##################################################################
    */
+
   dragStarted(event: CdkDragStart, index: number) {
     this.previousDragIndex = index;
   }
   dropListDropped(event: CdkDropList, index: number) {
     if (event) {
       moveItemInArray(this.availableColumns, this.previousDragIndex, index);
-      this.setColumnsToDisplay();
+      this.setDisplayedColumns();
     }
   }
 
@@ -329,29 +400,133 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
 
 
 
+
+
   /**
-   * ##################################################################
-   * Create a customer (by updating a new customer).
+   * Getting most recently activated query parameters.
    * ##################################################################
    */
-  createCustomer() {
-    // Create a new customer with defaults.
-    const customer = new Customer();
-    // Update the customer.
-    this.updateCustomer(customer);
+
+  // NIXgetQueryParams(): QueryParams {
+
+  //   const queryParams = new QueryParams();
+
+  //   queryParams.filterTemplateId = this.activatedFilterTemplateId;
+
+  //   if (this.activatedFilters) { queryParams.filter = this.activatedFilters; }
+  //   if (this.activatedSearchTerm) { queryParams.searchTerm = this.activatedSearchTerm; }
+
+  //   queryParams.sortOrder = this.sort.direction;
+  //   queryParams.sortField = this.sort.active;
+
+  //   queryParams.pageNumber = this.paginator.pageIndex;
+  //   queryParams.pageSize = this.paginator.pageSize;
+
+  //   return queryParams;
+
+  // }
+
+
+
+
+
+  /**
+ * Navigating to the CustomerDetailComponent.
+ * ##################################################################
+ */
+
+  // navigateToDetail(row: Customer) {
+  navigateToDetail(id: number) {
+
+    // this.selectedCustomer = row; // needed? Test
+
+    // this.router.navigate(['/customers', row.id, { ftid: this.activatedFilterTemplateId }]);
+
+    // this.router.navigate(['/customers', row.id, this.activatedQueryParams]);
+
+    // this.router.navigate(['/customers', row.id, { queryParams: JSON.stringify(this.activatedQueryParams) }]);
+
+    this.router.navigate(['/customers', id, { ids: 10, queryParams: JSON.stringify(this.activatedQueryParams) }]);
   }
 
 
 
+
+
   /**
-   * ##################################################################
-   * Update selected customers (by opening a modal dialog.
-   * TODO: multiple selections
+   * Filters and search term emitted by the filter-template component.
    * ##################################################################
    */
-  updateCustomer(customer?: Customer) {
+
+  onQueryParamsChange(params: QueryParams) {
+
+    this.activatedQueryParams.filterTemplateId = params.filterTemplateId;
+    this.activatedQueryParams.filter = params.filter;
+    this.activatedQueryParams.searchTerm = params.searchTerm;
+
+    this.activatedQueryParams.pageNumber = 0;
+
+    // this.activatedFilterTemplateId = params.filterTemplateId;
+    // this.activatedFilters = params.filter;
+    // this.activatedSearchTerm = params.searchTerm;
+
+    this.paginator.pageIndex = 0;
+
+    this.logMessage(
+      `[onQueryParamsChange()] this.activatedQueryParams.filter = \n ${JSON.stringify(this.activatedQueryParams.filter)}`
+    );
+
+    this.dataSource.getCustomers(this.activatedQueryParams);
+    /////////////////////////////////////////
+
+    this.customerSelection.clear();
+
+  }
+
+
+
+
+  /**
+   * Sets which columns to display in the data table.
+   * ##################################################################
+   */
+
+  setDisplayedColumns() {
+    this.displayedColumns = [];
+    this.availableColumns.forEach((column, index) => {
+      if (this.columnSelection.isSelected(column)) {
+        this.displayedColumns.push(column);
+      }
+    });
+    this.columnSelectionTable.renderRows();
+  }
+
+
+  /** Selects all customers if not all selected; otherwise clears selection. */
+  toggleAllCustomers() {
+    this.allCustomersSelected() ?
+      this.customerSelection.clear() :
+      this.customers.forEach(customer => this.customerSelection.select(customer));
+  }
+
+
+  /** Selects all columns if not all selected; otherwise clears selection. */
+  toggleAllColumns() {
+    this.allColumnsSelected() ?
+      this.columnSelection.clear() :
+      this.availableColumns.forEach(column => this.columnSelection.select(column));
+  }
+
+
+  /**
+   * Update selected customers (by opening a modal dialog.
+   * ##################################################################
+   * TODO: multiple selections
+   */
+
+  ORIGupdateCustomer(customer?: Customer) {
     if (!customer) {
-      if (this.rowSelection.isEmpty()) {
+      if (this.customerSelection.isEmpty()) {
         this.dialog.open(MessageDialogComponent, {
           data: {
             title: 'Update Selected Customers',
@@ -362,7 +537,7 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
         });
         return;
       }
-      customer = this.rowSelection.selected[0];
+      customer = this.customerSelection.selected[0];
     }
 
     const dialogConfig = new MatDialogConfig();
@@ -382,74 +557,92 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
       .subscribe(
         res => {
           if (!res) { return; }
-          this.getCustomers();
+          this.paginator.pageIndex = 0;
+          this.dataSource.getCustomers(this.activatedQueryParams);
+          this.customerSelection.clear();
         }
       );
   }
 
-
-
   /**
-  * Navigate to customer detail.
-  */
-  navigateToCustomerDetail(row: Customer) {
-    this.selectedCustomer = row;
-    this.router.navigate(['/customers', row.id]);
-  }
-
-
-  /**
+   * New: Update selected customers (by navigating to detail component).
    * ##################################################################
-   * Delete selected customer(s).
-   * ##################################################################
+   * TODO: multiple selections
    */
-  deleteCustomers() {
-    if (this.rowSelection.isEmpty()) {
+
+  updateCustomer(id?: number) {
+
+    // Create customer.
+    // if (id === 0) {
+    //   this.navigateToDetail(0);
+    // }
+
+    // (1) Update customer with the clicked row.id.
+
+    if (id) {
+
+      // NavigateToDetail /////////////////////////////////////////////
+      this.router.navigate(['/customers', id,
+        { queryParams: JSON.stringify(this.activatedQueryParams) }
+      ]);
+      /////////////////////////////////////////////////////////////////
+      return;
+    }
+
+    if (this.customerSelection.isEmpty()
+      || !this.customerSelection.selected.length) {
+
       this.dialog.open(MessageDialogComponent, {
         data: {
-          title: 'Delete Customers',
-          message: `Please select the customer(s) to delete.`,
+          title: 'Update Selected Customers',
+          message:
+            'Please select the customers to update.',
           showActions: false
         }
       });
       return;
     }
 
-    const numberOfSelections = this.rowSelection.selected.length;
-    const customer_s = numberOfSelections <= 1 ? 'customer' : `${numberOfSelections} customers`;
+    // Update customers with the selected ids.
 
-    const dialogRef = this.dialog.open(MessageDialogComponent, {
-      data: {
-        title: 'Delete Customers',
-        message: `Are you sure to permanently delete the selected ${customer_s}?`,
-        showActions: true
-      }
-    });
+    const ids: number[] = [];
+    for (let i = 0; i < this.customerSelection.selected.length; i++) {
+      ids[i] = this.customerSelection.selected[i].id;
+    }
+    // const customer1 = this.customerSelection.selected[0];
 
-    dialogRef.afterClosed()
-      .subscribe(
-        ok => {
-          if (!ok) { return; }
+    // this.navigateToDetail(this.customerSelection.selected[0].id);
+    // this.navigateToDetail(ids[0]);
 
-          // Start deleting. Identify selected customers.
-          const ids: number[] = [];
-          for (let i = 0; i < numberOfSelections; i++) {
-            ids.push(this.rowSelection.selected[i].id);
-          }
+    // NavigateToDetail ///////////////////////////////////////////////
+    this.router.navigate(['/customers', ids[0],
+      { ids: ids, queryParams: JSON.stringify(this.activatedQueryParams) }
+    ]);
+    //////////////////////////////////////////////////////////////////
 
-          // Delete identified (selected) customers.
-          // ##########################################################
-          this.customerService.deleteCustomers(ids)
-            .subscribe(
-              () => {
-                this.getCustomers();
-                this.rowSelection.clear();
-              },
-              // err handled in customerService
-            );
-        }
-      );
   }
+
+
+
+
+
+
+  // ##################################################################
+  // Component non public member methods.
+  // ##################################################################
+
+
+  /** Logging message to console. */
+  private logMessage(message: string) {
+    return this.messageService.logMessage('[customer-list.component.ts] ' + message);
+  }
+
+  /** Showing a user friendly message. */
+  private showMessage(message: string) {
+    return this.messageService.showMessage('*** ' + message + ' ***');
+  }
+
+
 
 
 
@@ -473,3 +666,39 @@ export class CustomerListComponent implements OnInit, AfterViewInit {
 // const numbers = interval(1000);
 // numbers.subscribe(x => console.log(x));
 ///////////////////////////////////////
+
+
+/**
+   * Setting query parameters and getting customers from dataSource.
+   * ##################################################################
+   */
+
+  // NIXgetCustomers(params?: QueryParams) {
+
+  //   // Test
+  //   // if (this.filterTemplateForm.form.value) {
+
+  //   // (1) Setting queryParams.
+  //   const queryParams = new QueryParams();
+
+  //   if (params) {
+  //     queryParams.searchTerm = params.searchTerm;
+  //     queryParams.filter = params.filter;
+  //   }
+
+  //   // if (this.showTestValues) {
+  //   //   console.log('%c########## queryParams [getCustomers()] = \n' +
+  //   //     JSON.stringify(queryParams), 'color: darkblue');
+  //   // }
+
+  //   queryParams.sortOrder = this.sort.direction;
+  //   // The id of the column being sorted.
+  //   queryParams.sortField = this.sort.active;
+  //   queryParams.pageNumber = this.paginator.pageIndex;
+  //   queryParams.pageSize = this.paginator.pageSize;
+
+  //   // (2) Getting customers from dataSource.
+  //   this.dataSource.getCustomers(queryParams);
+  //   /////////////////////////////////////////
+
+

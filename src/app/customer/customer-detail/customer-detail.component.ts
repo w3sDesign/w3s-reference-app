@@ -10,7 +10,7 @@ import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 
 import { CustomerService } from '../model/customer.service';
@@ -28,6 +28,8 @@ import { DynamicFormGroupService } from '../../shared/dynamic-form/dynamic-form-
 import { DynamicFormOptions } from '../../shared/dynamic-form/dynamic-form-options';
 // import { questionsConfig } from '../model/customer.config';
 import { MessageService } from '../../shared/message.service';
+import { QueryParams } from '../../shared/query-params';
+import { QueryResult } from '../../shared/query-result';
 
 
 // changeDetection: ChangeDetectionStrategy.OnPush
@@ -95,6 +97,12 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
   };
 
 
+  routeQueryParams: string;
+
+
+
+  // Component constructor.
+  // ##################################################################
 
   constructor(
     // public dialogRef: MatDialogRef<CustomerDetailDialogComponent>,
@@ -119,25 +127,46 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
   }
 
 
+  // Component lifecycle hook.
+  // ##################################################################
+  // Called once after creating the component,
+  // but before creating child components.
 
-  /**
-   * ##################################################################
-   * Loading data (from customers/id) and updating form when data arrives.
-   *
-   * Note: @ViewChild customerForm (needed in updateCustomerForm()) is not set before AfterViewInit!
-   * But it can be done here because customer$.subscribe() takes time.
-   * ##################################################################
-   */
+  //  @ViewChild customerForm not set before AfterViewInit!
+  //  But it can be done here because customer$.subscribe() takes time.
+
   ngOnInit() {
+
+    this.logMessage(`[ngOnInit()] ########################################`);
 
     this.logMessage(
       `(1)[ngOnInit()] this.route = \n ${this.route}`
     );
 
-    if (this.route) {
+    if (this.route) { // TO DO route has always a value
+
+      // Loading data (from customers/id) and updating form when data arrives.
+
       this.customer$ = this.route.paramMap.pipe(
-        switchMap((params: ParamMap) =>
-          this.customerService.getCustomer(+params.get('id')))
+        switchMap((routeParams: ParamMap) => {
+
+          // needed in navigateTo
+          this.routeQueryParams = routeParams.get('queryParams');
+
+          if (+routeParams.get('id') === 0) {
+
+            return of(new Customer());
+            ///////////////////////////////////////////////////////////////
+
+          } else {
+
+            return this.customerService.getCustomer(+routeParams.get('id'));
+            ///////////////////////////////////////////////////////////////
+
+          }
+
+
+        })
       );
 
       this.customer$.subscribe(
@@ -149,14 +178,14 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
 
           this.customer = res;
 
-          /** Error handler service (in customer service) returns {}
-           * in case of an error (e.g. if customer not found).
-           * So we need to check if the customer is defined, not null;
-           * and not {} by checking customer.name.
-           */
+          // Error handler service (in customer service) returns {} in case of an error (e.g. if customer not found).
+          // So we need to check if the customer is defined, not null; and not {} by checking customer.name.
+
           if (this.customer && this.customer.name) {
 
-            this.updateCustomerForm(this.customer);
+            this.customerForm.form.patchValue(this.customer);
+
+            this.addFormArrays(this.customer);
           }
 
         });
@@ -165,7 +194,14 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
   }
 
 
+  // Component lifecycle hook.
+  // ##################################################################
+  // Called once after creating the child components.
+
   ngAfterViewInit() {
+
+    this.logMessage(`[ngAfterViewInit()] ========================================`);
+
     this.customerForm.form.valueChanges.subscribe(val => {
 
       this.customerFormHasChanged = true;
@@ -175,14 +211,19 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
   }
 
 
+  // ##################################################################
+  // Component public member methods (in alphabetical order).
+  // ##################################################################
+
+
   /**
-   * ##################################################################
-   * Update form and add formArray.
+   * Adding formArrays of a customer.
    * ##################################################################
    */
-  updateCustomerForm(customer: Customer) {
 
-    this.customerForm.form.patchValue(customer);
+  addFormArrays(customer: Customer) {
+
+    // this.customerForm.form.patchValue(customer);
 
     // Adding the formArray that corresponds to the given customer
     // (analog to DynamicFormQuestionComponent).
@@ -210,15 +251,55 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
   }
 
 
+  /**
+   * Creating a new customer (delegating to customer service).
+   * ##################################################################
+   */
+
+  createCustomer(customer: Customer) {
+
+    this.customer =
+
+    this.customerService.createCustomer(customer)
+      .subscribe(res => {
+        this.navigateToList(customer);
+      });
+
+  }
+
+
+
+  /**
+   * Navigating back to the CustomerListComponent.
+   * ##################################################################
+   *  https://angular.io/guide/router#navigating-back-to-the-list-component
+   */
+
+  navigateToList(customer?: Customer) {
+
+    const customerId = customer ? customer.id : null;
+
+    // this.router.navigate(['/customers', { id: customerId, ftid: this.activeFilterTemplateId }]);
+
+    this.router.navigate(['/customers', { id: customerId, queryParams: this.routeQueryParams }]);
+
+  }
+
+
+  onAlertClose($event) {
+    this.hasErrors = false;
+  }
+
+
 
   /** Two update variants: */
 
   /**
-   * ##################################################################
    * 1. Customer form commit. TO DO Create or update customer.
    * onDynamicFormSubmit
    * ##################################################################
    */
+
   onCustomerFormSubmit() {
 
     // this.updateCustomer(this.customerForm.form.value);
@@ -230,7 +311,6 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
 
 
   /**
-   * ##################################################################
    *2. SaveDyn button. TO DO Create or update customer.
    * ##################################################################
    */
@@ -242,7 +322,6 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
 
 
   /**
-   * ##################################################################
    * OLD Build form (static version).
    * ##################################################################
    */
@@ -332,55 +411,25 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
   }
 
 
-
-  returnToList(customer?: Customer) {
-    this.router.navigate(['/customers']);
-    // this.router.navigate(['/customers', {id: customer.id}]);
-    // this.router.navigate(['/customers', row.id]);
-    // if (this.dialogRef) {
-    //   this.dialogRef.close({
-    //     customer,
-    //     isEdit: true
-    //   });
-    // }
-  }
-
-
   /**
-   * ##################################################################
    * Update customer (delegating to customer service).
    * ##################################################################
    */
+
   updateCustomer(customer: Customer) {
 
     this.customerService.updateCustomer(customer)
       .subscribe(res => {
-        this.returnToList(customer);
-      });
-  }
-
-
-  /**
-   * ##################################################################
-   * Create new customer (delegating to customer service).
-   * ##################################################################
-   */
-  createCustomer(customer: Customer) {
-
-    this.customerService.createCustomer(customer)
-      .subscribe(res => {
-        this.returnToList(customer);
+        this.navigateToList(customer);
       });
   }
 
 
 
-  onAlertClose($event) {
-    this.hasErrors = false;
-  }
 
-
-
+  // ##################################################################
+  // Component non public member methods.
+  // ##################################################################
 
 
   /** Logging message to console. */
@@ -441,14 +490,17 @@ export class CustomerDetailDialogComponent extends CustomerDetailComponent imple
 
     this.customer = this.data.customer;
 
-    // @ViewChild customerForm not set before AfterViewInit!
-    this.updateCustomerForm(this.customer);
 
-    // this.buildForm();
+    // @ViewChild customerForm not set before AfterViewInit!
+    this.customerForm.form.patchValue(this.customer);
+
+    this.addFormArrays(this.customer);
+
   }
 
 
-  returnToList(customer?: Customer) {
+  navigateToList(customer?: Customer) {
+
     this.dialogRef.close({
       customer,
       isEdit: true

@@ -37,11 +37,6 @@ export class HttpCustomerFilterTemplateService extends CustomerFilterTemplateSer
   }
 
 
-  // ##################################################################
-  // CREATE
-  // ##################################################################
-
-
   /**
    * Create the specified customer filter template on the http server.
    * ##################################################################
@@ -59,12 +54,6 @@ export class HttpCustomerFilterTemplateService extends CustomerFilterTemplateSer
         catchError(this.handleError<CustomerFilterTemplate>(message.replace('has been', 'can not be'))),
       );
   }
-
-
-
-  // ##################################################################
-  // GET
-  // ##################################################################
 
 
   /**
@@ -95,12 +84,6 @@ export class HttpCustomerFilterTemplateService extends CustomerFilterTemplateSer
   }
 
 
-
-  // ##################################################################
-  // UPDATE
-  // ##################################################################
-
-
   /**
    * Update the specified customer filter template on the http server.
    * ##################################################################
@@ -108,8 +91,6 @@ export class HttpCustomerFilterTemplateService extends CustomerFilterTemplateSer
    */
 
   updateCustomerFilterTemplate(customerFilterTemplate: CustomerFilterTemplate): Observable<CustomerFilterTemplate> {
-
-    // const httpHeader = this.httpUtils.getHttpHeaders();
 
     const message = `CustomerFilterTemplate with id = ${customerFilterTemplate.id}
  and name = "${customerFilterTemplate.name}" has been updated.`;
@@ -126,25 +107,14 @@ export class HttpCustomerFilterTemplateService extends CustomerFilterTemplateSer
 
 
   // ##################################################################
-  // Private helper methods
+  // Private helper methods.
   // ##################################################################
 
 
-  /**
-   * Handling http errors.
-   * ##################################################################
-   * Delegating to the httpErrorHandler service.
-   */
-
+  /** Handling http errors. */
   private handleError<T>(operationFailed: string) {
     return this.httpErrorHandler.handleError<T>('http-customer.service.ts', operationFailed);
   }
-
-  /**
-   * Logging / showing messages.
-   * ##################################################################
-   * Delegating to the message service.
-   */
 
   /** Logging message to console. */
   private log(message: string) {

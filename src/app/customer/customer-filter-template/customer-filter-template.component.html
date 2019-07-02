@@ -12,14 +12,13 @@
 
         <mat-panel-description>
 
-          <!-- ########################################################## -->
-          <!-- Active filters -->
+          <!-- Showing most recently activated filters -->
           <!-- ########################################################## -->
 
           <div class="special-font" style="display:block;color: rgba(0,0,0,.87); font-size:14px; font-weight: 400">
 
-            {{activeFiltersMessage}}
-            <span class="comma" *ngFor="let filter of activeFilterNames">{{(filter.replace('Filter', '') | titlecase)}}</span>
+            {{activatedFiltersMessage}}
+            <span class="comma" *ngFor="let afn of activatedFilterNames">{{(afn.replace('Filter', '') | titlecase)}}</span>
           </div>
 
         </mat-panel-description>
@@ -31,8 +30,7 @@
 
       <div class="row-container" style="align-items: flex-end">
 
-        <!-- ########################################################## -->
-        <!-- SearchInput - searching in all fields -->
+        <!-- Searching in all fields -->
         <!-- ########################################################## -->
 
         <!-- placeholder="Search" -->
@@ -44,27 +42,27 @@
         </mat-form-field>
 
 
-        <!-- ########################################################## -->
-        <!-- Search/Clear/Save filter buttons -->
+
+        <!-- Search/Clear/Save buttons -->
         <!-- ########################################################## -->
 
         <div class="push-right">
 
-          <button mat-raised-button matTooltip="Start searching customers by applying the provided filters." (click)="emitQueryParams()">
+          <button mat-raised-button matTooltip="Start searching customers by applying the provided filters." (click)="emitQueryParamsChange()">
             Search
           </button>
 
         </div>
 
-        <button mat-raised-button matTooltip="Clear all filters." (click)="searchInputModel=''; onSelectFilterTemplate(''); ">
+        <button mat-raised-button matTooltip="Clear all filters." (click)="searchInputModel=''; onFilterTemplateSelectionChange(''); emitQueryParamsChange();">
           Clear
         </button>
 
-        <button mat-raised-button matTooltip="Save the current filter template." (click)="updateFilterTemplate(filterTemplateForm.form.getRawValue())">
+        <button mat-raised-button [disabled]="!filterTemplateForm?.form.valid ||!filterTemplateForm?.form.dirty" matTooltip="Save the current filter template." (click)="updateFilterTemplate(filterTemplateForm.form.getRawValue())">
           Save
         </button>
 
-        <button mat-raised-button matTooltip="Save the current filter template as new template." (click)="createFilterTemplate(filterTemplateForm.form.getRawValue())">
+        <button mat-raised-button [disabled]="!filterTemplateForm?.form.valid" matTooltip="Save the current filter template as new template." (click)="createFilterTemplate(filterTemplateForm.form.getRawValue())">
           Save As
         </button>
 
@@ -80,17 +78,15 @@
 
       <div class="row-container">
 
-        <!-- ########################################################## -->
-        <!-- Select a filter template  -->
+        <!-- Selecting a filter template  -->
         <!-- ########################################################## -->
 
         <mat-form-field>
 
-          <mat-select [(value)]="selectedFilterTemplateName" (selectionChange)="onSelectFilterTemplate(selectedFilterTemplateName)">
+          <mat-select [(value)]="activatedQueryParams.filterTemplateId" (selectionChange)="onFilterTemplateSelectionChange(); emitQueryParamsChange();">
 
-            <!-- <mat-option value="standard">Standard</mat-option> -->
-            <!-- <mat-option value=""></mat-option> -->
-            <mat-option *ngFor="let name of filterTemplateNames" value="{{name}}">{{name}}</mat-option>
+            <!-- <mat-option value="none"></mat-option> -->
+            <mat-option *ngFor="let ft of filterTemplates" [value]="ft.id">{{ft.name}}</mat-option>
           </mat-select>
 
           <mat-hint align="start">
@@ -107,8 +103,7 @@
       <mat-drawer-container>
 
 
-        <!-- ############################################################ -->
-        <!-- Select filters table -->
+        <!-- Selecting filters -->
         <!-- ############################################################ -->
         <!-- Right drawer for selecting the filters to display -->
 
@@ -117,7 +112,7 @@
 
         <mat-drawer class="mat-elevation-z8" #filterDrawerRef position="end" mode="side" [opened]="'false'">
 
-          <table mat-table #selectingFiltersTable [dataSource]="availableFilterNames">
+          <table mat-table #filterSelectionTable [dataSource]="availableFilterNames">
 
             <ng-container [matColumnDef]="column" *ngFor="let column of ['select3', 'name']; let i = index">
 
@@ -125,13 +120,13 @@
               <ng-container *ngIf="column === 'select3'">
 
                 <th mat-header-cell *matHeaderCellDef>
-                  <mat-checkbox (change)="$event ? masterToggle3() : null; onSelectFilter('')" [checked]="filterSelection.hasValue() && allFiltersSelected()" [indeterminate]="filterSelection.hasValue() && !allFiltersSelected()">
+                  <mat-checkbox (change)="$event ? toggleAllFilters() : null; onFilterSelectionChange('')" [checked]="filterSelection.hasValue() && allFiltersSelected()" [indeterminate]="filterSelection.hasValue() && !allFiltersSelected()">
                   </mat-checkbox>
                 </th>
 
                 <!-- row (=filterName) from dataSource -->
                 <td mat-cell *matCellDef="let row">
-                  <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? filterSelection.toggle(row) : null; $event ? onSelectFilter(row) : null" [checked]="filterSelection.isSelected(row)">
+                  <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? filterSelection.toggle(row) : null; $event ? onFilterSelectionChange(row) : null" [checked]="filterSelection.isSelected(row)">
                   </mat-checkbox>
                 </td>
 
@@ -155,7 +150,7 @@
 
             <!-- Row definitions -->
             <tr mat-header-row *matHeaderRowDef="['select3', 'name']"></tr>
-            <tr mat-row *matRowDef="let row; columns: ['select3', 'name']" (click)="filterSelection.toggle(row)"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['select3', 'name']"></tr>
 
           </table>
 
@@ -166,13 +161,12 @@
         <!-- Set min-height when drawer is opened -->
         <mat-drawer-content [class.drawer-open]="filterDrawerRef.opened">
 
-          <!-- ########################################################## -->
           <!-- Filter template form -->
           <!-- ########################################################## -->
 
           <!-- (formSubmit)="onFilterTemplateFormSubmit($event)"> -->
 
-          <w3s-dynamic-form #filterTemplateForm *ngIf="filterTemplateQuestions" [questions]="filterTemplateQuestions" [options]="filterTemplateFormOptions" (formSubmit)="emitQueryParams()">
+          <w3s-dynamic-form #filterTemplateForm *ngIf="filterTemplateQuestions" [questions]="filterTemplateQuestions" [options]="filterTemplateFormOptions" (formSubmit)="emitQueryParamsChange()">
 
           </w3s-dynamic-form>
 
@@ -182,36 +176,15 @@
             <br>########## filterTemplates = <br> {{filterTemplates | json}}
 
             <br>########## filterTemplateQuestions = <br> {{filterTemplateQuestions | json}}
-            <br>
-            <br>########## availableFilterNames = <br> {{availableFilterNames | json}}
 
-            <br>########## selectedFilterNames = <br> {{selectedFilterNames | json}}
-
-            <br>########## activeFilterNames = <br> {{activeFilterNames | json}}
-
-
-            <!-- <div *ngIf="filterTemplateForm?.form?.value !== null"> -->
-            <!-- <div *ngIf="filterTemplateForm"> -->
-            <!-- Reference to the filter template form not set before AfterViewInit. -->
+            <br>########## displayedFilterNames = {{displayedFilterNames | json}}
+            <br>########## activatedFilterNames = {{activatedFilterNames | json}}
 
             <!-- This causes ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked.  -->
+            <br>########## filterTemplateForm?.form.value = <br> {{filterTemplateForm?.form.value | json}}
 
-            <br>
-            <br>########## filterTemplateForm?.form?.value = "selectedFilters" = <br> {{filterTemplateForm?.form?.value | json}}
+            <br>########## filterTemplateForm?.form.getRawValue() = <br> {{filterTemplateForm?.form.getRawValue() | json}}
 
-            <br>########## filterTemplateForm?.form?.getRawValue() = <br> {{filterTemplateForm?.form?.getRawValue() | json}}
-
-
-            <!-- <br>########## filterTemplateForm?.form?.getRawValue().id = {{filterTemplateForm?.form?.getRawValue()?.id}}
-
-            <br>########## filterTemplateForm?.form?.get('id').disabled = {{filterTemplateForm?.form?.get('id')?.disabled}}
-
-            <br>########## filterTemplateForm?.form?.id.disabled = {{filterTemplateForm?.form?.id?.disabled}}
-
-            <br>########## filterTemplateForm?.form?.disabled = {{filterTemplateForm?.form?.disabled}} -->
-
-
-            <!-- </div> -->
 
           </div>
 

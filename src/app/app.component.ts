@@ -59,14 +59,13 @@ export class AppComponent implements OnInit {
 
 
   ngOnInit() {
-    console.log('test');
-    console.log(this.router.url); // /
+    console.log('app.component: this.router.url = ' + this.router.url);
 
     this.activatedRoute.url
       .subscribe(url => console.log('url changed to: ' + url));
 
     this.navEnd.subscribe(event => {
-      console.log('navigation end = ' + event.url);
+      console.log('app.component: navigation end = ' + event.url);
       // Home page has no side nav.
       this.openSideNav = !(event.url === '/home' || event.url === '/');
     });

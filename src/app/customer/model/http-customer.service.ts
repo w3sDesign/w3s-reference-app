@@ -11,12 +11,14 @@ import { HttpUtilsService } from '../../shared/http-utils.service';
 import { MessageService } from '../../shared/message.service';
 import { QueryParams } from '../../shared/query-params';
 import { QueryResult } from '../../shared/query-result';
+import { setInjectImplementation } from '@angular/core/src/di/injector_compatibility';
 
 
 /**
  * Service for accessing and maintaining customers
  * on a remote http server (via HTTP REST API).
  * ####################################################################
+ * Implements the CustomerService interface.
  *
  * - See also https://github.com/angular/in-memory-web-api/blob/master/src/app/http-client-hero.service.ts
  */
@@ -41,11 +43,6 @@ export class HttpCustomerService extends CustomerService {
   }
 
 
-  // ##################################################################
-  // CREATE methods
-  // ##################################################################
-
-
   /**
    * Create the specified customer on the http server.
    * ##################################################################
@@ -55,21 +52,39 @@ export class HttpCustomerService extends CustomerService {
 
   createCustomer(customer: Customer): Observable<Customer> {
 
-    const message = `Customer with id = ${customer.id} and name = "${customer.name}" has been created.`;
+    // ===============================================================
+    // Client side auto generating customer id (should be done server side).
+    // Remove this for real server implementation.
+    // ===============================================================
+    const queryParams = new QueryParams();
+    queryParams.pageSize = 9999;
+    //  queryParams.sortField = 'id';
+    //  queryParams.sortOrder = 'desc';
 
-    return this.http.post<Customer>(this.customersUrl, customer, this.cudOptions)
+    // Getting all customers.
+    return this.getCustomers(queryParams)
       .pipe(
-        tap(() => this.show(message)),
-        tap(() => this.log(message)),
-        catchError(this.handleError<Customer>(message.replace('has been', 'can not be'))),
+        switchMap(res => {
+          // Returns the highest customer id + 1
+          customer.id = Math.max(...res.items.map(item => item.id)) + 1;
+
+          const message = `Customer with id = ${customer.id} and name = ${customer.name} has been created.`;
+
+          return this.http.post<Customer>(this.customersUrl, customer, this.cudOptions)
+            .pipe(
+              tap(() => this.showMessage(message)),
+              tap(() => this.logMessage(`[createCustomer()] ${message}`)),
+              catchError(this.handleError<Customer>(message.replace('has been', 'can not be'))),
+            );
+        })
+
       );
+
+
+
+
+
   }
-
-
-
-  // ##################################################################
-  // DELETE methods
-  // ##################################################################
 
 
   /**
@@ -86,8 +101,8 @@ export class HttpCustomerService extends CustomerService {
 
     return this.http.delete(this.customersUrl + `/${id}`, this.cudOptions)
       .pipe(
-        tap(() => this.show(message)),
-        tap(() => this.log(message)),
+        tap(() => this.showMessage(message)),
+        tap(() => this.logMessage(message)),
         catchError(this.handleError<Customer>(`Customer ${id} can not be deleted.`)),
       );
   }
@@ -114,8 +129,8 @@ export class HttpCustomerService extends CustomerService {
 
     return forkJoin(tasks$)
       .pipe(
-        tap(() => this.show(message)),
-        tap(() => this.log(message)),
+        tap(() => this.showMessage(message)),
+        tap(() => this.logMessage(message)),
         catchError(this.handleError<Customer>('deleteCustomers(ids)')),
       );
 
@@ -128,12 +143,6 @@ export class HttpCustomerService extends CustomerService {
     return this.http.delete(this.customersUrl + `/${id}`, this.cudOptions);
 
   }
-
-
-
-  // ##################################################################
-  // GET methods
-  // ##################################################################
 
 
   /**
@@ -175,9 +184,11 @@ export class HttpCustomerService extends CustomerService {
 
   getCustomers(queryParams?: QueryParams): Observable<QueryResult> {
 
+    if (!queryParams) { queryParams = new QueryParams(); }
+
     if (queryParams.searchTerm) {
 
-      this.log(
+      this.logMessage(
         `[getCustomers(queryParams) / searchTerm] queryParams = \n ${JSON.stringify(queryParams)}`
       );
 
@@ -185,6 +196,9 @@ export class HttpCustomerService extends CustomerService {
       return this.http.get<Customer[]>(this.customersUrl)
         .pipe(
           switchMap(res => {
+            // ===============================================================
+            // Client side searching (should be done server side).
+            // Remove this for real server implementation.
             // ===============================================================
             const queryResult = this.httpUtils.searchInAllFields(res, queryParams);
             // ===============================================================
@@ -195,7 +209,7 @@ export class HttpCustomerService extends CustomerService {
 
     } else {
 
-      this.log(
+      this.logMessage(
         `[getCustomers(queryParams) / filters] queryParams = \n ${JSON.stringify(queryParams)}`
       );
 
@@ -203,6 +217,9 @@ export class HttpCustomerService extends CustomerService {
       return this.http.get<Customer[]>(this.customersUrl)
         .pipe(
           switchMap(res => {
+            // ===============================================================
+            // Client side filtering and sorting (should be done server side).
+            // Remove this for real server implementation.
             // ===============================================================
             const queryResult = this.httpUtils.filterAndSort(res, queryParams);
             // ===============================================================
@@ -214,12 +231,6 @@ export class HttpCustomerService extends CustomerService {
     }
 
   }
-
-
-
-  // ##################################################################
-  // UPDATE methods
-  // ##################################################################
 
 
   /**
@@ -237,8 +248,8 @@ export class HttpCustomerService extends CustomerService {
 
     return this.http.put<Customer>(this.customersUrl, customer, this.cudOptions)
       .pipe(
-        tap(() => this.show(message)),
-        tap(() => this.log(message)),
+        tap(() => this.showMessage(message)),
+        tap(() => this.logMessage(message)),
 
         catchError(this.handleError<Customer>(message.replace('has been', 'can not be'))),
       );
@@ -247,33 +258,22 @@ export class HttpCustomerService extends CustomerService {
 
 
   // ##################################################################
-  // Private helper methods
+  // Private helper methods.
   // ##################################################################
 
 
-  /**
-   * Handling http errors.
-   * ##################################################################
-   * Delegating to the httpErrorHandler service.
-   */
-
+  /** Handling http errors. */
   private handleError<T>(operationFailed: string) {
     return this.httpErrorHandler.handleError<T>('http-customer.service.ts', operationFailed);
   }
 
-  /**
-   * Logging / showing messages.
-   * ##################################################################
-   * Delegating to the message service.
-   */
-
   /** Logging message to console. */
-  private log(message: string) {
-    return this.messageService.logMessage('[http-customer.service.ts] ' + message);
+  private logMessage(message: string) {
+    return this.messageService.logMessage('[########## http-customer.service.ts ##########] ' + message);
   }
 
-  /** Showing a user friendly message. */
-  private show(message: string) {
+  /** Showing user friendly message. */
+  private showMessage(message: string) {
     return this.messageService.showMessage(message);
   }
 

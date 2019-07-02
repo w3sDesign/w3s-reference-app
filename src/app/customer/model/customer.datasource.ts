@@ -10,25 +10,24 @@ import { QueryResult } from '../../shared/query-result';
 
 
 /**
- * The CustomerDataSource class provides the data for the data table
- * in the CustomerListComponent.
+ * Component for encapsulating data retrieval for the data table.
  * ####################################################################
- * The data table listens (subscribes) to the customers data stream
+ *
+ * The data table component does not know (is independent of)
+ * where the data is coming from.
+ *
+ * The data table subscribes to an Observable provided by the data source
  * and automatically triggers an update every time new data is emitted.
  */
 
 export class CustomerDataSource implements DataSource<any> {
 
-  // customers: Customer[];
-  // customers$: Observable<Customer[]>;
+  /** Accepting/emitting customer arrays. */
+  private customersSubject = new BehaviorSubject<Customer[]>([]);
 
-  /** Subject for accepting and emitting customer arrays. */
-  customers: BehaviorSubject<Customer[]> = new BehaviorSubject([]);
+  public customers$ = this.customersSubject.asObservable();
 
-  /**
-   * Subject for accepting and emitting loading true/false
-   * (the progress bar listens to this stream).
-   */
+  /** Subject for accepting and emitting loading true/false. */
   isLoading = new BehaviorSubject<boolean>(false);
 
   /** Subject for accepting and emitting the total number of queried customers. */
@@ -46,12 +45,19 @@ export class CustomerDataSource implements DataSource<any> {
 
 
   /**
-   * Connecting the data table by providing the customers to render.
+   * Connecting the data table.
    * ##################################################################
+   *
+   * https://blog.angular-university.io/angular-material-data-table/
+   *
+   * This method will be called once by the data table at bootstrap time.
+   * The data table subscribes to the observable that this method returns.
+   * The observable emits the customers that should be displayed.
    * The data table renders a row for each object in the data array.
    */
+
   connect(collectionViewer: CollectionViewer): Observable<any[]> {
-    return this.customers.asObservable();
+    return this.customersSubject.asObservable();
   }
 
   /**
@@ -59,64 +65,38 @@ export class CustomerDataSource implements DataSource<any> {
    * ##################################################################
    */
   disconnect(collectionViewer: CollectionViewer): void {
-    this.customers.complete();
+    this.customersSubject.complete();
     this.isLoading.complete();
     this.totalNumberOfItems.complete();
   }
 
 
   /**
-   * getCustomers()
+   * Getting the customers.
    * ##################################################################
-   * is implemented by delegating to the customer service.
+   *
+   * Implemented by delegating to the customer service.
    * If the data arrives successfully, it is passed to the customers
    * subject (by calling next(res.items)), which in turn emits the data
-   * to the connected data table for rendering.
+   * to the connected (subscribed) data table for rendering.
    */
 
-  // getCustomers(queryParams: QueryParams) {
-  //   this.isLoading.next(true);
-  //   /**
-  //    * Delegating to customer service which returns a query result observable.
-  //    * ###########################################
-  //    */
-  //   this.customerService.getCustomers(queryParams)
-  //     .pipe(
-  //       tap((res: QueryResult) => {
-  //         /**
-  //          * Passing the queryResult.items to the customers subject, which
-  //          * emits the data to the connected (subscribed) data table for rendering.
-  //          */
-  //         this.customers.next(res.items);
-
-  //         this.totalNumberOfItems.next(res.totalCount);
-  //       }),
-  //       catchError(err => of(new QueryResult())), // TODO
-  //       finalize(() => this.isLoading.next(false))
-  //     )
-  //     .subscribe();
-  // }
-
-
   getCustomers(queryParams: QueryParams) {
+
     this.isLoading.next(true);
 
-    /**
-     * Delegating to customer service which returns a query result observable.
-     * ###########################################
-     */
     this.customerService.getCustomers(queryParams)
 
+      // Customer service  returns a query result observable.
       .subscribe((res: QueryResult) => {
-        /**
-         * Passing the queryResult.items to the customers subject, which
-         * emits the data to the connected (subscribed) data table for rendering.
-         */
-        this.customers.next(res.items);
+
+        // Emitting the customers.
+        this.customersSubject.next(res.items);
 
         this.totalNumberOfItems.next(res.totalCount);
 
         this.isLoading.next(false);
+
       });
 
   }

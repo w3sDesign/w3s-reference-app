@@ -12,6 +12,7 @@ import { MessageSnackBarComponent } from './message-snack-bar/message-snack-bar.
 export class MessageService {
 
   // messages: string[] = [];
+  nextId = 1;
 
   constructor(
     private snackBar: MatSnackBar
@@ -22,7 +23,7 @@ export class MessageService {
   logMessage(message: string) {
     // if (this.showTestValues) {
     if (!environment.production) {
-      console.log(`%c########## ${message}`, `color: darkblue`);
+      console.log(`%c#${this.nextId++}######### ${message}`, 'color: blue');
     }
   }
 

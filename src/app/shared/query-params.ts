@@ -1,8 +1,12 @@
 export class QueryParams {
+  // filterTemplateName = '';
+  filterTemplateId = 0;
   filter: any = ''; // = {};
   searchTerm = '';  // searching in all fields
+
   sortOrder: 'asc' | 'desc' | '' = 'asc';
   sortField = '';
+
   pageNumber = 0;
   pageSize = 10;
 }

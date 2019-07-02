@@ -65,7 +65,7 @@ export class HttpUtilsService {
 
     if (queryParams.filter) {
 
-      filteredItems = this.filterItems(items, queryParams.filter);
+      filteredItems = this.performFiltering(items, queryParams.filter);
 
       // this.log(
       //   `[filterAndSort()] filteredItems = \n ${JSON.stringify(filteredItems)}`
@@ -81,7 +81,7 @@ export class HttpUtilsService {
 
     if (queryParams.sortField) {
 
-      filteredItems = this.sortItems(filteredItems, queryParams.sortField, queryParams.sortOrder);
+      filteredItems = this.performSorting(filteredItems, queryParams.sortField, queryParams.sortOrder);
 
     }
 
@@ -119,41 +119,57 @@ export class HttpUtilsService {
    * ##################################################################
    * Filtering routine.
    * ##################################################################
+   * For example:
+   * itemObj  : { "id"      : "20018",  "name"      : "XY Foundation" }
+   * filterObj: { "idFilter": ">20010", "nameFilter": "Foundation" }
    */
 
-  filterItems(items: any[], filters: any[]): any[] {
+  performFiltering(items: any[], filters: any): any[] {
 
-    const filterTemplate = filters;
+    const filterObj = filters;
 
-    const filteredItems = items.filter(item => { // JS array.filter() method
+
+    // ################################################################
+    // JS array.filter(...) method
+    // ################################################################
+
+    const filteredItems = items.filter(itemObj => {
+
 
       let testFailed = false;
 
-      /**
-       * For example:
-       * item          : { "id"      : "20018",  "name"      : "Vehicle Risus Foundation" }
-       * filterTemplate: { "idFilter": ">20010", "nameFilter": "Foundation" }
-       *
-       * For each key in the filter template object ('idFilter', 'nameFilter').
-       */
 
-      Object.keys(filterTemplate).forEach(filterKey => {
+      // ==============================================================
+      // For each itemObj in the items array *and*
+      // for each filterKey in the filterObj:
+      // ==============================================================
 
-        const itemKey = filterKey.replace('Filter', '');
+      Object.keys(filterObj).forEach(filterKey => { // 'idFilter', 'nameFilter'
 
-        const value = item[itemKey];
+        const itemKey = filterKey.replace('Filter', ''); // 'id', 'name'
 
-        if (!value) { console.error('##########no value! value = ' + value); }
+        const itemValue = itemObj[itemKey];
+
+        // if (!itemValue) { console.error('##########no itemValue! itemValue = ' + itemValue); }
         // console.log('#########itemKey: ' + itemKey);
-        // console.log('#########value: ' + JSON.stringify(value));
+        // console.log('#########itemValue: ' + JSON.stringify(itemValue));
 
-        const filter = filterTemplate[filterKey].trim().toLowerCase();
+        const filterValue = filterObj[filterKey].trim().toLowerCase();
 
-        if (filter && !testFailed) {
 
-          if (typeof (value) === 'string') {
+        if (filterValue && !testFailed) {
 
-            if (value.toLowerCase().indexOf(filter) === -1) {
+          ///////////
+          // Tests  //
+          ///////////
+
+          if (typeof (itemValue) === 'string') {
+
+            // no itemValue.
+            if (!itemValue) { testFailed = true; }
+
+            // filterValue does not exist.
+            if (itemValue.toLowerCase().indexOf(filterValue) === -1) {
               testFailed = true;
             }
 
@@ -161,45 +177,54 @@ export class HttpUtilsService {
 
           }
 
-          if (typeof (value) === 'number') {
 
-            switch (filter.substring(0, 1)) {
+          if (typeof (itemValue) === 'number') {
+
+            if (!itemValue && itemValue !== 0) { testFailed = true; }
+
+            switch (filterValue.substring(0, 1)) {
               case '>':
-                if (value <= +filter.substring(1)) { testFailed = true; }
+                if (itemValue <= +filterValue.substring(1)) { testFailed = true; }
                 break;
               case '<':
-                if (value >= +filter.substring(1)) { testFailed = true; }
+                if (itemValue >= +filterValue.substring(1)) { testFailed = true; }
                 break;
               case '=':
-                if (value !== +filter.substring(1)) { testFailed = true; }
+                if (itemValue !== +filterValue.substring(1)) { testFailed = true; }
                 break;
 
               // other tests ...
 
               default:
-                if (value !== +filter) { testFailed = true; }
+                if (itemValue !== +filterValue) { testFailed = true; }
             }
 
           }
 
           // Only string and numbers!!
-          // customers AdditionalAddresses have value = object array!
+          // customers AdditionalAddresses have itemValue = object array!
           // error => server returned undefined
 
-        }
 
-      });
+        } // End of tests
 
-      // If an item has passed all filter tests (not failed) return true
-      // to the array.filter method; else return false.
+
+      }); // ==============================================================
+
+
+      // If an itemObj has passed all tests (not failed) return true
+      // to the items.filter(...) method; else return false.
+
       return !testFailed;
 
-    });
+
+    }); // ################################################################
+
+
 
     // this.log(
-    //   `[filterItems()] filteredItems = \n ${JSON.stringify(filteredItems)}`
+    //   `[performFiltering()] filteredItems = \n ${JSON.stringify(filteredItems)}`
     // );
-
 
     return filteredItems;
 
@@ -212,7 +237,7 @@ export class HttpUtilsService {
    * Sorting routine.
    * ##################################################################
    */
-  sortItems(items: any[], sortField: string = '', sortOrder: string = 'asc'): any[] {
+  performSorting(items: any[], sortField: string = '', sortOrder: string = 'asc'): any[] {
 
     if (!sortField) { return items; }
 
@@ -273,7 +298,7 @@ export class HttpUtilsService {
 
     if (queryParams.sortField) {
 
-      searchedItems = this.sortItems(searchedItems, queryParams.sortField, queryParams.sortOrder);
+      searchedItems = this.performSorting(searchedItems, queryParams.sortField, queryParams.sortOrder);
 
     }
 
@@ -317,59 +342,59 @@ export class HttpUtilsService {
 
     // ################################################################
 
-    const searchedItems = items.filter(item => { // JS array.filter() method
+    const searchedItems = items.filter(itemObj => { // JS array.filter() method
 
-      let hasItemPassedTests = false;
+      let hasItemObjPassedTests = false;
 
       /**
        * For example:
-       * item = customer : { "id": "20018",  "name": "Vehicle Risus Foundation" }
+       * itemObj = customer : { "id": "20018",  "name": "Vehicle Risus Foundation" }
        * searchTerm      : "found"
        */
-      Object.keys(item).forEach(key => {
+      Object.keys(itemObj).forEach(key => {
 
-        const value = item[key];
+        const itemValue = itemObj[key];
         let str: string;
 
 
-        if (typeof (value) === 'string') {
+        if (typeof (itemValue) === 'string') {
 
-          str = value.trim().toLowerCase();
+          str = itemValue.trim().toLowerCase();
 
           // if (this.showTestValues) {
-          //   console.log('%c########## item[key] [searchItems()] = \n' +
-          //     JSON.stringify(item[key]), 'color: darkgreen');
+          //   console.log('%c########## itemObj[key] [searchItems()] = \n' +
+          //     JSON.stringify(itemObj[key]), 'color: darkgreen');
 
           //   console.log('%c########## let str [searchItems()] = \n' +
           //     JSON.stringify(str), 'color: darkgreen');
           // }
 
           if (str.indexOf(searchTerm) !== -1) {
-            hasItemPassedTests = true;
+            hasItemObjPassedTests = true;
           }
 
         }
 
 
-        if (typeof (value) === 'number') {
+        if (typeof (itemValue) === 'number') {
 
-          str = value.toString();
+          str = itemValue.toString();
 
           if (str.indexOf(searchTerm) !== -1) {
-            hasItemPassedTests = true;
+            hasItemObjPassedTests = true;
           }
 
         }
 
         // Only string and numbers!!
-        // customers AdditionalAddresses have value = object array!
+        // customers AdditionalAddresses have itemValue = object array!
         // error => server returned undefined
 
       });
 
-      // If an item has passed the tests return true
+      // If an itemObj has passed the tests return true
       // to the array.filter method; else return false.
-      return hasItemPassedTests;
+      return hasItemObjPassedTests;
 
     });
 

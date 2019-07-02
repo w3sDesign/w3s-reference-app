@@ -3,10 +3,6 @@
 
   <mat-tab label="Basic Data">
 
-    <!-- ############################################################ -->
-    <!--                        Dynamic Version                       -->
-    <!-- ############################################################ -->
-
     <div class="w3s-detail-component mat-elevation-z8">
 
       <div style="padding:30px 30px;">
@@ -14,28 +10,34 @@
 
         <!-- <h5>{{title}}</h5> -->
 
-        <!-- ========================================================== -->
-        <!-- Generating the customer dynamic form. -->
-        <!-- ========================================================== -->
+        <!-- Customer form -->
+        <!-- ########################################################## -->
 
         <w3s-dynamic-form #customerForm *ngIf="customerQuestions" [questions]="customerQuestions" [options]="customerFormOptions" [dataGroupNames]="dataGroupNames" [title]="title" (formSubmit)="onCustomerFormSubmit($event)">
 
         </w3s-dynamic-form>
 
-        <!-- ========================================================== -->
 
 
 
         <br>
+
+        <!-- Back/Cancel/Save buttons -->
+        <!-- ########################################################## -->
+
         <div class="nix-flex-box">
 
+          <button type="button" mat-raised-button (click)="navigateToList(customer)" matTooltip="Go back.">
+            Back
+          </button>&nbsp;
+
           <!-- [mat-dialog-close]="customer" only for closing dialog window -->
-          <button type="button" mat-raised-button (click)="returnToList()" matTooltip="Cancel changes and go back.">
+          <button type="button" mat-raised-button (click)="navigateToList(customer)" matTooltip="Cancel changes and go back.">
             Cancel
           </button>&nbsp;
 
           <!-- Create or update customer -->
-          <button type="button" mat-raised-button color="primary" (click)="updateCustomer(customer)" [disabled]="!customerFormHasChanged" matTooltip="Save changes and go back.">
+          <button type="button" mat-raised-button color="primary" (click)="customer.id ? updateCustomer(customer) : createCustomer(customer)" [disabled]="!customerFormHasChanged" matTooltip="Save changes and go back.">
             Save
           </button>
 
@@ -72,5 +74,3 @@
 
 
 </mat-tab-group>
-
-

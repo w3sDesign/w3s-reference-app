@@ -2,6 +2,7 @@ import { Customer } from './customer';
 
 // Generated on generatedata.com
 export const mockCustomers: Customer[] = [
+
   {
     id: 20000,
     name: 'Laoreet Ipsum Curabitur Foundation',

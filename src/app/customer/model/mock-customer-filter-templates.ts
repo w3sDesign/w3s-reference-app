@@ -2,11 +2,9 @@ import { CustomerFilterTemplate } from './customer-filter-template';
 
 export const mockCustomerFilterTemplates: CustomerFilterTemplate[] = [
   {
+    // Empty filter template.
     id: 0,
-    name: '', // empty template
-
-    idFilter: '',
-    nameFilter: '',
+    name: '',
   },
   {
     id: 1,

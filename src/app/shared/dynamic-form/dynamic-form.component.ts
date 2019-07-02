@@ -4,6 +4,7 @@ import { FormGroup } from '@angular/forms';
 import { QuestionBase } from './question-base';
 import { DynamicFormGroupService } from './dynamic-form-group.service';
 import { DynamicFormOptions } from './dynamic-form-options';
+import { MessageService } from '../message.service';
 
 @Component({
   selector: 'w3s-dynamic-form',
@@ -52,18 +53,31 @@ export class DynamicFormComponent implements OnInit {
 
 
 
-  /**
-   * Note that input properties (like questions and options)
-   * are set *after* construction (but before OnInit).
-   */
-  constructor( // #####################################################
+  // Component constructor.
+  // ##################################################################
+  // Note that input properties (like questions and options)
+  // are set *after* construction (but before OnInit).
 
-    private formGroupService: DynamicFormGroupService) {
+  constructor(
+
+    private formGroupService: DynamicFormGroupService,
+    private messageService: MessageService,
+
+  ) {
 
   }
 
-  ngOnInit() { // #####################################################
 
+  // Component lifecycle hook.
+  // ##################################################################
+  // Called once after creating the component,
+  // but before creating child components.
+
+  ngOnInit() {
+
+    this.logMessage(`[ngOnInit()] ########################################`);
+
+    // this.logMessage(`[ngAfterViewInit()] ========================================`);
     // /** Setting data group names. */
     // for (let i = 0; i < 100; i++) {
     //   const idx = this.questions.findIndex(question => question.group === i + 1);
@@ -128,4 +142,23 @@ export class DynamicFormComponent implements OnInit {
     this.form.patchValue(value);
 
   }
+
+
+
+  // ##################################################################
+  // Component non public member methods.
+  // ##################################################################
+
+
+  /** Logging message to console. */
+  private logMessage(message: string) {
+    return this.messageService.logMessage('[dynamic-form.component.ts] ' + message);
+  }
+
+  /** Showing a user friendly message. */
+  private showMessage(message: string) {
+    return this.messageService.showMessage('*** ' + message + ' ***');
+  }
+
+
 }
