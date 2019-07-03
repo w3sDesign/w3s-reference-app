@@ -104,7 +104,8 @@
     </mat-drawer>
 
 
-    <mat-drawer-content>
+        <!-- Set min-height when drawer is opened -->
+        <mat-drawer-content [class.drawer-open]="columnDrawerRef.opened">
 
       <div *ngIf="showTestValues" class="w3s-show-test-values">
         <br>########## availableColumns = <br> {{availableColumns | json}}
@@ -117,7 +118,7 @@
       <!-- Main customer data table -->
       <!-- ############################################################ -->
 
-      <table class="customerTable" mat-table #table matSort cdkDropListGroup [cdkDropListGroupDisabled]="'true'" [dataSource]="dataSource">
+      <table class="customerTable" mat-table #table matSort [matSortActive]="activatedQueryParams.sortField" [matSortDirection]="activatedQueryParams.sortOrder" matSortDisableClear cdkDropListGroup [cdkDropListGroupDisabled]="'true'" [dataSource]="dataSource">
 
         <ng-container [matColumnDef]="column" *ngFor="let column of availableColumns; let i = index">
 

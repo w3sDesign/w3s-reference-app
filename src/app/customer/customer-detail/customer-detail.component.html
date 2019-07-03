@@ -32,23 +32,27 @@
           </button>&nbsp;
 
           <!-- [mat-dialog-close]="customer" only for closing dialog window -->
-          <button type="button" mat-raised-button (click)="navigateToList(customer)" matTooltip="Cancel changes and go back.">
+          <button type="button" mat-raised-button [disabled]="!customerForm?.form.dirty" (click)="navigateToList(customer)" matTooltip="Cancel changes and go back.">
             Cancel
           </button>&nbsp;
 
           <!-- Create or update customer -->
-          <button type="button" mat-raised-button color="primary" (click)="customer.id ? updateCustomer(customer) : createCustomer(customer)" [disabled]="!customerFormHasChanged" matTooltip="Save changes and go back.">
+          <!-- customerForm.form.getRawValue() = actual values of customer -->
+          <!-- [disabled]="!customerFormHasChanged" -->
+          <!-- Compare with customer-filter-template.component.html -->
+
+          <button type="button" mat-raised-button color="primary" [disabled]="!customerForm?.form.valid || !customerForm?.form.dirty" (click)="customer.id ? updateCustomer(customerForm.form.getRawValue()) : createCustomer(customerForm.form.getRawValue())"  matTooltip="Save changes and go back.">
             Save
           </button>
 
         </div> <!-- End flex-box -->
 
 
-        <!-- <div *ngIf="showTestValues"  class="w3s-show-test-values">
+        <div *ngIf="showTestValues"  class="w3s-show-test-values">
           <br>########## customer:<br> {{customer | json}}
-          <br>########## customerForm?.form?.value:<br> {{customerForm?.form?.value  | json}}
+          <br>########## customerForm?.form.value:<br> {{customerForm?.form.value  | json}}
           <br><br>
-        </div> -->
+        </div>
 
 
       </div>

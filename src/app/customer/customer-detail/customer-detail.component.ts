@@ -64,7 +64,7 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
   /** Not set before AfterViewInit! */
   @ViewChild('customerForm')
   customerForm: DynamicFormComponent;
-  customerFormHasChanged = false;
+  // customerFormHasChanged = false;
 
   /**
    * Questions for generating the dynamic form:
@@ -169,26 +169,6 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
         })
       );
 
-      this.customer$.subscribe(
-        res => {
-
-          this.logMessage(
-            `(2)[ngOnInit()] customer = \n ${JSON.stringify(res)}`
-          );
-
-          this.customer = res;
-
-          // Error handler service (in customer service) returns {} in case of an error (e.g. if customer not found).
-          // So we need to check if the customer is defined, not null; and not {} by checking customer.name.
-
-          if (this.customer && this.customer.name) {
-
-            this.customerForm.form.patchValue(this.customer);
-
-            this.addFormArrays(this.customer);
-          }
-
-        });
     }
 
   }
@@ -202,11 +182,34 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
 
     this.logMessage(`[ngAfterViewInit()] ========================================`);
 
-    this.customerForm.form.valueChanges.subscribe(val => {
+    // this.customerForm.form.valueChanges.subscribe(val => {
 
-      this.customerFormHasChanged = true;
+    //   this.customerFormHasChanged = true;
 
-    });
+    // });
+
+
+    this.customer$.subscribe(
+      res => {
+
+        this.logMessage(
+          `(2)[ngOnInit()] customer = \n ${JSON.stringify(res)}`
+        );
+
+        this.customer = res;
+
+        // Error handler service (in customer service) returns {} in case of an error (e.g. if customer not found).
+        // So we need to check if the customer is defined, not null; and not {} by checking customer.id.
+
+        if (this.customer && this.customer.id >= 0) {
+
+          this.customerForm.form.patchValue(this.customer);
+
+          this.addFormArrays(this.customer);
+        }
+
+      });
+
 
   }
 
@@ -227,6 +230,7 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
 
     // Adding the formArray that corresponds to the given customer
     // (analog to DynamicFormQuestionComponent).
+
     this.customerQuestions.forEach(question => {
       if (question.controlType === 'formArray' && customer[question.name]) {
 
@@ -258,7 +262,7 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
 
   createCustomer(customer: Customer) {
 
-    this.customer =
+    // this.customer = this.customerForm.form.value;
 
     this.customerService.createCustomer(customer)
       .subscribe(res => {

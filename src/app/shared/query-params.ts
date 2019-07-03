@@ -5,7 +5,7 @@ export class QueryParams {
   searchTerm = '';  // searching in all fields
 
   sortOrder: 'asc' | 'desc' | '' = 'asc';
-  sortField = '';
+  sortField = 'id';
 
   pageNumber = 0;
   pageSize = 10;

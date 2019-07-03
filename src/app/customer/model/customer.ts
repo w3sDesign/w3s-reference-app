@@ -22,8 +22,8 @@ export class Customer {
   // Basic Data
   id = 0;
   name = '';
-  type?: CustomerType = '';
-  status?: CustomerStatus = '';
+  type?: CustomerType = 'business';
+  status?: CustomerStatus = 'active';
 
   homepage ?= '';
   comment ?= '';

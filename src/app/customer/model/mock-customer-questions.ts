@@ -15,7 +15,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     inputType: 'number',
     group: 1,
     groupName: 'Basic Data',
-    order: 100,
+    order: 110,
     isRequired: true,
     // isDisabled: false,
     isReadonly: true,
@@ -26,10 +26,11 @@ export const mockCustomerQuestions: QuestionBase[] = [
     label: 'Name',
     tooltip: 'Full company name',
     controlType: 'textbox',
+    // inputType: 'textarea',
     inputType: 'text',
     group: 1,
     groupName: 'Basic Data',
-    order: 110,
+    order: 120,
     isRequired: true,
     // isDisabled: false,
   },
@@ -44,7 +45,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     inputType: '',
     group: 1,
     groupName: 'Basic Data',
-    order: 120,
+    order: 130,
 
     options: [
       { key: 'business', value: 'Business' },
@@ -61,7 +62,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     inputType: '',
     group: 1,
     groupName: 'Basic Data',
-    order: 130,
+    order: 140,
 
     options: [
       { key: 'active', value: 'Active' },
@@ -99,7 +100,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
 
 
 
-  // Group 2: Main Address and Additional Addresses
+  // Group 2: Main Address
 
   {
     name: 'country',
@@ -109,7 +110,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     inputType: 'text',
     group: 2,
     groupName: 'Addresses',
-    order: 200,
+    order: 210,
     // isRequired: false,
     // isDisabled: false,
   },
@@ -118,10 +119,10 @@ export const mockCustomerQuestions: QuestionBase[] = [
     defaultValue: '',
     label: 'Postal Code',
     controlType: 'textbox',
-    inputType: 'textarea',
+    inputType: 'text',
     group: 2,
     groupName: 'Addresses',
-    order: 230,
+    order: 220,
     isRequired: false,
     isDisabled: false,
   },
@@ -130,10 +131,10 @@ export const mockCustomerQuestions: QuestionBase[] = [
     defaultValue: '',
     label: 'City',
     controlType: 'textbox',
-    inputType: 'textarea',
+    inputType: 'text',
     group: 2,
     groupName: 'Addresses',
-    order: 240,
+    order: 230,
     isRequired: false,
     isDisabled: false,
   },
@@ -145,7 +146,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     inputType: 'text',
     group: 2,
     groupName: 'Addresses',
-    order: 210,
+    order: 240,
     // isRequired: false,
     // isDisabled: false,
   },
@@ -161,13 +162,24 @@ export const mockCustomerQuestions: QuestionBase[] = [
     groupName: 'Additional Addresses',
     nestedQuestions: [
       {
+        name: 'country',
+        defaultValue: '',
+        label: 'Country',
+        controlType: 'textbox',
+        inputType: 'text',
+        // group: 2,
+        order: 310,
+        // isRequired: false,
+        // isDisabled: false,
+      },
+      {
         name: 'postalCode',
         defaultValue: '',
         label: 'Postal Code',
         controlType: 'textbox',
         inputType: 'text',
         // group: 2,
-        order: 260,
+        order: 320,
         // isRequired: false,
         // isDisabled: false,
       },
@@ -178,7 +190,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
         controlType: 'textbox',
         inputType: 'text',
         // group: 2,
-        order: 270,
+        order: 330,
         // isRequired: false,
         // isDisabled: false,
       },
@@ -189,7 +201,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
         controlType: 'textbox',
         inputType: 'text',
         // group: 2,
-        order: 250,
+        order: 340,
         // isRequired: false,
         // isDisabled: false,
       },
@@ -207,7 +219,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     inputType: 'text',
     group: 4,
     groupName: 'Contacts',
-    order: 400,
+    order: 410,
   },
 
   {
@@ -218,7 +230,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     inputType: 'text',
     group: 4,
     groupName: 'Contacts',
-    order: 410,
+    order: 420,
   },
 
   {
@@ -229,7 +241,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     inputType: 'text',
     group: 4,
     groupName: 'Contacts',
-    order: 420,
+    order: 430,
   },
 
   {
@@ -240,7 +252,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     inputType: 'text',
     group: 4,
     groupName: 'Contacts',
-    order: 430,
+    order: 440,
   },
 
 

@@ -204,7 +204,7 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
 
 
 
-
+this.columnSelection.
 
 
     // Setting this.customers object array.
@@ -245,6 +245,7 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
         // Load data
         this.dataSource.getCustomers(this.activatedQueryParams);
       });
+
 
     // Observing if either page size or page index changes.
     this.paginator.page

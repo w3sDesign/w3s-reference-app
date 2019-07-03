@@ -509,19 +509,19 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
    * ##################################################################
    */
 
-  generateFilterTemplateForm(questions: QuestionBase[]) {
+  // generateFilterTemplateForm(questions: QuestionBase[]) {
 
-    // this.filterTemplateForm.form = this.formGroupService.createFormGroup(questions);
-    this.filterTemplateForm.createForm(questions);
+  //   // this.filterTemplateForm.form = this.formGroupService.createFormGroup(questions);
+  //   this.filterTemplateForm.createForm(questions);
 
-    // this.getCustomers();
+  //   // this.getCustomers();
 
-    this.logMessage(
-      `[generateFilterTemplateForm()] this.filterTemplateForm.form.value = \n ${JSON.stringify(this.filterTemplateForm.form.value)}`
-    );
+  //   this.logMessage(
+  //     `[generateFilterTemplateForm()] this.filterTemplateForm.form.value = \n ${JSON.stringify(this.filterTemplateForm.form.value)}`
+  //   );
 
-    // this.onFilterTemplateFormValueChanges();
-  }
+  //   // this.onFilterTemplateFormValueChanges();
+  // }
 
 
   // onClearFilters() {
@@ -566,7 +566,8 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
     this.filterTemplateQuestions = this.generateFilterTemplateQuestions(this.displayedFilterNames);
 
     // (3) Generate filterTemplateForm.
-    this.generateFilterTemplateForm(this.filterTemplateQuestions);
+    this.filterTemplateForm.createForm(this.filterTemplateQuestions);
+    // this.generateFilterTemplateForm(this.filterTemplateQuestions);
 
     // (4) Render filter template form
     // this.renderFilterTemplateForm(this.selectedFilterTemplateName);
@@ -618,7 +619,8 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
     // );
 
     // (3) Generating filterTemplateForm.
-    this.generateFilterTemplateForm(this.filterTemplateQuestions);
+    this.filterTemplateForm.createForm(this.filterTemplateQuestions);
+    // this.generateFilterTemplateForm(this.filterTemplateQuestions);
 
     // (4) Setting filter template form.
     // this.renderFilterTemplateForm(name);
