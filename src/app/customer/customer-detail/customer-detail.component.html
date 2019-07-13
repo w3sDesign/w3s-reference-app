@@ -3,59 +3,117 @@
 
   <mat-tab label="Basic Data">
 
+
     <div class="w3s-detail-component mat-elevation-z8">
 
-      <div style="padding:30px 30px;">
+      <!-- Test DatePicker -->
+      <!-- ######################################################## -->
+
+      <mat-form-field>
+        <input matInput [matDatepicker]="dp" placeholder="Moment.js datepicker" [formControl]="date">
+        <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+        <mat-datepicker #dp></mat-datepicker>
+      </mat-form-field>
 
 
-        <!-- <h5>{{title}}</h5> -->
 
-        <!-- Customer form -->
-        <!-- ########################################################## -->
+      <!-- Back/Cancel/Save buttons -->
+      <!-- ######################################################## -->
+      <!-- At the beginning *and* at the end! -->
+
+      <div class="button-bar">
+
+        <div class="special-font">
+          <!-- Create/Update Customer -->
+          {{title}}
+        </div>
+
+        <div class="push-right">
+          <button type="button" mat-raised-button (click)="navigateToList(customer)" matTooltip="Go back.">
+            Back
+          </button>
+        </div>
+
+        <!-- [mat-dialog-close]="customer" only for closing dialog window -->
+        <button type="button" mat-raised-button [disabled]="!customerForm?.form.dirty" (click)="navigateToList(customer)" matTooltip="Cancel changes and go back.">
+          Cancel
+        </button>
+
+        <!-- Create or update customer -->
+        <!-- customerForm.form.getRawValue() = actual values of customer -->
+        <!-- [disabled]="!customerFormHasChanged" -->
+        <!-- Compare with customer-filter-template.component.html -->
+
+        <button type="button" mat-raised-button color="primary" [disabled]="!customerForm?.form.valid || !customerForm?.form.dirty" (click)="customer.id ? updateCustomer(customerForm.form.getRawValue()) : createCustomer(customerForm.form.getRawValue())" matTooltip="Save changes and go back.">
+          Save
+        </button>
+
+      </div>
+      <mat-divider></mat-divider>
+
+
+
+      <!-- Customer detail form -->
+      <!-- ######################################################## -->
+
+      <div class="customer-form">
+
+        <!-- ====================================================== -->
 
         <w3s-dynamic-form #customerForm *ngIf="customerQuestions" [questions]="customerQuestions" [options]="customerFormOptions" [dataGroupNames]="dataGroupNames" [title]="title" (formSubmit)="onCustomerFormSubmit($event)">
 
+          <!-- ==================================================== -->
+
         </w3s-dynamic-form>
 
+      </div>
 
 
 
-        <br>
-
-        <!-- Back/Cancel/Save buttons -->
-        <!-- ########################################################## -->
-
-        <div class="nix-flex-box">
-
-          <button type="button" mat-raised-button (click)="navigateToList(customer)" matTooltip="Go back.">
-            Back
-          </button>&nbsp;
-
-          <!-- [mat-dialog-close]="customer" only for closing dialog window -->
-          <button type="button" mat-raised-button [disabled]="!customerForm?.form.dirty" (click)="navigateToList(customer)" matTooltip="Cancel changes and go back.">
-            Cancel
-          </button>&nbsp;
-
-          <!-- Create or update customer -->
-          <!-- customerForm.form.getRawValue() = actual values of customer -->
-          <!-- [disabled]="!customerFormHasChanged" -->
-          <!-- Compare with customer-filter-template.component.html -->
-
-          <button type="button" mat-raised-button color="primary" [disabled]="!customerForm?.form.valid || !customerForm?.form.dirty" (click)="customer.id ? updateCustomer(customerForm.form.getRawValue()) : createCustomer(customerForm.form.getRawValue())"  matTooltip="Save changes and go back.">
-            Save
-          </button>
-
-        </div> <!-- End flex-box -->
 
 
-        <div *ngIf="showTestValues"  class="w3s-show-test-values">
-          <br>########## customer:<br> {{customer | json}}
-          <br>########## customerForm?.form.value:<br> {{customerForm?.form.value  | json}}
-          <br><br>
-        </div>
+      <br>
 
+      <!-- Back/Cancel/Save buttons -->
+      <!-- ######################################################## -->
+      <!-- At the beginning *and*at the end! -->
+
+      <div class="button-bar">
+
+        <button type="button" mat-raised-button (click)="navigateToList(customer)" matTooltip="Go back.">
+          Back
+        </button>
+
+        <!-- [mat-dialog-close]="customer" only for closing dialog window -->
+        <button type="button" mat-raised-button [disabled]="!customerForm?.form.dirty" (click)="navigateToList(customer)" matTooltip="Cancel changes and go back.">
+          Cancel
+        </button>
+
+        <!-- Create or update customer -->
+        <!-- customerForm.form.getRawValue() = actual values of customer -->
+        <!-- [disabled]="!customerFormHasChanged" -->
+        <!-- Compare with customer-filter-template.component.html -->
+
+        <button type="button" mat-raised-button color="primary" [disabled]="!customerForm?.form.valid || !customerForm?.form.dirty" (click)="customer.id ? updateCustomer(customerForm.form.getRawValue()) : createCustomer(customerForm.form.getRawValue())" matTooltip="Save changes and go back.">
+          Save
+        </button>
 
       </div>
+
+
+
+
+      <div *ngIf="showTestValues" class="w3s-show-test-values">
+
+        <br>########## customer:<br> {{customer | json}}
+        <!-- This causes ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked.  -->
+        <!-- <br>########## customerForm?.form.value:<br> {{customerForm?.form.value  | json}} -->
+        <br><br>
+
+      </div>
+
+
+      <!-- </div> -->
     </div>
 
 

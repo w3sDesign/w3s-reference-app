@@ -20,7 +20,8 @@ import { SharedMaterialModule } from './shared-material.module';
   ],
 
   declarations: [
-    HighlightDirective, DynamicFormComponent, DynamicFormQuestionComponent,
+    HighlightDirective,
+    DynamicFormComponent, DynamicFormQuestionComponent,
   ],
 
   providers: [
@@ -28,7 +29,9 @@ import { SharedMaterialModule } from './shared-material.module';
   ],
 
   exports: [
-    HighlightDirective, DynamicFormComponent, DynamicFormQuestionComponent,
+    HighlightDirective,
+    DynamicFormComponent, DynamicFormQuestionComponent,
+
     CommonModule, FormsModule, ReactiveFormsModule, LayoutModule,
     SharedMaterialModule
   ],

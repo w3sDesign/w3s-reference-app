@@ -3,7 +3,11 @@ import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
 import { CdkDragStart, CdkDropList, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
-import { MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTable } from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSort } from '@angular/material/sort';
+import { MatTable } from '@angular/material/table';
 
 import { fromEvent, merge, Observable, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap, switchMap } from 'rxjs/operators';
@@ -96,8 +100,8 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
     'department', 'person', 'phone', 'email'
   ];
 
-  /** Columns displayed in the data table */
-  /** = selected in the columnSelection table */
+  /** Columns displayed in the data table. */
+  /** = selected in the columnSelection table. */
   displayedColumns: string[] = [
     'select', 'id', 'name', 'country', 'city', 'phone', 'email'
   ];
@@ -105,32 +109,32 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
 
 
 
-  /** Data table paginator */
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  /** Paginating table rows. */
+  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
 
-  /** Sorting table columns */
-  @ViewChild(MatSort) sort: MatSort;
+  /** Sorting table columns. */
+  @ViewChild(MatSort, {static: false}) sort: MatSort;
 
-  // /** Searching in all fields */
+  // /** Searching in all fields. */
   // @ViewChild('searchInput') searchInput: ElementRef;
 
-  /** Customer selection handling (selecting data table rows). */
+  /** Selecting customers (selecting specific table rows). */
   customerSelection = new SelectionModel<Customer>(true, []);
 
-  /** Column selection handling (selecting which columns to display). */
+  /** Selecting columns (selecting which columns to display). */
   /** Args: allowMultiSelect, initialSelection */
   columnSelection = new SelectionModel<string>(true, this.displayedColumns);
 
   /** Table for column selection. */
-  @ViewChild('columnSelectionTable') columnSelectionTable: MatTable<string[]>;
+  @ViewChild('columnSelectionTable', {static: false}) columnSelectionTable: MatTable<string[]>;
 
-
-
-  /** Create/Update/Delete buttons */
-  @ViewChild('crudButtons', { read: ViewContainerRef }) crudButtons;
-
-  /** For drag and drop main table columns. */
+  /** Needed for drag and drop columns. */
   previousDragIndex: number;
+
+
+  /** Create/Update/Delete buttons. */
+  @ViewChild('crudButtons', { read: ViewContainerRef , static: false}) crudButtons;
+
 
 
 
@@ -164,47 +168,57 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
 
     this.logMessage(`[ngOnInit()] ########################################`);
 
-    // Observing if activated route includes query params
+    // Setting parameters from activated route
     // (from navigateToList() in CustomerDetailComponent).
 
     this.route.paramMap.pipe(
       switchMap((routeParams: ParamMap) => {
 
-        // = 0 when id is null (because + converts null to 0)
+        // Setting selected customer id from activated route.
+
         // this.selectedCustomerId = +this.route.snapshot.paramMap.get('id');
+        // = 0 when id is null (because + converts null to 0)
 
         this.selectedCustomerId = +routeParams.get('id');
 
 
-        const qp = routeParams.get('queryParams');
+        // Setting displayed columns from activated route.
 
+        const dc: string = routeParams.get('displayedColumns');
+        this.logMessage(
+          `[ngOnInit()] routeParams.get('displayedColumns') = ${dc}`
+        );
+        if (dc) {
+          this.displayedColumns = JSON.parse(dc);
+          this.logMessage(
+            `[ngOnInit()] routeParams / displayedColumns = ${JSON.stringify(this.displayedColumns)}`
+          );
+        }
+
+
+        // Setting query params from activated route.
+
+        const qp: string = routeParams.get('queryParams');
         this.logMessage(
           `[ngOnInit()] routeParams.get('queryParams') = ${qp}`
         );
-
         if (qp) {
-
           this.activatedQueryParams = JSON.parse(qp) as QueryParams;
-
           // this.dataSource.getCustomers(JSON.parse(qp) as QueryParams);
-
           // } else {
-
           //   this.dataSource.getCustomers(this.activatedQueryParams);
-
         }
+
 
         this.dataSource.getCustomers(this.activatedQueryParams);
         ////////////////////////////////////////////////////////
 
-
         return of(routeParams);
       })
+
     ).subscribe();
 
 
-
-this.columnSelection.
 
 
     // Setting this.customers object array.
@@ -228,14 +242,10 @@ this.columnSelection.
     );
 
 
-
-
-
-
     // Observing if either active sort or sort direction changes.
+
     this.sort.sortChange
       .subscribe(() => {
-
         this.activatedQueryParams.sortField = this.sort.active;
         this.activatedQueryParams.sortOrder = this.sort.direction;
         // Reset to first page.
@@ -248,15 +258,14 @@ this.columnSelection.
 
 
     // Observing if either page size or page index changes.
+
     this.paginator.page
       .subscribe(() => {
-
         this.activatedQueryParams.pageNumber = this.paginator.pageIndex;
         this.activatedQueryParams.pageSize = this.paginator.pageSize;
 
         this.dataSource.getCustomers(this.activatedQueryParams);
       });
-
 
   }
 
@@ -436,18 +445,13 @@ this.columnSelection.
  * ##################################################################
  */
 
-  // navigateToDetail(row: Customer) {
-  navigateToDetail(id: number) {
+  navigateToDetail(id: number, ids?: number[]) {
 
-    // this.selectedCustomer = row; // needed? Test
-
-    // this.router.navigate(['/customers', row.id, { ftid: this.activatedFilterTemplateId }]);
-
-    // this.router.navigate(['/customers', row.id, this.activatedQueryParams]);
-
-    // this.router.navigate(['/customers', row.id, { queryParams: JSON.stringify(this.activatedQueryParams) }]);
-
-    this.router.navigate(['/customers', id, { ids: 10, queryParams: JSON.stringify(this.activatedQueryParams) }]);
+    this.router.navigate(['/customers', id, {
+      ids: ids ? ids : null,
+      displayedColumns: JSON.stringify(this.displayedColumns),
+      queryParams: JSON.stringify(this.activatedQueryParams),
+    }]);
   }
 
 
@@ -493,12 +497,18 @@ this.columnSelection.
    */
 
   setDisplayedColumns() {
+
+    // Displayed columns ordered by their selection.
+    // this.displayedColumns = this.columnSelection.selected;
+
+    // Displayed columns ordered like available columns.
     this.displayedColumns = [];
     this.availableColumns.forEach((column, index) => {
       if (this.columnSelection.isSelected(column)) {
         this.displayedColumns.push(column);
       }
     });
+
     this.columnSelectionTable.renderRows();
   }
 
@@ -573,22 +583,21 @@ this.columnSelection.
 
   updateCustomer(id?: number) {
 
-    // Create customer.
-    // if (id === 0) {
-    //   this.navigateToDetail(0);
-    // }
-
     // (1) Update customer with the clicked row.id.
 
     if (id) {
 
-      // NavigateToDetail /////////////////////////////////////////////
-      this.router.navigate(['/customers', id,
-        { queryParams: JSON.stringify(this.activatedQueryParams) }
-      ]);
-      /////////////////////////////////////////////////////////////////
+      this.navigateToDetail(id);
+
+      // this.router.navigate(['/customers', id, {
+      //   displayedColumns: JSON.stringify(this.displayedColumns),
+      //   queryParams: JSON.stringify(this.activatedQueryParams)
+      // }]);
+
       return;
     }
+
+    // (2) Update selected customers (no row.id).
 
     if (this.customerSelection.isEmpty()
       || !this.customerSelection.selected.length) {
@@ -610,16 +619,14 @@ this.columnSelection.
     for (let i = 0; i < this.customerSelection.selected.length; i++) {
       ids[i] = this.customerSelection.selected[i].id;
     }
-    // const customer1 = this.customerSelection.selected[0];
 
-    // this.navigateToDetail(this.customerSelection.selected[0].id);
-    // this.navigateToDetail(ids[0]);
+    this.navigateToDetail(ids[0], ids);
 
-    // NavigateToDetail ///////////////////////////////////////////////
-    this.router.navigate(['/customers', ids[0],
-      { ids: ids, queryParams: JSON.stringify(this.activatedQueryParams) }
-    ]);
-    //////////////////////////////////////////////////////////////////
+    // this.router.navigate(['/customers', ids[0], {
+    //   ids: ids,
+    //   displayedColumns: JSON.stringify(this.displayedColumns),
+    //   queryParams: JSON.stringify(this.activatedQueryParams)
+    // }]);
 
   }
 

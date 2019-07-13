@@ -1,9 +1,9 @@
 <!-- <div [formGroup]="form"> -->
 
 
-<!-- ########################################################## -->
 <!-- Handling a question according to its controlType -->
 <!-- ########################################################## -->
+
 
 <ng-container [ngSwitch]="question.controlType" [formGroup]="form">
 
@@ -14,7 +14,7 @@
 
   <ng-container *ngSwitchCase="'textbox'">
 
-    <mat-form-field *ngIf="question.inputType !== 'textarea'" [class.hide]="question.isDisabled" [appearance]="options.formFieldAppearance">
+    <mat-form-field *ngIf="(question.inputType === 'number' || question.inputType === 'text')" [class.hide]="question.isDisabled" [appearance]="options.formFieldAppearance">
 
       <mat-label>{{question.label}}</mat-label>
 
@@ -23,8 +23,51 @@
 
       <mat-hint align="start">{{question.hint}}</mat-hint>
 
-      <!-- <mat-error *ngIf="!isValid"> -->
-      <mat-error>{{question.label}} is required</mat-error>
+      <!-- <mat-error>{{question.label}} is required</mat-error> -->
+      <mat-error *ngIf="isInvalid">{{getErrorMessage()}}</mat-error>
+
+
+    </mat-form-field>
+
+  </ng-container>
+
+
+  <ng-container *ngSwitchCase="'textbox'">
+
+    <mat-form-field *ngIf="question.inputType === 'date'" [class.hide]="question.isDisabled" [appearance]="options.formFieldAppearance">
+
+      <mat-label>{{question.label}}</mat-label>
+
+      <input matInput [formControlName]="question.name" [id]="question.name" [readonly]="question.isReadonly" [required]="question.isRequired" [matDatepicker]="datepicker">
+      <!-- [type]="question.inputType" -->
+      <!-- [matTooltip]="question.tooltip" -->
+      <!-- Prevents certain dates from being selected from the datepicker. -->
+      <!-- [matDatepickerFilter]="datepickerFilter" -->
+
+      <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+      <mat-datepicker #datepicker></mat-datepicker>
+
+      <mat-hint align="start">{{question.hint}}</mat-hint>
+
+      <mat-error *ngIf="isInvalid">{{getErrorMessage()}}</mat-error>
+
+    </mat-form-field>
+
+  </ng-container>
+
+
+  <ng-container *ngSwitchCase="'textbox'">
+
+    <mat-form-field *ngIf="(question.inputType === 'email')" [class.hide]="question.isDisabled" [appearance]="options.formFieldAppearance">
+
+      <mat-label>{{question.label}}</mat-label>
+
+      <input matInput [formControlName]="question.name" [id]="question.name" [readonly]="question.isReadonly" [required]="question.isRequired" [matTooltip]="question.tooltip">
+      <!-- [type]="question.inputType"  -->
+
+      <mat-hint align="start">{{question.hint}}</mat-hint>
+
+      <mat-error *ngIf="isInvalid">{{getErrorMessage()}}</mat-error>
 
     </mat-form-field>
 
@@ -37,13 +80,14 @@
 
       <mat-label>{{question.label}}</mat-label>
 
-      <textarea matInput [formControlName]="question.name" [id]="question.name" [type]="question.inputType" [readonly]="question.isReadonly" [required]="question.isRequired" [matTooltip]="question.tooltip" rows="2" cols="200" [w3sHighlight]="'yellow'">
+      <textarea matInput [formControlName]="question.name" [id]="question.name" [type]="question.inputType" [readonly]="question.isReadonly" [required]="question.isRequired" [matTooltip]="question.tooltip" rows="1" cols="200" [w3sHighlight]="'yellow'">
 
           </textarea>
 
       <mat-hint align="start">{{question.hint}}</mat-hint>
 
-      <mat-error>{{question.label}} is required</mat-error>
+      <mat-error *ngIf="isInvalid">{{getErrorMessage()}}</mat-error>
+
 
     </mat-form-field>
 
@@ -51,31 +95,24 @@
 
 
 
-
-
-
-  <!-- TODO? Orig version for textarea -->
-  <!-- <mat-form-field *ngSwitchCase="'textbox'" [class.hide]="question.isDisabled"> -->
-  <!-- <input matInput [formControlName]="question.name" [id]="question.name" [type]="question.inputType" [readonly]="question.isReadonly" [required]="question.isRequired" [matTooltip]="question.tooltip" rows="1" cols="200" [w3sHighlight]="'yellow'" /> -->
-  <!-- <mat-hint align="start">{{question.label}}</mat-hint> -->
-  <!-- <mat-error>{{question.label}} is required</mat-error> -->
-  <!-- </mat-form-field> -->
-
-
   <!-- ========================================================== -->
   <!-- Question controlType === 'dropdown' -->
   <!-- ========================================================== -->
 
-  <mat-form-field *ngSwitchCase="'dropdown'" [class.hide]="question.isDisabled">
+  <mat-form-field *ngSwitchCase="'dropdown'" [class.hide]="question.isDisabled" [appearance]="options.formFieldAppearance">
 
-    <mat-select [formControlName]="question.name" [id]="question.name">
+    <mat-label>{{question.label}}</mat-label>
+
+    <mat-select [formControlName]="question.name" [id]="question.name" [required]="question.isRequired">
       <mat-option *ngFor="let option of question.options" [value]="option.key">{{option.value}}</mat-option>
     </mat-select>
 
-    <mat-hint align="start">{{question.label}}</mat-hint>
-    <mat-error>{{question.label}} is required</mat-error>
+    <mat-hint align="start">{{question.hint}}</mat-hint>
+
+    <mat-error *ngIf="isInvalid">{{getErrorMessage()}}</mat-error>
 
   </mat-form-field>
+
 
 
   <!-- ========================================================== -->
@@ -88,7 +125,6 @@
     <mat-checkbox [formControlName]="question.name" [id]="question.name" [class.hide]="question.isDisabled">{{question.label}}</mat-checkbox>
 
   </ng-container>
-
 
 
 
@@ -120,6 +156,7 @@
 
                 <input matInput [formControlName]="nestedQuestion.name" [id]="nestedQuestion.name" [type]="nestedQuestion.inputType" [readonly]="nestedQuestion.isReadonly" [required]="nestedQuestion.isRequired" [matTooltip]="nestedQuestion.tooltip">
 
+                <!-- TODO <mat-error *ngIf="isInvalid">{{getErrorMessage()}}</mat-error> -->
                 <mat-error>{{nestedQuestion.label}} is required</mat-error>
 
               </mat-form-field>
@@ -149,6 +186,8 @@
 
       <br>
       <button mat-raised-button color="nixprimary" (click)="addFormGroup()">Add Address</button>
+
+
 
 
       <div *ngIf="showTestValues" class="w3s-show-test-values">

@@ -28,8 +28,8 @@ import { environment } from '../../environments/environment';
     CommonModule,
     HttpClientModule,
 
-    //  The HttpClientInMemoryWebApiModule module intercepts HTTP requests
-    //  and returns simulated server responses.
+    //  The HttpClientInMemoryWebApiModule module intercepts
+    //  HTTP requests and returns simulated server responses.
     //  Remove it when a real server is ready to receive requests.
     environment.production
       ? []
@@ -39,8 +39,8 @@ import { environment } from '../../environments/environment';
           dataEncapsulation: false
         }),
 
-        SharedModule,
-        CustomerRoutingModule,
+    SharedModule,
+    CustomerRoutingModule,
   ],
 
   declarations: [
@@ -56,19 +56,26 @@ import { environment } from '../../environments/environment';
   ],
 
   providers: [
+
     // Choose the right implementation.
     // ################################################################
-    // All application code refers to an interface and is independent of an implementation.
-    // CustomerService is the interface (100% abstract class).
-    // HttpCustomerService and MockCustomerService are different implementations.
+    // Application code refers to an interface and is independent of
+    // an implementation. For example:
+    //  CustomerService is the interface (100% abstract class).
+    //  HttpCustomerService and MockCustomerService are different implementations.
 
     { provide: CustomerService, useClass: HttpCustomerService },
+
     // {provide: CustomerService, useClass: MockCustomerService},
 
     { provide: CustomerFilterTemplateService, useClass: HttpCustomerFilterTemplateService },
+
     // {provide: CustomerFilterTemplateService, useClass: MockCustomerFilterTemplateService},
 
     CustomerInMemoryDataService,
+    // Is the same as:
+    // {provide: CustomerInMemoryDataService, useClass: CustomerInMemoryDataService},
+
   ],
 
   exports: [

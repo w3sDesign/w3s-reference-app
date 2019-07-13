@@ -5,7 +5,7 @@ import { Observable, of, throwError } from 'rxjs';
 
 import { MessageSnackBarComponent } from './message-snack-bar/message-snack-bar.component';
 import { MessageService } from './message.service';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 

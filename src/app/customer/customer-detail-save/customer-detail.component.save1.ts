@@ -7,7 +7,7 @@ import {
   Component, OnInit, Inject, ElementRef, ViewChild, ChangeDetectionStrategy
 } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { HttpCustomerService } from '../model/http-customer.service';

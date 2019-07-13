@@ -1,7 +1,11 @@
 // tslint:disable-next-line:max-line-length
 import { Component, ElementRef, OnInit, ViewChild, ViewContainerRef, AfterViewInit, OnChanges, EventEmitter, Output } from '@angular/core';
 
-import { MatDialog, MatDialogConfig, MatPaginator, MatSnackBar, MatSort, MatTable } from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSort } from '@angular/material/sort';
+import { MatTable } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 import { CdkDragStart, CdkDropList, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
@@ -89,7 +93,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
    * Reference to the filter template form.
    * Not set before AfterViewInit.
    */
-  @ViewChild('filterTemplateForm')
+  @ViewChild('filterTemplateForm', {static: false})
   filterTemplateForm: DynamicFormComponent;
 
   // filterTemplateFormValue: any = {};
@@ -128,7 +132,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
   filterSelection = new SelectionModel<string>(true, this.displayedFilterNames);
 
   /** Table for filter selection. */
-  @ViewChild('filterSelectionTable')
+  @ViewChild('filterSelectionTable', {static: false})
   filterSelectionTable: MatTable<string[]>;
 
 
@@ -572,7 +576,9 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
     // (4) Render filter template form
     // this.renderFilterTemplateForm(this.selectedFilterTemplateName);
 
-    this.filterTemplateForm.setFormValue(formValueSave);
+    // analog this.customerForm.form.patchValue(this.customer);
+    // this.filterTemplateForm.setFormValue(formValueSave);
+    this.filterTemplateForm.form.patchValue(formValueSave);
 
     // (5) Emit QueryParams
     this.emitQueryParamsChange();

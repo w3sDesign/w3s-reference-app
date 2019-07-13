@@ -1,6 +1,12 @@
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
+import { betweenDateValidator } from '../../shared/form-validators/between-date.directive';
+import { Validators } from '@angular/forms';
 
-// TODO? mockCustomerDetailQuestions for CustomerDetailComponent
+import * as moment from 'moment';
+////////////////////
+moment.locale('de');
+////////////////////
+
 
 export const mockCustomerQuestions: QuestionBase[] = [
 
@@ -32,20 +38,36 @@ export const mockCustomerQuestions: QuestionBase[] = [
     groupName: 'Basic Data',
     order: 120,
     isRequired: true,
-    // isDisabled: false,
+
+    validators: [
+      Validators.required,
+    ],
+    validationErrors: {
+      'required': 'Name required.',
+    },
+
   },
 
 
   // TODO type + status dropdown ?readOnly
   {
     name: 'type',
-    defaultValue: '',
+    defaultValue: 'business',
     label: 'Customer Type',
     controlType: 'dropdown',
     inputType: '',
     group: 1,
     groupName: 'Basic Data',
     order: 130,
+    isRequired: true,
+
+    validators: [
+      Validators.required,
+    ],
+    validationErrors: {
+      'required': 'Customer type required.',
+    },
+
 
     options: [
       { key: 'business', value: 'Business' },
@@ -56,13 +78,22 @@ export const mockCustomerQuestions: QuestionBase[] = [
 
   {
     name: 'status',
-    defaultValue: '',
+    defaultValue: 'active',
     label: 'Customer Status',
     controlType: 'dropdown',
     inputType: '',
     group: 1,
     groupName: 'Basic Data',
     order: 140,
+    isRequired: true,
+
+    validators: [
+      Validators.required,
+    ],
+    validationErrors: {
+      'required': 'Customer status required.',
+    },
+
 
     options: [
       { key: 'active', value: 'Active' },
@@ -78,7 +109,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     defaultValue: '',
     label: 'Comment',
     controlType: 'textbox',
-    inputType: 'text',
+    inputType: 'textarea',
     group: 1,
     groupName: 'Basic Data',
     order: 150,
@@ -91,28 +122,127 @@ export const mockCustomerQuestions: QuestionBase[] = [
     defaultValue: '',
     label: 'Creation Date',
     controlType: 'textbox',
-    inputType: 'text',
+    inputType: 'date',
     group: 1,
     groupName: 'Basic Data',
     order: 160,
+    isRequired: true,
+
+    validators: [
+      Validators.required,
+      betweenDateValidator(moment('2000-01-01'), moment()),
+      // `Not between ${moment('2000-01-01').format('L')} and ${moment().format('L')}.`)
+    ],
+    validationErrors: {
+      'required': 'Date required.',
+      'betweenDate': `Date not between ${moment('2000-01-01').format('L')} and ${moment().format('L')}.`
+    },
+
   },
-
-
 
 
   // Group 2: Main Address
 
   {
     name: 'country',
-    defaultValue: '',
+    defaultValue: 'Austria',
     label: 'Country',
-    controlType: 'textbox',
-    inputType: 'text',
+    controlType: 'dropdown',
+    inputType: '',
     group: 2,
-    groupName: 'Addresses',
+    groupName: 'Main Address',
     order: 210,
-    // isRequired: false,
-    // isDisabled: false,
+    isRequired: true,
+
+    validators: [
+      Validators.required,
+    ],
+    validationErrors: {
+      'required': 'Country required.',
+    },
+
+
+
+    options: [
+      { key: 'Albania', value: 'Albania' },
+      { key: 'Algeria', value: 'Algeria' },
+      { key: 'Argentina', value: 'Argentina' },
+      { key: 'Armenia', value: 'Armenia' },
+      { key: 'Australia', value: 'Australia' },
+      { key: 'Austria', value: 'Austria' },
+      { key: 'Belgium', value: 'Belgium' },
+      { key: 'Bolivia', value: 'Bolivia' },
+      { key: 'Bosnia and Herzegovina', value: 'Bosnia and Herzegovina' },
+      { key: 'Brazil', value: 'Brazil' },
+      { key: 'Bulgaria', value: 'Bulgaria' },
+      { key: 'Canada', value: 'Canada' },
+      { key: 'Chile', value: 'Chile' },
+      { key: 'China', value: 'China' },
+      { key: 'Colombia', value: 'Colombia' },
+      { key: 'Croatia', value: 'Croatia' },
+      { key: 'Cuba', value: 'Cuba' },
+      { key: 'Cyprus', value: 'Cyprus' },
+      { key: 'Czech Republic', value: 'Czech Republic' },
+      { key: 'Denmark', value: 'Denmark' },
+      { key: 'Egypt', value: 'Egypt' },
+      { key: 'Finland', value: 'Finland' },
+      { key: 'France', value: 'France' },
+      { key: 'Georgia', value: 'Georgia' },
+      { key: 'Germany', value: 'Germany' },
+      { key: 'Greece', value: 'Greece' },
+      { key: 'Hungary', value: 'Hungary' },
+      { key: 'Iceland', value: 'Iceland' },
+      { key: 'India', value: 'India' },
+      { key: 'Indonesia', value: 'Indonesia' },
+      { key: 'Iran', value: 'Iran' },
+      { key: 'Iraq', value: 'Iraq' },
+      { key: 'Ireland', value: 'Ireland' },
+      { key: 'Israel', value: 'Israel' },
+      { key: 'Italy', value: 'Italy' },
+      { key: 'Japan', value: 'Japan' },
+      { key: 'Korea, Republic of', value: 'Korea, Republic of' },
+      { key: 'Liberia', value: 'Liberia' },
+      { key: 'Liechtenstein', value: 'Liechtenstein' },
+      { key: 'Lithuania', value: 'Lithuania' },
+      { key: 'Luxembourg', value: 'Luxembourg' },
+      { key: 'Macedonia', value: 'Macedonia' },
+      { key: 'Malta', value: 'Malta' },
+      { key: 'Mexico', value: 'Mexico' },
+      { key: 'Moldova, Republic of', value: 'Moldova, Republic of' },
+      { key: 'Monaco', value: 'Monaco' },
+      { key: 'Mongolia', value: 'Mongolia' },
+      { key: 'Morocco', value: 'Morocco' },
+      { key: 'Netherlands', value: 'Netherlands' },
+      { key: 'Norway', value: 'Norway' },
+      { key: 'Oman', value: 'Oman' },
+      { key: 'Pakistan', value: 'Pakistan' },
+      { key: 'Peru', value: 'Peru' },
+      { key: 'Philippines', value: 'Philippines' },
+      { key: 'Poland', value: 'Poland' },
+      { key: 'Portugal', value: 'Portugal' },
+      { key: 'Romania', value: 'Romania' },
+      { key: 'Russian Federation', value: 'Russian Federation' },
+      { key: 'Saudi Arabia', value: 'Saudi Arabia' },
+      { key: 'Serbia and Montenegro', value: 'Serbia and Montenegro' },
+      { key: 'Slovakia', value: 'Slovakia' },
+      { key: 'Slovenia', value: 'Slovenia' },
+      { key: 'South Africa', value: 'South Africa' },
+      { key: 'Spain', value: 'Spain' },
+      { key: 'Sweden', value: 'Sweden' },
+      { key: 'Switzerland', value: 'Switzerland' },
+      { key: 'Thailand', value: 'Thailand' },
+      { key: 'Tunisia', value: 'Tunisia' },
+      { key: 'Turkey', value: 'Turkey' },
+      { key: 'Ukraine', value: 'Ukraine' },
+      { key: 'United Arab Emirates', value: 'United Arab Emirates' },
+      { key: 'United Kingdom', value: 'United Kingdom' },
+      { key: 'United States', value: 'United States' },
+      { key: 'Uruguay', value: 'Uruguay' },
+      { key: 'Venezuela', value: 'Venezuela' },
+      { key: 'Viet Nam', value: 'Viet Nam' },
+      { key: 'Yemen', value: 'Yemen' },
+      { key: 'Zambia', value: 'Zambia' },
+    ]
   },
   {
     name: 'postalCode',
@@ -121,10 +251,17 @@ export const mockCustomerQuestions: QuestionBase[] = [
     controlType: 'textbox',
     inputType: 'text',
     group: 2,
-    groupName: 'Addresses',
+    groupName: 'Main Address',
     order: 220,
-    isRequired: false,
-    isDisabled: false,
+    isRequired: true,
+
+    validators: [
+      Validators.required,
+    ],
+    validationErrors: {
+      'required': 'PostalCode required.',
+    },
+
   },
   {
     name: 'city',
@@ -133,10 +270,17 @@ export const mockCustomerQuestions: QuestionBase[] = [
     controlType: 'textbox',
     inputType: 'text',
     group: 2,
-    groupName: 'Addresses',
+    groupName: 'Main Address',
     order: 230,
-    isRequired: false,
-    isDisabled: false,
+    isRequired: true,
+
+    validators: [
+      Validators.required,
+    ],
+    validationErrors: {
+      'required': 'City required.',
+    },
+
   },
   {
     name: 'street',
@@ -145,10 +289,17 @@ export const mockCustomerQuestions: QuestionBase[] = [
     controlType: 'textbox',
     inputType: 'text',
     group: 2,
-    groupName: 'Addresses',
+    groupName: 'Main Address',
     order: 240,
-    // isRequired: false,
-    // isDisabled: false,
+    isRequired: true,
+
+    validators: [
+      Validators.required,
+    ],
+    validationErrors: {
+      'required': 'Street required.',
+    },
+
   },
 
 
@@ -209,7 +360,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
   },
 
 
-  // Group 4: Main Contact and additional Contacts
+  // Group 5: Main Contact
 
   {
     name: 'department',
@@ -218,7 +369,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     controlType: 'textbox',
     inputType: 'text',
     group: 4,
-    groupName: 'Contacts',
+    groupName: 'Main Contact',
     order: 410,
   },
 
@@ -229,7 +380,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     controlType: 'textbox',
     inputType: 'text',
     group: 4,
-    groupName: 'Contacts',
+    groupName: 'Main Contact',
     order: 420,
   },
 
@@ -240,8 +391,9 @@ export const mockCustomerQuestions: QuestionBase[] = [
     controlType: 'textbox',
     inputType: 'text',
     group: 4,
-    groupName: 'Contacts',
+    groupName: 'Main Contact',
     order: 430,
+
   },
 
   {
@@ -249,11 +401,24 @@ export const mockCustomerQuestions: QuestionBase[] = [
     defaultValue: '',
     label: 'Email',
     controlType: 'textbox',
-    inputType: 'text',
+    inputType: 'email',
     group: 4,
-    groupName: 'Contacts',
+    groupName: 'Main Contact',
     order: 440,
+    isRequired: true,
+
+    validators: [
+      Validators.required,
+      Validators.email,
+    ],
+    validationErrors: {
+      'required': 'Email required.',
+      'email': 'Not a valid email.',
+    },
+
   },
+
+  // Group 6: Additional Contacts
 
 
 ];

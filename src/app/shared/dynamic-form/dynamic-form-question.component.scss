@@ -12,7 +12,10 @@
   padding-top: 16px;
 
   .mat-form-field {
-    flex: 1;
+    // flex: 1;
+
+    flex: 0 0 315px;
+
     // margin-right: 30px;
     // max-width: 400px;
   }
@@ -48,23 +51,10 @@
 
 
 
-.checkbox {
-  display: flex;
-
-  flex-direction: column;
-  align-items: center; // vertical
-  justify-content: flex-start; // horizontal
-  flex-wrap: wrap; // default = nowrap
-
-  font-size: 14px;
-  // padding-bottom: 16px; // 8px 16px 24px;
-}
-
-// // test
-// .flex-box {
+// .checkbox {
 //   display: flex;
 
-//   flex-direction: row;
+//   flex-direction: column;
 //   align-items: center; // vertical
 //   justify-content: flex-start; // horizontal
 //   flex-wrap: wrap; // default = nowrap
@@ -72,3 +62,16 @@
 //   font-size: 14px;
 //   // padding-bottom: 16px; // 8px 16px 24px;
 // }
+
+// // // test
+// // .flex-box {
+// //   display: flex;
+
+// //   flex-direction: row;
+// //   align-items: center; // vertical
+// //   justify-content: flex-start; // horizontal
+// //   flex-wrap: wrap; // default = nowrap
+
+// //   font-size: 14px;
+// //   // padding-bottom: 16px; // 8px 16px 24px;
+// // }

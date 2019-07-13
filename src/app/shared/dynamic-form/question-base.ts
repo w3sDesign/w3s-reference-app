@@ -1,6 +1,11 @@
+import { ValidatorFn, ValidationErrors } from '@angular/forms';
+
+
+export type QuestionInputType = 'number' | 'text' | 'date' | 'email' | 'textarea' | '';
+
 /**
  * Form field metadata
- * for generating dynamic forms.
+ * for generating dynamic form controls.
  */
 export class QuestionBase {
   name = '';
@@ -9,13 +14,19 @@ export class QuestionBase {
   hint ? = '';
   tooltip ? = '';
   controlType = '';
-  inputType ? = '';
-  group?: 0 | 1 | 2 | 3 | 4 | 5 = 0; // 0 = no grouping; 1,2,3... = grouping
+  inputType?: QuestionInputType = '';
+
+  // 0 = no grouping; 1,2,3... = grouping
+  group?: 0 | 1 | 2 | 3 | 4 | 5 = 0;
   groupName ? = '';
   order ? = 0;
   isRequired ? = false;
   isDisabled ? = false;
   isReadonly ? = false;
+
+  // Form control validators.
+  validators?: ValidatorFn[] | null = null;
+  validationErrors?: ValidationErrors | null = null;
 
   nestedQuestions?: QuestionBase[] = [];
 

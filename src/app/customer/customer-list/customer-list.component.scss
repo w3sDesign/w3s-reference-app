@@ -1,4 +1,31 @@
-/* Private styles */
+.button-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center; // vertical
+  justify-content: flex-start; // horizontal
+  flex-wrap: wrap; // default = nowrap
+
+  padding: 16px 8px 16px 24px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.button-bar button {
+  margin-right: 20px;
+}
+
+.button-bar .push-right {
+  // Auto margin will take up all of the space that it can,
+  // and so the block is pushed to the right.
+  margin-left: auto;
+}
+
+.button-bar .special-font {
+  font-family: monospace;
+}
+
+
+
 
 .customerTable {}
 
@@ -57,23 +84,7 @@ mat-drawer {
   opacity: 0;
 }
 
-// Moved to global styles.scss
-// .mat-sort-header-button {
-//   cursor: move;
-// }
 
-
-#filterButtons {
-  @extend %flex-box;
-  padding: 0 0 16px 24px; //30px 8px 16px 0px;
-  width: 100%;
-}
-
-#crudButtons {
-  @extend %flex-box;
-  padding: 16px 8px 16px 24px;
-  width: 100%;
-}
 
 
 %flex-box {
@@ -93,10 +104,6 @@ mat-drawer {
     margin-right: 20px;
   }
 }
-
-// .mat-form-field {
-//   margin-right: 30px;
-// }
 
 
 table {
@@ -123,9 +130,6 @@ table {
 }
 
 
-.special-font {
-  font-family: monospace;
-}
 
 /*
 https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Aligning_Items_in_a_Flex_Container
@@ -145,97 +149,20 @@ and so the block is pushed into the middle. */
 
 
 
-// /* from mesonic 5.5.5 ===================================================*/
-
-// .mat-table__wrapper {
-// 	width: 100%;
-// 	overflow-x: auto;
-
-
-// 	mat-cell, mat-header-cell {
-// 		min-height: 100%;
-// 	}
-
-
-// }
-
-// .mat-table__wrapper .mat-table {
-// 	min-width: 1000px;
-// 	width: 100%;
-// }
-
-// .mat-table__wrapper--dashboard .mat-table {
-// 	min-width: 600px !important;
+// Moved to global styles.scss
+// .mat-sort-header-button {
+//   cursor: move;
 // }
 
 
-// .mat-table__wrapper .mat-table .email-cell {
-// 	word-wrap: normal;
-// 	width: 180px;
-// 	flex: auto;
+// #filterButtons {
+//   @extend %flex-box;
+//   padding: 0 0 16px 24px; //30px 8px 16px 0px;
+//   width: 100%;
 // }
 
-
-// .m-mat-dialog-container__wrapper .mat-dialog-container {
-// 	padding: 0;
-// 	overflow-x: hidden;
-
-// 	.m-portlet {
-// 		margin-bottom: 0;
-// 	}
-
-// 	.alert {
-// 		border-radius: 0 !important;
-// 		width: 1032px;
-// 	}
-// }
-
-// .mat-table__wrapper--sub .mat-table {
-// 	min-width: 400px;
-
-// 	.mat-cell:last-child {
-// 		flex: 0 0 100px;
-// 	}
-
-// 	.mat-header-cell:last-child {
-// 		flex: 0 0 100px;
-// 	}
-// }
-
-// .ml-auto {
-// 	margin-left: auto;
-// }
-
-// .example-full-width {
-// 	width: 100%;
-// }
-
-// mat-radio-button {
-// 	padding-right: 16px;
-// }
-
-// .m-form--alert {
-// 	margin-top: 30px;
-// }
-
-
-// .mat-table__bottom {
-// 	display: flex;
-// 	align-items: center;
-// 	justify-content: flex-end;
-// }
-
-// .mat-column-vinCode {
-// 	flex: 0 0 170px;
-// }
-
-// .m-portlet-mx-0 {
-// 	margin: -1.1rem -2.2rem 0;
-// 	overflow-x: hidden;
-// }
-// .mat-table__wrapper .mat-table .mat-row-editing.mat-row-inactive {
-// 	height: 0;
-// 	min-height: 0;
-// 	padding: 0 !important;
-// 	border-bottom:0 !important;
+// #crudButtons {
+//   @extend %flex-box;
+//   padding: 16px 8px 16px 24px;
+//   width: 100%;
 // }

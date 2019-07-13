@@ -22,7 +22,7 @@ body {
 }
 
 
-// ####################################################################
+
 // Overriding material styles in "app.component.html".
 // ####################################################################
 
@@ -38,31 +38,47 @@ body {
 
 
 
-// ####################################################################
 // Overriding material styles in "customer-list.component.html"
-// ( and other list components).
 // ####################################################################
+// ( and other list components).
 
 .w3s-list-component {
   margin: 30px;
 }
 
-.w3s-list-component .mat-expansion-panel-header .mat-expansion-panel-header-title {
-  font-size: 1rem;
-  font-weight: 500;
-}
-.w3s-list-component .mat-expansion-panel-body {
-  padding: 0;
-}
+// .w3s-list-component .mat-expansion-panel-header .mat-expansion-panel-header-title {
+//   font-size: 18px; // 1rem;
+//   font-weight: 500;
+// }
+// .w3s-list-component .mat-expansion-panel-body {
+//   padding: 0;
+// }
 
 .w3s-list-component table .mat-sort-header-button {
   cursor: move;
 }
 
+
+
+// Overriding material styles in "customer-filter-templates.component.html"
 // ####################################################################
+// ( and other filter-template components).
+
+
+// .w3s-filter-template-component .mat-expansion-panel-header .mat-expansion-panel-header-title {
+//   font-size: 18px; // 1rem;
+//   font-weight: 500;
+// }
+
+.w3s-filter-template-component .mat-expansion-panel-body {
+  padding: 0;
+}
+
+
+
 // Overriding material styles in "customer-detail.component.html"
-// (and other detail components).
 // ####################################################################
+// (and other detail components).
 
 .w3s-detail-component {
   margin: 30px;
@@ -123,6 +139,9 @@ body {
   // width: 100%;
   // z-index: 1000;
 }
+
+
+
 
 
 // /* Master Styles */

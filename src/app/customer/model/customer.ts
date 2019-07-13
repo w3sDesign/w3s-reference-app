@@ -1,16 +1,23 @@
 export interface Address {
-  // type?: AddAddressType = other;
+  // type?: AddressType = other;
   country: string;
-  street: string;
   postalCode: string;
   city: string;
+  street: string;
+}
+export interface Contact {
+  // type?: ContactType = other;
+  department: string;
+  person: string;
+  phone: string;
+  email: string;
 }
 
 // TODO
 export type CustomerType = 'business' | 'individual' | 'other' | '';
 export type CustomerStatus = 'active' | 'suspended' | 'pending' | '';
 
-export type AddAddressType = 'shipping' | 'billing' | 'other';
+export type AddressType = 'shipping' | 'billing' | 'other';
 
 
 /**
@@ -22,8 +29,8 @@ export class Customer {
   // Basic Data
   id = 0;
   name = '';
-  type?: CustomerType = 'business';
-  status?: CustomerStatus = 'active';
+  type?: CustomerType = '';
+  status?: CustomerStatus = '';
 
   homepage ?= '';
   comment ?= '';
@@ -37,7 +44,7 @@ export class Customer {
   street ?= '';
 
   // Additional Addresses
-  addAddresses?: any[];
+  addAddresses?: Address[];
 
   // Main contact
   department ?= '';
@@ -46,7 +53,7 @@ export class Customer {
   email ?= '';
 
   // Additional Contacts
-  // contacts?: Contact[] = [];
+  addContacts?: Contact[];
 }
 
 

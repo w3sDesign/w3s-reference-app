@@ -4,18 +4,21 @@
   <!-- Filter template component -->
   <!-- ############################################################ -->
 
+  <!-- ============================================================ -->
+
   <w3s-customer-filter-template (queryParamsChange)="onQueryParamsChange($event)">
 
   </w3s-customer-filter-template>
 
+  <!-- ============================================================ -->
 
 
 
   <!-- Create/Update/Delete buttons -->
   <!-- ############################################################ -->
+  <!-- <div id="crudButtons" #crudButtons> -->
 
-  <!-- <mat-action-row #crudButtons style="align-items: center; font-size:14px;"> -->
-  <div id="crudButtons" #crudButtons>
+  <div class="button-bar" #crudButtons>
 
     <div class="special-font">
       {{dataSource.totalNumberOfItems | async}} customers selected.
@@ -41,7 +44,6 @@
     </button>
 
   </div>
-  <!-- End of main CRUD Buttons -->
 
 
   <mat-divider></mat-divider>
@@ -104,8 +106,8 @@
     </mat-drawer>
 
 
-        <!-- Set min-height when drawer is opened -->
-        <mat-drawer-content [class.drawer-open]="columnDrawerRef.opened">
+    <!-- Set min-height when drawer is opened -->
+    <mat-drawer-content [class.drawer-open]="columnDrawerRef.opened">
 
       <div *ngIf="showTestValues" class="w3s-show-test-values">
         <br>########## availableColumns = <br> {{availableColumns | json}}

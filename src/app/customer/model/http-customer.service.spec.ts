@@ -12,7 +12,7 @@ import { MessageService } from '../../shared/message.service';
 
 import { mockCustomers } from '../model/mock-customers';
 import { QueryResult } from '../../shared/query-result';
-import { MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Overlay } from '@angular/cdk/overlay';
 
 // const customers = mockCustomers;

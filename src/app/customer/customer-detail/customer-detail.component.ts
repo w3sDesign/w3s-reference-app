@@ -7,8 +7,8 @@ import {
   Component, OnInit, Inject, ElementRef, ViewChild, ChangeDetectionStrategy, AfterViewInit
 } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { FormBuilder, FormGroup, Validators, FormArray, FormControl } from '@angular/forms';
 
 import { Observable, of } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
@@ -32,12 +32,52 @@ import { QueryParams } from '../../shared/query-params';
 import { QueryResult } from '../../shared/query-result';
 
 
+
+// // Test MatDatepicker
+// /////////////////////
+// import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+// import { MomentDateAdapter, MAT_MOMENT_DATE_FORMATS } from '@angular/material-moment-adapter';
+
+import * as moment from 'moment';
+// import 'moment/locale/de';
+
+// import * as _moment from 'moment';
+// // tslint:disable-next-line:no-duplicate-imports
+// import {default as _rollupMoment} from 'moment';
+
+// const moment = _rollupMoment || _moment;
+/////////////////////
+
+
+
 // changeDetection: ChangeDetectionStrategy.OnPush
 @Component({
   selector: 'app-customer-detail',
   templateUrl: './customer-detail.component.html',
-  styleUrls: ['./customer-detail.component.scss']
+  styleUrls: ['./customer-detail.component.scss'],
+
+  // providers: [
+
+  //   { provide: MAT_DATE_LOCALE, useValue: 'de' },
+
+  //   // `MomentDateAdapter` and `MAT_MOMENT_DATE_FORMATS` can be automatically provided by importing
+  //   // `MatMomentDateModule` in your applications root module. We provide it at the component level
+  //   // here, due to limitations of our example generation script.
+
+  //   // { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
+
+  //   // { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
+  // ],
+
 })
+
+/**
+ * Reusable detail component for creating and updating customers.
+ * ####################################################################
+ * Communicates with other components (the main List component)
+ * via router navigation.
+ */
+
 export class CustomerDetailComponent implements OnInit, AfterViewInit {
 
   showTestValues = true;
@@ -47,9 +87,10 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
   customer: Customer;
 
   // customerForm: FormGroup; // = static form
-  hasErrors = false;
-  hasChanged = false;
-  title = 'Customer';
+  // hasErrors = false;
+  // hasChanged = false;
+
+  title: string;
 
   // loadingAfterSubmit: boolean = false;
   // @ViewChild("nameInput") nameInput: ElementRef;
@@ -62,9 +103,8 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
 
   /** Reference to the dynamic form component */
   /** Not set before AfterViewInit! */
-  @ViewChild('customerForm')
+  @ViewChild('customerForm', { static: false })
   customerForm: DynamicFormComponent;
-  // customerFormHasChanged = false;
 
   /**
    * Questions for generating the dynamic form:
@@ -97,9 +137,12 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
   };
 
 
+  routeIds: string;
+  routeDisplayedColumns: string;
   routeQueryParams: string;
 
-
+  // test MatDatepicker
+  date: FormControl;
 
   // Component constructor.
   // ##################################################################
@@ -124,6 +167,23 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
       if (idx === -1) { break; }
       this.dataGroupNames[i] = this.customerQuestions[idx].groupName;
     }
+
+
+    // Test MatDatepicker
+    /////////////////////
+    // Datepicker takes `Moment` objects instead of `Date` objects.
+
+    // date = new FormControl(moment([2017, 0, 1]));
+    // moment.locale('de');
+    // let m = moment();
+
+    // current date.
+    this.date = new FormControl(moment());
+
+    // moment.locale('de');
+    // moment.defaultFormat(L);
+    ////////////////////
+
   }
 
 
@@ -133,7 +193,6 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
   // but before creating child components.
 
   //  @ViewChild customerForm not set before AfterViewInit!
-  //  But it can be done here because customer$.subscribe() takes time.
 
   ngOnInit() {
 
@@ -143,33 +202,67 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
       `(1)[ngOnInit()] this.route = \n ${this.route}`
     );
 
-    if (this.route) { // TO DO route has always a value
+    // Loading customer data.
+    // Updating form must be done in ngAfterViewInit.
 
-      // Loading data (from customers/id) and updating form when data arrives.
+    this.customer$ = this.route.paramMap.pipe(
+      switchMap((routeParams: ParamMap) => {
 
-      this.customer$ = this.route.paramMap.pipe(
-        switchMap((routeParams: ParamMap) => {
+        // Needed in navigateToList().
+        this.routeIds = routeParams.get('ids');
+        this.routeDisplayedColumns = routeParams.get('displayedColumns');
+        this.routeQueryParams = routeParams.get('queryParams');
 
-          // needed in navigateTo
-          this.routeQueryParams = routeParams.get('queryParams');
+        if (+routeParams.get('id') === 0) {
+          this.title = 'Create Customer';
+          return of(new Customer());
+          ///////////////////////////////////////////////////////////////
 
-          if (+routeParams.get('id') === 0) {
+        } else {
 
-            return of(new Customer());
-            ///////////////////////////////////////////////////////////////
+          this.title = 'Update Customer';
+          return this.customerService.getCustomer(+routeParams.get('id'));
+          ///////////////////////////////////////////////////////////////
 
-          } else {
+        }
 
-            return this.customerService.getCustomer(+routeParams.get('id'));
-            ///////////////////////////////////////////////////////////////
-
-          }
+      })
+    );
 
 
-        })
-      );
+    this.customer$.subscribe(
+      res => {
+        this.customer = res;
 
-    }
+        // Error handler service (in customer service) returns {} in case
+        // of an error (e.g. if the customer is not found).
+        // So we need to check if the customer is defined, not null;
+        // and not {} by checking customer.id.
+
+        // if (this.customer && this.customer.id >= 0) {
+        if (this.customer && this.customer.id > 0) {
+
+          // Updating form
+
+          this.logMessage(
+            `1[ngOnInit()] this.customer = \n ${JSON.stringify(this.customer)}`
+          );
+
+          setTimeout(() => {
+
+            this.logMessage(
+              `2[ngOnInit()] this.customer = \n ${JSON.stringify(this.customer)}`
+            );
+
+            this.customerForm.form.patchValue(this.customer);
+            this.addFormArrays(this.customer);
+
+          });
+        }
+
+
+      });
+
 
   }
 
@@ -183,32 +276,12 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
     this.logMessage(`[ngAfterViewInit()] ========================================`);
 
     // this.customerForm.form.valueChanges.subscribe(val => {
-
     //   this.customerFormHasChanged = true;
-
     // });
 
 
-    this.customer$.subscribe(
-      res => {
 
-        this.logMessage(
-          `(2)[ngOnInit()] customer = \n ${JSON.stringify(res)}`
-        );
 
-        this.customer = res;
-
-        // Error handler service (in customer service) returns {} in case of an error (e.g. if customer not found).
-        // So we need to check if the customer is defined, not null; and not {} by checking customer.id.
-
-        if (this.customer && this.customer.id >= 0) {
-
-          this.customerForm.form.patchValue(this.customer);
-
-          this.addFormArrays(this.customer);
-        }
-
-      });
 
 
   }
@@ -220,7 +293,7 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
 
 
   /**
-   * Adding formArrays of a customer.
+   * Adding formArrays to a customer.
    * ##################################################################
    */
 
@@ -281,18 +354,19 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
 
   navigateToList(customer?: Customer) {
 
-    const customerId = customer ? customer.id : null;
-
-    // this.router.navigate(['/customers', { id: customerId, ftid: this.activeFilterTemplateId }]);
-
-    this.router.navigate(['/customers', { id: customerId, queryParams: this.routeQueryParams }]);
+    this.router.navigate(['/customers', {
+      id: customer ? customer.id : null,
+      ids: this.routeIds,
+      displayedColumns: this.routeDisplayedColumns,
+      queryParams: this.routeQueryParams,
+    }]);
 
   }
 
 
-  onAlertClose($event) {
-    this.hasErrors = false;
-  }
+  // onAlertClose($event) {
+  //   this.hasErrors = false;
+  // }
 
 
 
@@ -391,28 +465,28 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
     return preparedCustomer;
   }
 
-  save() {
+  // save() {
 
-    this.hasErrors = false;
-    // this.loadingAfterSubmit = false;
-    const controls = this.customerForm.form.controls;
-    /** check form */
-    if (this.customerForm.form.invalid) {
-      Object.keys(controls).forEach(controlName =>
-        controls[controlName].markAsTouched()
-      );
-      this.hasErrors = true;
-      return;
-    }
+  //   this.hasErrors = false;
+  //   // this.loadingAfterSubmit = false;
+  //   const controls = this.customerForm.form.controls;
+  //   /** check form */
+  //   if (this.customerForm.form.invalid) {
+  //     Object.keys(controls).forEach(controlName =>
+  //       controls[controlName].markAsTouched()
+  //     );
+  //     this.hasErrors = true;
+  //     return;
+  //   }
 
-    const editedCustomer: Customer = this.prepareCustomer();
+  //   const editedCustomer: Customer = this.prepareCustomer();
 
-    if (editedCustomer.id > 0) {
-      this.updateCustomer(editedCustomer);
-    } else {
-      this.createCustomer(editedCustomer);
-    }
-  }
+  //   if (editedCustomer.id > 0) {
+  //     this.updateCustomer(editedCustomer);
+  //   } else {
+  //     this.createCustomer(editedCustomer);
+  //   }
+  // }
 
 
   /**

@@ -1,6 +1,69 @@
 // analog customer-list.component.scss
 
 
+// .mat-panel-title .special-style {
+
+  .mat-expansion-panel-header-title .special-font {
+    line-height: 27px;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .mat-expansion-panel-header-description .special-font {
+    line-height: 27px;
+    display: block;
+    color: rgba(0, 0, 0, .87);
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+
+
+
+.button-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center; // vertical
+  justify-content: flex-start; // horizontal
+  flex-wrap: wrap; // default = nowrap
+
+  // padding: 16px 8px 16px 24px;
+  padding: 0 8px 16px 24px;
+  font-size: 14px;
+  width: 100%;
+
+  background-color: #fff;
+}
+
+.button-bar button,
+.button-bar .mat-form-field {
+  margin-right: 20px;
+}
+
+.button-bar .push-right {
+  // Auto margin will take up all of the space that it can,
+  // and so the block is pushed to the right.
+  margin-left: auto;
+}
+
+.button-bar .special-font {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+
+
+// .row-container {
+//   @extend %flex-box;
+//   padding: 0 8px 16px 24px;
+//   width: 100%;
+
+// }
+
+
+
+
 .comma:not(:first-child)::before {
   content: ', ';
 }
@@ -11,13 +74,6 @@
   color: #fff;
 }
 
-
-.row-container {
-  @extend %flex-box;
-  padding: 0 8px 16px 24px;
-  width: 100%;
-
-}
 
 mat-drawer-container {
   padding: 0 8px 30px 24px;
@@ -30,7 +86,7 @@ mat-drawer-container {
 
 mat-drawer {
   width: 180px;
-//   min-height: 300px;
+  //   min-height: 300px;
 }
 
 
@@ -98,9 +154,6 @@ table {
 
 
 
-.special-font {
-  font-family: monospace;
-}
 
 /*
 https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Aligning_Items_in_a_Flex_Container
@@ -114,6 +167,3 @@ and so the block is pushed into the middle. */
 .push-right {
   margin-left: auto;
 }
-
-
-

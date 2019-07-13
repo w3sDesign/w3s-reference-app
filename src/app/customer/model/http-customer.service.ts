@@ -11,7 +11,6 @@ import { HttpUtilsService } from '../../shared/http-utils.service';
 import { MessageService } from '../../shared/message.service';
 import { QueryParams } from '../../shared/query-params';
 import { QueryResult } from '../../shared/query-result';
-import { setInjectImplementation } from '@angular/core/src/di/injector_compatibility';
 
 
 /**
@@ -44,7 +43,7 @@ export class HttpCustomerService extends CustomerService {
 
 
   /**
-   * Create the specified customer on the http server.
+   * Creating a customer on the remote http server.
    * ##################################################################
    *
    * HTTP POST - ?Response (with the generated customer.id) expected.
@@ -68,7 +67,7 @@ export class HttpCustomerService extends CustomerService {
           // Returns the highest customer id + 1
           customer.id = Math.max(...res.items.map(item => item.id)) + 1;
 
-          const message = `Customer with id = ${customer.id} and name = ${customer.name} has been created.`;
+          const message = `Customer with id = ${customer.id} and name = "${customer.name}" has been created.`;
 
           return this.http.post<Customer>(this.customersUrl, customer, this.cudOptions)
             .pipe(
@@ -88,7 +87,7 @@ export class HttpCustomerService extends CustomerService {
 
 
   /**
-   * Delete the customer with the specified id.
+   * Deleting a customer on the remote http server.
    * ##################################################################
    * Returns an empty object.
    *
@@ -109,7 +108,7 @@ export class HttpCustomerService extends CustomerService {
 
 
   /**
-   * Delete the customers with the specified ids.
+   * Deleting multiple customers with the specified ids.
    * ##################################################################
    * Returns an empty object.
    *
@@ -146,7 +145,7 @@ export class HttpCustomerService extends CustomerService {
 
 
   /**
-   * Get the customer with the specified id.
+   * Getting a customer from the remote http server.
    * ##################################################################
    */
 
@@ -160,7 +159,7 @@ export class HttpCustomerService extends CustomerService {
 
 
   /**
-   * Get the customers with the specified QueryParams.
+   * Getting customers from the remote http server.
    * ##################################################################
    *
    * @param queryParams   The filter, sort, and page parameters.
@@ -234,7 +233,7 @@ export class HttpCustomerService extends CustomerService {
 
 
   /**
-   * Update the specified customer on the http server.
+   * Updating a customer on the remote http server.
    * ##################################################################
    * Returns the updated customer upon success.
    *
@@ -258,7 +257,7 @@ export class HttpCustomerService extends CustomerService {
 
 
   // ##################################################################
-  // Private helper methods.
+  // Non public helper methods.
   // ##################################################################
 
 

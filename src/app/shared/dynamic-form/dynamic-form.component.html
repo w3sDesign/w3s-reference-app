@@ -2,12 +2,12 @@
 
 <form (ngSubmit)="onSubmit()" *ngIf="form" [formGroup]="form" [ngClass]="formClass">
 
-  <ng-container *ngIf="title">
+  <!-- <ng-container *ngIf="title">
     <h6>{{title}}</h6>
-  </ng-container>
+  </ng-container> -->
 
 
-  <!-- ########################################################## -->
+
   <!-- Multiple data groups (e.g. Basic Data, Addresses, Contacts). -->
   <!-- ########################################################## -->
 
@@ -18,7 +18,7 @@
 
       <br>
       <h6> {{dataGroupName}} </h6>
-      <mat-divider></mat-divider>
+      <!-- <mat-divider></mat-divider> -->
 
 
 
@@ -30,13 +30,18 @@
 
           <ng-container *ngFor="let question of questions">
 
-            <!-- ########################################################## -->
+
+            <!-- Dynamic form component -->
+            <!-- ################################################## -->
+
+            <!-- ================================================== -->
 
             <w3s-dynamic-form-question *ngIf="question.groupName === dataGroupName" [question]="question" [options]="options" [form]="form">
 
             </w3s-dynamic-form-question>
 
-            <!-- ########################################################## -->
+            <!-- ================================================== -->
+
 
           </ng-container>
 
@@ -78,7 +83,8 @@
   </ng-container>
 
 
-  <!-- ########################################################## -->
+
+
   <!-- No data groups. -->
   <!-- ########################################################## -->
 
@@ -101,7 +107,6 @@
 
 
 
-  <!-- ########################################################## -->
   <!-- Submit form button -->
   <!-- ########################################################## -->
 
@@ -113,17 +118,17 @@
   <!-- You trigger the event by clicking a button with submit type.  -->
   <!-- This allows the user to press the Enter key to submit the completed form. -->
 
-  <!-- ########################################################## -->
-
   <button style="display: none" type="submit" *ngIf="form" mat-raised-button matTooltip="Start Searching" [disabled]="!form.valid">Submit</button>
 
 
 </form>
 
+
+
 <div *ngIf="showTestValues" class="showTestValues">
 
-  <ng-container *ngIf="payLoad">
-    <br>#######dynamic-form-component: Saved the following values (form.value) :<br> {{payLoad}}
-  </ng-container>
+  <!-- <ng-container *ngIf="payLoad"> -->
+  <!-- <br>#######dynamic-form-component: Saved the following values (form.value) :<br> {{payLoad}} -->
+  <!-- </ng-container> -->
 
 </div>
