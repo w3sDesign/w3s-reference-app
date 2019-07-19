@@ -7,7 +7,6 @@ import * as moment from 'moment';
 moment.locale('de');
 ////////////////////
 
-
 export const mockCustomerQuestions: QuestionBase[] = [
 
   // Group 1: Basic Data
@@ -39,6 +38,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     order: 120,
     isRequired: true,
 
+    // Validators array.
     validators: [
       Validators.required,
     ],
@@ -47,9 +47,6 @@ export const mockCustomerQuestions: QuestionBase[] = [
     },
 
   },
-
-
-  // TODO type + status dropdown ?readOnly
   {
     name: 'type',
     defaultValue: 'business',
@@ -94,7 +91,6 @@ export const mockCustomerQuestions: QuestionBase[] = [
       'required': 'Customer status required.',
     },
 
-
     options: [
       { key: 'active', value: 'Active' },
       { key: 'suspended', value: 'Suspended' },
@@ -102,7 +98,6 @@ export const mockCustomerQuestions: QuestionBase[] = [
       // { key: 'unproven', value: 'Unproven' }
     ],
   },
-
 
   {
     name: 'comment',
@@ -114,8 +109,6 @@ export const mockCustomerQuestions: QuestionBase[] = [
     groupName: 'Basic Data',
     order: 150,
   },
-
-
 
   {
     name: 'creationDate',
@@ -130,12 +123,14 @@ export const mockCustomerQuestions: QuestionBase[] = [
 
     validators: [
       Validators.required,
-      betweenDateValidator(moment('2000-01-01'), moment()),
-      // `Not between ${moment('2000-01-01').format('L')} and ${moment().format('L')}.`)
+      betweenDateValidator(moment('1970-01-01'), moment()),
     ],
+    // Error code
     validationErrors: {
+      // errorCode: errorMessage
       'required': 'Date required.',
-      'betweenDate': `Date not between ${moment('2000-01-01').format('L')} and ${moment().format('L')}.`
+      // TODO format('L') not needed!?
+      'betweenDate': `Date not between ${moment('1970-01-01').format('L')} and ${moment().format('L')}.`
     },
 
   },

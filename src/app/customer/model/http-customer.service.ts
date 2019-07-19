@@ -183,51 +183,62 @@ export class HttpCustomerService extends CustomerService {
 
   getCustomers(queryParams?: QueryParams): Observable<QueryResult> {
 
-    if (!queryParams) { queryParams = new QueryParams(); }
-
-    if (queryParams.searchTerm) {
-
-      this.logMessage(
-        `[getCustomers(queryParams) / searchTerm] queryParams = \n ${JSON.stringify(queryParams)}`
+    return this.http.get<Customer[]>(this.customersUrl)
+      .pipe(
+        switchMap(res => {
+          const queryResult = this.httpUtils.createQueryResult(res, queryParams);
+          return of(queryResult);
+        }),
+        catchError(this.handleError<QueryResult>('http.get in getCustomers(queryParams)'))
       );
 
-      // Search term (for searching in all fields) is set.
-      return this.http.get<Customer[]>(this.customersUrl)
-        .pipe(
-          switchMap(res => {
-            // ===============================================================
-            // Client side searching (should be done server side).
-            // Remove this for real server implementation.
-            // ===============================================================
-            const queryResult = this.httpUtils.searchInAllFields(res, queryParams);
-            // ===============================================================
-            return of(queryResult);
-          }),
-          catchError(this.handleError<QueryResult>('http.get in getCustomers(queryParams.searchTerm)'))
-        );
 
-    } else {
 
-      this.logMessage(
-        `[getCustomers(queryParams) / filters] queryParams = \n ${JSON.stringify(queryParams)}`
-      );
+    // if (!queryParams) { queryParams = new QueryParams(); }
 
-      // Filters are set (or empty = select all).
-      return this.http.get<Customer[]>(this.customersUrl)
-        .pipe(
-          switchMap(res => {
-            // ===============================================================
-            // Client side filtering and sorting (should be done server side).
-            // Remove this for real server implementation.
-            // ===============================================================
-            const queryResult = this.httpUtils.filterAndSort(res, queryParams);
-            // ===============================================================
-            return of(queryResult);
-          }),
-          catchError(this.handleError<QueryResult>('http.get in getCustomers(queryParams)'))
-        );
+    // if (queryParams.searchTerm) {
 
-    }
+    //   this.logMessage(
+    //     `[getCustomers(queryParams) / searchTerm] queryParams = \n ${JSON.stringify(queryParams)}`
+    //   );
+
+    //   // Search term (for searching in all fields) is set.
+    //   return this.http.get<Customer[]>(this.customersUrl)
+    //     .pipe(
+    //       switchMap(res => {
+    //         // ===============================================================
+    //         // Client side searching (should be done server side).
+    //         // Remove this for real server implementation.
+    //         // ===============================================================
+    //         const queryResult = this.httpUtils.searchInAllFields(res, queryParams);
+    //         // ===============================================================
+    //         return of(queryResult);
+    //       }),
+    //       catchError(this.handleError<QueryResult>('http.get in getCustomers(queryParams.searchTerm)'))
+    //     );
+
+    // } else {
+
+    //   this.logMessage(
+    //     `[getCustomers(queryParams) / filters] queryParams = \n ${JSON.stringify(queryParams)}`
+    //   );
+
+    //   // Filters are set (or empty = select all).
+    //   return this.http.get<Customer[]>(this.customersUrl)
+    //     .pipe(
+    //       switchMap(res => {
+    //         // ===============================================================
+    //         // Client side filtering and sorting (should be done server side).
+    //         // Remove this for real server implementation.
+    //         // ===============================================================
+    //         const queryResult = this.httpUtils.filterAndSort(res, queryParams);
+    //         // ===============================================================
+    //         return of(queryResult);
+    //       }),
+    //       catchError(this.handleError<QueryResult>('http.get in getCustomers(queryParams)'))
+    //     );
+
+    // }
 
   }
 

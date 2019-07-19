@@ -150,7 +150,12 @@
 
             <!-- row from dataSource -->
             <td mat-cell *matCellDef="let row">
-              {{row[column]}}
+              <span *ngIf="column === 'creationDate'">
+                {{row[column] | momentDatePipe }}
+              </span>
+              <span *ngIf="column !== 'creationDate'">
+                {{row[column]}}
+              </span>
             </td>
 
           </ng-container>
@@ -172,7 +177,7 @@
 
 
 
-      <!-- Spinner and paginator -->
+      <!-- MatSpinner and MatPaginator -->
       <!-- ############################################################ -->
       <!-- <div style="display:flex; justify-content:flex-end;"> -->
 

@@ -1,3 +1,6 @@
+import * as moment from 'moment';
+import { Moment } from 'moment';
+
 export interface Address {
   // type?: AddressType = other;
   country: string;
@@ -34,7 +37,7 @@ export class Customer {
 
   homepage ?= '';
   comment ?= '';
-  creationDate ?= '';
+  creationDate ?: string;
 
 
   // Main address

@@ -42,6 +42,15 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
+
+
+// MatDatepicker
+// ####################################################################
+
+// https://material.angular.io/components/datepicker/overview#choosing-a-date-implementation-and-date-format-settings
+
+// https://blog.angular.io/taking-advantage-of-the-angular-material-datepicker-237e80fa14b3
+
 import { DateAdapter, MatDateFormats, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 
 // Using moment date library (https://momentjs.com/)
@@ -54,10 +63,10 @@ import { MomentDateAdapter, MAT_MOMENT_DATE_FORMATS } from '@angular/material-mo
 // MAT_DATE_FORMAT uses dateInput: 'l' (like 1.7.2019).
 // https://github.com/angular/components/blob/master/src/material-moment-adapter/adapter/moment-date-formats.ts
 
-// W3S_MAT_MOMENT_DATE_FORMAT uses dateInput: 'L' (like 01.07.2019)
+// W3S_MAT_MOMENT_DATE_FORMATS uses dateInput: 'L' (like 01.07.2019)
 // https://momentjs.com/docs/#/displaying/format/
 
-export const W3S_MAT_MOMENT_DATE_FORMAT: MatDateFormats = {
+export const W3S_MAT_MOMENT_DATE_FORMATS: MatDateFormats = {
   parse: {
     dateInput: 'L', // instead of 'l'
   },
@@ -68,6 +77,8 @@ export const W3S_MAT_MOMENT_DATE_FORMAT: MatDateFormats = {
     monthYearA11yLabel: 'MMMM YYYY',
   },
 };
+
+// ####################################################################
 
 
 
@@ -85,11 +96,12 @@ export const W3S_MAT_MOMENT_DATE_FORMAT: MatDateFormats = {
     // Using MAT_MOMENT_DATE_FORMATS (1.7.2019)
     // { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
 
-    // Using W3S_MAT_MOMENT_DATE_FORMAT (01.07.2019)
-    { provide: MAT_DATE_FORMATS, useValue: W3S_MAT_MOMENT_DATE_FORMAT },
+    // Using W3S_MAT_MOMENT_DATE_FORMATS (01.07.2019)
+    { provide: MAT_DATE_FORMATS, useValue: W3S_MAT_MOMENT_DATE_FORMATS },
 
   ],
 
+  // Shared modules (must) export everything.
   exports: [
     DragDropModule,
     MatAutocompleteModule,

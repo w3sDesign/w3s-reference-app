@@ -56,7 +56,12 @@ export class HttpUtilsService {
 
   filterAndSort(items: any[], queryParams: QueryParams): QueryResult {
 
-    let filteredItems: any[] = items; // [];
+    let filteredItems: any[] = items.slice(); // [];
+    let sortedItems: any[] = items.slice(); // [];
+
+    // if (!queryParams.filter && !) {
+
+    let data: any[];
 
 
     // ==================================================================
@@ -65,7 +70,7 @@ export class HttpUtilsService {
 
     if (queryParams.filter) {
 
-      filteredItems = this.performFiltering(items, queryParams.filter);
+      filteredItems = this.filterItems(items, queryParams.filter);
 
       // this.log(
       //   `[filterAndSort()] filteredItems = \n ${JSON.stringify(filteredItems)}`
@@ -81,7 +86,7 @@ export class HttpUtilsService {
 
     if (queryParams.sortField) {
 
-      filteredItems = this.performSorting(filteredItems, queryParams.sortField, queryParams.sortOrder);
+      sortedItems = this.sortItems(filteredItems, queryParams.sortField, queryParams.sortOrder);
 
     }
 
@@ -90,10 +95,10 @@ export class HttpUtilsService {
     // (3) Paginating filtered (and sorted) items.
     // ================================================================
 
-    const totalCount = filteredItems.length;
-    const initialPos = queryParams.pageNumber * queryParams.pageSize;
+    // const totalCount = filteredItems.length;
+    // const initialPos = queryParams.pageNumber * queryParams.pageSize;
 
-    filteredItems = filteredItems.slice(initialPos, initialPos + queryParams.pageSize);
+    // filteredItems = filteredItems.slice(initialPos, initialPos + queryParams.pageSize);
 
 
     // ================================================================
@@ -102,8 +107,10 @@ export class HttpUtilsService {
 
     const queryResult = new QueryResult();
 
-    queryResult.items = filteredItems;
-    queryResult.totalCount = totalCount;
+    const initialPos = queryParams.pageNumber * queryParams.pageSize;
+
+    queryResult.items = filteredItems.slice(initialPos, initialPos + queryParams.pageSize);
+    queryResult.totalCount = filteredItems.length;
 
     return queryResult;
 
@@ -111,7 +118,18 @@ export class HttpUtilsService {
   }
 
 
+  createQueryResult(items: any[], queryParams: QueryParams): QueryResult {
 
+    const queryResult = new QueryResult();
+
+    const initialPos = queryParams.pageNumber * queryParams.pageSize;
+
+    queryResult.items = items.slice(initialPos, initialPos + queryParams.pageSize);
+    queryResult.totalCount = items.length;
+
+    return queryResult;
+
+  }
 
 
 
@@ -124,7 +142,7 @@ export class HttpUtilsService {
    * filterObj: { "idFilter": ">20010", "nameFilter": "Foundation" }
    */
 
-  performFiltering(items: any[], filters: any): any[] {
+  filterItems(items: any[], filters: any): any[] {
 
     const filterObj = filters;
 
@@ -223,7 +241,7 @@ export class HttpUtilsService {
 
 
     // this.log(
-    //   `[performFiltering()] filteredItems = \n ${JSON.stringify(filteredItems)}`
+    //   `[filterItems()] filteredItems = \n ${JSON.stringify(filteredItems)}`
     // );
 
     return filteredItems;
@@ -237,7 +255,7 @@ export class HttpUtilsService {
    * Sorting routine.
    * ##################################################################
    */
-  performSorting(items: any[], sortField: string = '', sortOrder: string = 'asc'): any[] {
+  sortItems(items: any[], sortField: string = '', sortOrder: string = 'asc'): any[] {
 
     if (!sortField) { return items; }
 
@@ -298,7 +316,7 @@ export class HttpUtilsService {
 
     if (queryParams.sortField) {
 
-      searchedItems = this.performSorting(searchedItems, queryParams.sortField, queryParams.sortOrder);
+      searchedItems = this.sortItems(searchedItems, queryParams.sortField, queryParams.sortOrder);
 
     }
 

@@ -31,22 +31,7 @@ import { MessageService } from '../../shared/message.service';
 import { QueryParams } from '../../shared/query-params';
 import { QueryResult } from '../../shared/query-result';
 
-
-
-// // Test MatDatepicker
-// /////////////////////
-// import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-// import { MomentDateAdapter, MAT_MOMENT_DATE_FORMATS } from '@angular/material-moment-adapter';
-
 import * as moment from 'moment';
-// import 'moment/locale/de';
-
-// import * as _moment from 'moment';
-// // tslint:disable-next-line:no-duplicate-imports
-// import {default as _rollupMoment} from 'moment';
-
-// const moment = _rollupMoment || _moment;
-/////////////////////
 
 
 
@@ -55,20 +40,6 @@ import * as moment from 'moment';
   selector: 'app-customer-detail',
   templateUrl: './customer-detail.component.html',
   styleUrls: ['./customer-detail.component.scss'],
-
-  // providers: [
-
-  //   { provide: MAT_DATE_LOCALE, useValue: 'de' },
-
-  //   // `MomentDateAdapter` and `MAT_MOMENT_DATE_FORMATS` can be automatically provided by importing
-  //   // `MatMomentDateModule` in your applications root module. We provide it at the component level
-  //   // here, due to limitations of our example generation script.
-
-  //   // { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
-
-  //   // { provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS },
-  // ],
-
 })
 
 /**
@@ -98,22 +69,16 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
   countries: any[] = countries;
 
   // dialogRef: MatDialogRef<CustomerDetailDialogComponent>;
-  data: any;
+  matDialogData: any;
 
 
   /** Reference to the dynamic form component */
-  /** Not set before AfterViewInit! */
+  // Not set before AfterViewInit.
   @ViewChild('customerForm', { static: false })
   customerForm: DynamicFormComponent;
 
-  /**
-   * Questions for generating the dynamic form:
-   * <w3s-dynamic-form [questions]="customerQuestions" ...
-   */
-  // filterTemplateQuestions: QuestionBase[];
-  // TODO? loading from server must be before app! APP-INITIALIZE?
-
-  // Compare <w3s-dynamic-form [questions]="customerQuestions" ...
+  /** Questions for generating the dynamic form. */
+  // TODO? Loading from server must be before app! APP-INITIALIZE?
   customerQuestions: QuestionBase[] = mockCustomerQuestions;
 
   /** Data group names (e.g. 'Basic Data', 'Addresses'). */
@@ -150,7 +115,7 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
   constructor(
     // public dialogRef: MatDialogRef<CustomerDetailDialogComponent>,
     // data object from open.dialog(): data = { customer }
-    // @Inject(MAT_DIALOG_DATA) public data: any,
+    // @Inject(MAT_DIALOG_DATA) public matDialogData: any,
 
     private formBuilder: FormBuilder,
     private router: Router,
@@ -167,23 +132,6 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
       if (idx === -1) { break; }
       this.dataGroupNames[i] = this.customerQuestions[idx].groupName;
     }
-
-
-    // Test MatDatepicker
-    /////////////////////
-    // Datepicker takes `Moment` objects instead of `Date` objects.
-
-    // date = new FormControl(moment([2017, 0, 1]));
-    // moment.locale('de');
-    // let m = moment();
-
-    // current date.
-    this.date = new FormControl(moment());
-
-    // moment.locale('de');
-    // moment.defaultFormat(L);
-    ////////////////////
-
   }
 
 
@@ -205,6 +153,7 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
     // Loading customer data.
     // Updating form must be done in ngAfterViewInit.
 
+    // Getting customer id from activated route.
     this.customer$ = this.route.paramMap.pipe(
       switchMap((routeParams: ParamMap) => {
 
@@ -237,7 +186,7 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
         // Error handler service (in customer service) returns {} in case
         // of an error (e.g. if the customer is not found).
         // So we need to check if the customer is defined, not null;
-        // and not {} by checking customer.id.
+        // and not {} by checking the customer.id.
 
         // if (this.customer && this.customer.id >= 0) {
         if (this.customer && this.customer.id > 0) {
@@ -254,7 +203,20 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
               `2[ngOnInit()] this.customer = \n ${JSON.stringify(this.customer)}`
             );
 
+            const cd = this.customerForm.form.get('creationDate');
+
+            // cd.disable({ emitEvent: false });
+
+            // Update form (?except creationDate).
             this.customerForm.form.patchValue(this.customer);
+
+            // cd.enable({ emitEvent: false });
+            // cd.markAsPristine();
+
+            // Set creation date with a moment (needed by matDatepicker).
+            // strict mode true/false
+            cd.setValue(moment(this.customer.creationDate, ['YYYY-MM-DD', 'DD/MM/YYYY'], false));
+
             this.addFormArrays(this.customer);
 
           });
@@ -293,33 +255,44 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
 
 
   /**
-   * Adding formArrays to a customer.
+   * Adding formArrays if existent (like additional addresses/contacts).
    * ##################################################################
+   * (analog to DynamicFormQuestionComponent).
    */
 
   addFormArrays(customer: Customer) {
 
-    // this.customerForm.form.patchValue(customer);
-
-    // Adding the formArray that corresponds to the given customer
-    // (analog to DynamicFormQuestionComponent).
-
     this.customerQuestions.forEach(question => {
       if (question.controlType === 'formArray' && customer[question.name]) {
 
-        if (customer[question.name].length > 0) {
-          const l = customer[question.name].length; // e.g. number of add. addresses
+        const l = customer[question.name].length;
+        if (l > 0) {
           for (let i = 0; i < l; i++) {
 
-            /** Creating a FormGroup from the given *nested* questions. */
+            // Creating a FormGroup for each *nested* question.
             const formGroup = this.formGroupService.createFormGroup(question.nestedQuestions);
 
-            /** Adding this new FormGroup to the FormArray. */
+            // Adding this new FormGroup to the FormArray.
             const formArray = this.customerForm.form.get(question.name) as FormArray;
             formArray.push(formGroup);
 
           }
-          this.customerForm.form.patchValue(customer);
+          const cd = this.customerForm.form.get('creationDate');
+
+          // cd.disable({ emitEvent: false });
+
+          // Update form (?except creationDate).
+          this.customerForm.form.patchValue(this.customer);
+
+          // cd.enable({ emitEvent: false });
+          // cd.markAsPristine();
+
+          // Set creation date with a moment (needed by matDatepicker).
+          // strict mode true/false
+          cd.setValue(moment(this.customer.creationDate, ['YYYY-MM-DD', 'DD/MM/YYYY'], false));
+
+
+          // this.customerForm.form.patchValue(customer);
         }
 
       }
@@ -333,9 +306,13 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
    * ##################################################################
    */
 
-  createCustomer(customer: Customer) {
+  createCustomer() {
 
-    // this.customer = this.customerForm.form.value;
+    const customer: Customer = this.customerForm.form.getRawValue();
+
+    const cd = this.customerForm.form.get('creationDate');
+    // cd.value is a moment
+    customer.creationDate = cd.value.format('YYYY-MM-DD');
 
     this.customerService.createCustomer(customer)
       .subscribe(res => {
@@ -389,7 +366,7 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
 
 
   /**
-   *2. SaveDyn button. TO DO Create or update customer.
+   * 2. SaveDyn button. TO DO Create or update customer.
    * ##################################################################
    */
   // saveDyn() {
@@ -494,10 +471,22 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
    * ##################################################################
    */
 
-  updateCustomer(customer: Customer) {
+  updateCustomer() {
+
+    const customer: Customer = this.customerForm.form.getRawValue();
+
+    const cd = this.customerForm.form.get('creationDate');
+    // cd.value is a moment
+    customer.creationDate = cd.value.format('YYYY-MM-DD');
+
 
     this.customerService.updateCustomer(customer)
       .subscribe(res => {
+
+        this.logMessage(
+          `1[updateCustomer()] customer = \n ${JSON.stringify(customer)}`
+        );
+
         this.navigateToList(customer);
       });
   }
@@ -544,7 +533,7 @@ export class CustomerDetailDialogComponent extends CustomerDetailComponent imple
   constructor(
     public dialogRef: MatDialogRef<CustomerDetailDialogComponent>,
     // data object from open.dialog(): data = { customer }
-    @Inject(MAT_DIALOG_DATA) public data: any,
+    @Inject(MAT_DIALOG_DATA) public matDialogData: any,
 
     formBuilder: FormBuilder,
 
@@ -566,7 +555,7 @@ export class CustomerDetailDialogComponent extends CustomerDetailComponent imple
 
   ngAfterViewInit() {
 
-    this.customer = this.data.customer;
+    this.customer = this.matDialogData.customer;
 
 
     // @ViewChild customerForm not set before AfterViewInit!

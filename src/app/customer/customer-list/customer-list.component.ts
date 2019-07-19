@@ -44,6 +44,10 @@ import { HttpCustomerService } from '../model/http-customer.service';
 import { MessageService } from '../../shared/message.service';
 // import { FocusMonitor } from '@angular/cdk/a11y';
 
+import * as moment from 'moment';
+import { MomentDatePipe } from '../../shared/pipes/momentDate.pipe';
+import { HttpUtilsService } from '../../shared/http-utils.service';
+
 
 
 @Component({
@@ -109,11 +113,11 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
 
 
 
-  /** Paginating table rows. */
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  /** MatPaginator component for navigating between pages. */
+  @ViewChild(MatPaginator, {static: false}) matPaginator: MatPaginator;
 
-  /** Sorting table columns. */
-  @ViewChild(MatSort, {static: false}) sort: MatSort;
+  /** MatSort directive for sorting table columns. */
+  @ViewChild(MatSort, {static: false}) matSort: MatSort;
 
   // /** Searching in all fields. */
   // @ViewChild('searchInput') searchInput: ElementRef;
@@ -149,10 +153,10 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
     private formGroupService: DynamicFormGroupService,
     private dialog: MatDialog,
     private messageService: MessageService,
-    // private focusMonitor: FocusMonitor
+    private httpUtils: HttpUtilsService,
   ) {
 
-    this.dataSource = new CustomerDataSource(this.customerService);
+    this.dataSource = new CustomerDataSource(this.customerService, this.httpUtils);
     // this.filterTemplateQuestions = this.generateFilterTemplateQuestions();
 
     this.activatedQueryParams = new QueryParams();
@@ -223,7 +227,13 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
 
     // Setting this.customers object array.
     this.dataSource.customers$
-      .subscribe(res => this.customers = res);
+      .subscribe(res => {
+        this.customers = res;
+
+        this.logMessage(
+          `[ngOnInit() customers$.subscribe] this.customers = \n ${JSON.stringify(this.customers)}`
+        );
+      });
 
   }
 
@@ -237,32 +247,34 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
 
     this.logMessage(`[ngAfterViewInit()] ========================================`);
 
-    this.logMessage(
-      `[ngAfterViewInit()] this.customers = \n ${JSON.stringify(this.customers)}`
-    );
+
+    // TODO? Moving to view? (sortChange)="onSortChange"
+
+    // Observing matSort (sortChange) event
+    // emitted when either active sort or sort direction changes.
+
+    this.matSort.sortChange
+    .subscribe(() => {
+      this.activatedQueryParams.sortField = this.matSort.active;
+      this.activatedQueryParams.sortOrder = this.matSort.direction;
+      // Reset to first page.
+      this.activatedQueryParams.pageNumber = 0;
+      this.matPaginator.pageIndex = 0;
+
+      // Load data
+      this.dataSource.getCustomers(this.activatedQueryParams);
+    });
 
 
-    // Observing if either active sort or sort direction changes.
+    // TODO? Moving to view? (page)="onPageChange"
 
-    this.sort.sortChange
+    // Observing matPaginator (page) event
+    // emitted when either page size or page index changes.
+
+    this.matPaginator.page
       .subscribe(() => {
-        this.activatedQueryParams.sortField = this.sort.active;
-        this.activatedQueryParams.sortOrder = this.sort.direction;
-        // Reset to first page.
-        this.activatedQueryParams.pageNumber = 0;
-        this.paginator.pageIndex = 0;
-
-        // Load data
-        this.dataSource.getCustomers(this.activatedQueryParams);
-      });
-
-
-    // Observing if either page size or page index changes.
-
-    this.paginator.page
-      .subscribe(() => {
-        this.activatedQueryParams.pageNumber = this.paginator.pageIndex;
-        this.activatedQueryParams.pageSize = this.paginator.pageSize;
+        this.activatedQueryParams.pageNumber = this.matPaginator.pageIndex;
+        this.activatedQueryParams.pageSize = this.matPaginator.pageSize;
 
         this.dataSource.getCustomers(this.activatedQueryParams);
       });
@@ -374,7 +386,7 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
           this.customerService.deleteCustomers(ids)
             .subscribe(
               () => {
-                this.paginator.pageIndex = 0;
+                this.matPaginator.pageIndex = 0;
                 this.dataSource.getCustomers(this.activatedQueryParams);
                 this.customerSelection.clear();
               },
@@ -429,8 +441,8 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
   //   queryParams.sortOrder = this.sort.direction;
   //   queryParams.sortField = this.sort.active;
 
-  //   queryParams.pageNumber = this.paginator.pageIndex;
-  //   queryParams.pageSize = this.paginator.pageSize;
+  //   queryParams.pageNumber = this.matPaginator.pageIndex;
+  //   queryParams.pageSize = this.matPaginator.pageSize;
 
   //   return queryParams;
 
@@ -475,7 +487,7 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
     // this.activatedFilters = params.filter;
     // this.activatedSearchTerm = params.searchTerm;
 
-    this.paginator.pageIndex = 0;
+    this.matPaginator.pageIndex = 0;
 
     this.logMessage(
       `[onQueryParamsChange()] this.activatedQueryParams.filter = \n ${JSON.stringify(this.activatedQueryParams.filter)}`
@@ -568,7 +580,7 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
       .subscribe(
         res => {
           if (!res) { return; }
-          this.paginator.pageIndex = 0;
+          this.matPaginator.pageIndex = 0;
           this.dataSource.getCustomers(this.activatedQueryParams);
           this.customerSelection.clear();
         }
@@ -702,8 +714,8 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
   //   queryParams.sortOrder = this.sort.direction;
   //   // The id of the column being sorted.
   //   queryParams.sortField = this.sort.active;
-  //   queryParams.pageNumber = this.paginator.pageIndex;
-  //   queryParams.pageSize = this.paginator.pageSize;
+  //   queryParams.pageNumber = this.matPaginator.pageIndex;
+  //   queryParams.pageSize = this.matPaginator.pageSize;
 
   //   // (2) Getting customers from dataSource.
   //   this.dataSource.getCustomers(queryParams);

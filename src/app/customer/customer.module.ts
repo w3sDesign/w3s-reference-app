@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
 
@@ -18,7 +19,9 @@ import { CustomerFilterTemplateService } from './model/customer-filter-template.
 import { HttpCustomerFilterTemplateService } from './model/http-customer-filter-template.service';
 // import { MockCustomerFilterTemplateService } from './model/http-customer-filter-template.service';
 
+// SharedModule includes (must include) SharedMaterialModule.
 import { SharedModule } from '../shared/shared.module';
+
 import { environment } from '../../environments/environment';
 
 
@@ -40,6 +43,7 @@ import { environment } from '../../environments/environment';
         }),
 
     SharedModule,
+
     CustomerRoutingModule,
   ],
 

@@ -38,6 +38,7 @@ export class DynamicFormGroupService {
 
           group[question.name] = new FormControl(
             { value: moment(), disabled: question.isDisabled },
+            // Validators array from question.
             question.validators
           );
 

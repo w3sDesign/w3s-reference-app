@@ -6,17 +6,6 @@
 
     <div class="w3s-detail-component mat-elevation-z8">
 
-      <!-- Test DatePicker -->
-      <!-- ######################################################## -->
-
-      <mat-form-field>
-        <input matInput [matDatepicker]="dp" placeholder="Moment.js datepicker" [formControl]="date">
-        <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-        <mat-datepicker #dp></mat-datepicker>
-      </mat-form-field>
-
-
-
       <!-- Back/Cancel/Save buttons -->
       <!-- ######################################################## -->
       <!-- At the beginning *and* at the end! -->
@@ -44,7 +33,7 @@
         <!-- [disabled]="!customerFormHasChanged" -->
         <!-- Compare with customer-filter-template.component.html -->
 
-        <button type="button" mat-raised-button color="primary" [disabled]="!customerForm?.form.valid || !customerForm?.form.dirty" (click)="customer.id ? updateCustomer(customerForm.form.getRawValue()) : createCustomer(customerForm.form.getRawValue())" matTooltip="Save changes and go back.">
+        <button type="button" mat-raised-button color="primary" [disabled]="!customerForm?.form.valid || !customerForm?.form.dirty" (click)="customer.id ? updateCustomer() : createCustomer()" matTooltip="Save changes and go back.">
           Save
         </button>
 
@@ -76,7 +65,7 @@
 
       <!-- Back/Cancel/Save buttons -->
       <!-- ######################################################## -->
-      <!-- At the beginning *and*at the end! -->
+      <!-- At the beginning *and* at the end! -->
 
       <div class="button-bar">
 
@@ -94,7 +83,7 @@
         <!-- [disabled]="!customerFormHasChanged" -->
         <!-- Compare with customer-filter-template.component.html -->
 
-        <button type="button" mat-raised-button color="primary" [disabled]="!customerForm?.form.valid || !customerForm?.form.dirty" (click)="customer.id ? updateCustomer(customerForm.form.getRawValue()) : createCustomer(customerForm.form.getRawValue())" matTooltip="Save changes and go back.">
+        <button type="button" mat-raised-button color="primary" [disabled]="!customerForm?.form.valid || !customerForm?.form.dirty" (click)="customer.id ? updateCustomer() : createCustomer()" matTooltip="Save changes and go back.">
           Save
         </button>
 

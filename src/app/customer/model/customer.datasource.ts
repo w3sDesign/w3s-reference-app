@@ -1,12 +1,14 @@
 import { CollectionViewer, DataSource } from '@angular/cdk/collections';
 
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { tap, catchError, switchMap } from 'rxjs/operators';
 
 import { Customer } from './customer';
 import { CustomerService } from './customer.service';
 
 import { QueryParams } from '../../shared/query-params';
 import { QueryResult } from '../../shared/query-result';
+import { HttpUtilsService } from '../../shared/http-utils.service';
 
 
 /**
@@ -38,7 +40,8 @@ export class CustomerDataSource implements DataSource<any> {
 
 
   constructor(
-    private customerService: CustomerService
+    private customerService: CustomerService,
+    private httpUtils: HttpUtilsService,
   ) {
     this.totalNumberOfItems.subscribe(nr => (this.hasItems = nr > 0));
   }
@@ -86,6 +89,44 @@ export class CustomerDataSource implements DataSource<any> {
     this.isLoading.next(true);
 
     this.customerService.getCustomers(queryParams)
+      .pipe(
+
+        // new filter+sort handling in data source!
+        // removing form customer service
+
+        switchMap((res1: QueryResult) => {
+
+          // if (!queryParams) { queryParams = new QueryParams(); }
+
+          if (queryParams.searchTerm) {
+
+
+            // TODO
+
+          } else if (queryParams.filter) {
+
+            // ========================================================
+            // Client side filtering and sorting.
+            // Moved from http-customer.service
+            // ========================================================
+
+            const filteredItems = this.httpUtils.filterItems(
+              res1.items, queryParams.filter);
+
+            const sortedItems = this.httpUtils.sortItems(
+              filteredItems, queryParams.sortField, queryParams.sortOrder);
+
+            const queryResult = this.httpUtils.createQueryResult(
+              sortedItems, queryParams);
+
+            return of(queryResult);
+
+          } else {
+
+            return of(res1);
+          }
+
+        }))
 
       // Customer service  returns a query result observable.
       .subscribe((res: QueryResult) => {

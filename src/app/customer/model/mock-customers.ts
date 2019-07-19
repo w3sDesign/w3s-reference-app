@@ -1,4 +1,5 @@
 import { Customer } from './customer';
+import * as moment from 'moment';
 
 // Generated on generatedata.com
 export const mockCustomers: Customer[] = [
@@ -9,7 +10,7 @@ export const mockCustomers: Customer[] = [
     type: 'business',
     status: 'suspended',
     comment: 'velit. Sed malesuada augue ut',
-    creationDate: '26/11/2017',
+    creationDate: '01/07/2019',
     country: 'Brunei',
     postalCode: '14468',
     city: 'Arzano',

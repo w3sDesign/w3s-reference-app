@@ -8,7 +8,25 @@ import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
 import { DynamicFormQuestionComponent } from './dynamic-form/dynamic-form-question.component';
 import { DynamicFormGroupService } from './dynamic-form/dynamic-form-group.service';
 
+// Moved from AppModule!
+import { MessageDialogComponent } from './message-dialog/message-dialog.component';
+import { MessageSnackBarComponent } from './message-snack-bar/message-snack-bar.component';
+import { InputDialogComponent } from './input-dialog/input-dialog.component';
+
+import { HttpErrorHandler } from './http-error-handler.service';
+import { HttpUtilsService } from './http-utils.service';
+import { MessageService } from './message.service';
+
 import { SharedMaterialModule } from './shared-material.module';
+
+
+// https://angular.io/guide/i18n#i18n-pipes
+import { registerLocaleData } from '@angular/common';
+import localeDe from '@angular/common/locales/de';
+
+import { MomentDatePipe } from './pipes/momentDate.pipe';
+
+registerLocaleData(localeDe, 'de');
 
 
 
@@ -20,20 +38,41 @@ import { SharedMaterialModule } from './shared-material.module';
   ],
 
   declarations: [
-    HighlightDirective,
     DynamicFormComponent, DynamicFormQuestionComponent,
+    HighlightDirective,
+    MomentDatePipe,
+
+    MessageDialogComponent,
+    MessageSnackBarComponent,
+    InputDialogComponent,
+  ],
+
+  entryComponents: [
+    MessageDialogComponent,
+    MessageSnackBarComponent,
+    InputDialogComponent,
   ],
 
   providers: [
-    DynamicFormGroupService
+    DynamicFormGroupService,
+
+    HttpErrorHandler,
+    HttpUtilsService,
+    MessageService,
   ],
 
+  // Shared modules (must) export everything.
   exports: [
-    HighlightDirective,
-    DynamicFormComponent, DynamicFormQuestionComponent,
-
     CommonModule, FormsModule, ReactiveFormsModule, LayoutModule,
-    SharedMaterialModule
+    SharedMaterialModule,
+
+    DynamicFormComponent, DynamicFormQuestionComponent,
+    HighlightDirective,
+    MomentDatePipe,
+
+    MessageDialogComponent,
+    MessageSnackBarComponent,
+    InputDialogComponent,
   ],
 
 })

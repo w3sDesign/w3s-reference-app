@@ -104,60 +104,63 @@ export class DynamicFormQuestionComponent implements OnInit {
   //   [key: string]: any;
   // };
 
+  /** Getting the validation error message from question
+   *  to be displayed if the form control is invalid. */
   getErrorMessage() {
 
-    const fc = this.form.controls[this.question.name];
+    const formControl = this.form.controls[this.question.name];
 
 
     this.logMessage(
-      `[getErrorMessage()] =====================================`
+      `[getErrorMessage() from question] =====================================`
     );
 
     this.logMessage(
-      `[getErrorMessage()] this.question.name = ${this.question.name}`
+      `[getErrorMessage() from question] this.question.name = ${this.question.name}`
     );
     // undefined!
     // {"required":"Date required.",
     //  "betweenDate":"Not between 01.01.2000 and 13.07.2019."}
     this.logMessage(
-      `[getErrorMessage()] this.question.validationErrors = ${JSON.stringify(this.question.validationErrors)}`
+      `[getErrorMessage() from question] this.question.validationErrors = ${JSON.stringify(this.question.validationErrors)}`
     );
     if (this.question.validationErrors) {
       this.logMessage(
-        `[getErrorMessage()] Object.keys(this.question.validationErrors) =
+        `[getErrorMessage() from question] Object.keys(this.question.validationErrors) =
               ${JSON.stringify(Object.keys(this.question.validationErrors))}`
       );
     }
 
     this.logMessage(
-      `[getErrorMessage()] -------------------------------------`
+      `[getErrorMessage() from question] -------------------------------------`
     );
     this.logMessage(
-      `[getErrorMessage()] this.form.controls = ${this.form.controls}`
+      `[getErrorMessage() from question] this.form.controls = ${this.form.controls}`
     );
     this.logMessage(
-      `[getErrorMessage()] fc.errors = ${JSON.stringify(fc.errors)}`
+      `[getErrorMessage() from question] formControl.errors = ${JSON.stringify(formControl.errors)}`
     );
-    if (fc.errors) {
+    if (formControl.errors) {
       this.logMessage(
-        `[getErrorMessage()] Object.keys(fc.errors) = ${JSON.stringify(Object.keys(fc.errors))}`
+        `[getErrorMessage() from question] Object.keys(formControl.errors) = ${JSON.stringify(Object.keys(formControl.errors))}`
       );
     }
     this.logMessage(
-      `[getErrorMessage()] fc.errors.required = ${fc.errors.required}`
+      `[getErrorMessage() from question] formControl.errors.required = ${formControl.errors.required}`
     );
     this.logMessage(
-      `[getErrorMessage()] fc.errors['betweenDate'] = ${fc.errors['betweenDate']}`
+      `[getErrorMessage() from question] formControl.errors['betweenDate'] = ${formControl.errors['betweenDate']}`
     );
 
 
 
     if (this.question.validationErrors) {
+      // For example, qErrorCodes = ['required', 'betweenDate']
       const qErrorCodes: string[] = Object.keys(this.question.validationErrors);
-      const fcErrorCodes: string[] = Object.keys(fc.errors);
+      const fcErrorCodes: string[] = Object.keys(formControl.errors);
 
       for (let i = 0; i < qErrorCodes.length; i++) {
-        if (fc.hasError(qErrorCodes[i])) {
+        if (formControl.hasError(qErrorCodes[i])) {
           return this.question.validationErrors[qErrorCodes[i]];
         }
       }
@@ -167,14 +170,14 @@ export class DynamicFormQuestionComponent implements OnInit {
 
     // let msg: string;
 
-    // if (fc.hasError('required')) {
+    // if (formControl.hasError('required')) {
     //   msg = 'Value required.';
 
-    // } else if (fc.hasError('email')) {
+    // } else if (formControl.hasError('email')) {
     //   msg = 'Not a valid email.';
 
-    // } else if (fc.hasError('betweenDate')) {
-    //   msg = fc.getError('betweenDate').message;
+    // } else if (formControl.hasError('betweenDate')) {
+    //   msg = formControl.getError('betweenDate').message;
 
     // } else {
     //   msg = 'Not a valid value.';
