@@ -7,6 +7,10 @@ import * as _ from 'lodash';
 import { JsonPipe } from '@angular/common';
 import { MessageService } from './message.service';
 
+import * as moment from 'moment';
+import { Moment } from 'moment';
+
+
 
 @Injectable({ providedIn: 'root' })
 
@@ -38,84 +42,6 @@ export class HttpUtilsService {
     return result;
   }
 
-
-
-
-
-
-
-  /**
-   * Client side filtering and sorting.
-   * ##################################################################
-   *
-   * @param items         The items (customers) array to be filtered and sorted.
-   * @param queryParams   The params for filtering, sorting, and paginating.
-   *
-   * @return queryResult  The filtered and sorted items array.
-   */
-
-  filterAndSort(items: any[], queryParams: QueryParams): QueryResult {
-
-    let filteredItems: any[] = items.slice(); // [];
-    let sortedItems: any[] = items.slice(); // [];
-
-    // if (!queryParams.filter && !) {
-
-    let data: any[];
-
-
-    // ==================================================================
-    // (1) Filtering items.
-    // ==================================================================
-
-    if (queryParams.filter) {
-
-      filteredItems = this.filterItems(items, queryParams.filter);
-
-      // this.log(
-      //   `[filterAndSort()] filteredItems = \n ${JSON.stringify(filteredItems)}`
-      // );
-
-
-    }
-
-
-    // ================================================================
-    // (2) Sorting filtered items.
-    // ================================================================
-
-    if (queryParams.sortField) {
-
-      sortedItems = this.sortItems(filteredItems, queryParams.sortField, queryParams.sortOrder);
-
-    }
-
-
-    // ================================================================
-    // (3) Paginating filtered (and sorted) items.
-    // ================================================================
-
-    // const totalCount = filteredItems.length;
-    // const initialPos = queryParams.pageNumber * queryParams.pageSize;
-
-    // filteredItems = filteredItems.slice(initialPos, initialPos + queryParams.pageSize);
-
-
-    // ================================================================
-    // (4) Returning the queryResult.
-    // ================================================================
-
-    const queryResult = new QueryResult();
-
-    const initialPos = queryParams.pageNumber * queryParams.pageSize;
-
-    queryResult.items = filteredItems.slice(initialPos, initialPos + queryParams.pageSize);
-    queryResult.totalCount = filteredItems.length;
-
-    return queryResult;
-
-
-  }
 
 
   createQueryResult(items: any[], queryParams: QueryParams): QueryResult {
@@ -255,24 +181,50 @@ export class HttpUtilsService {
    * Sorting routine.
    * ##################################################################
    */
-  sortItems(items: any[], sortField: string = '', sortOrder: string = 'asc'): any[] {
+
+  sortItems(data: any[], sortField: string, sortOrder: string): any[] {
+
+    const items = data.slice();
+    const isAsc = sortOrder === 'asc';
 
     if (!sortField) { return items; }
 
-    let result: any[] = [];
-    result = items.sort((a, b) => {
-      if (a[sortField] < b[sortField]) {
-        return sortOrder === 'asc' ? -1 : 1;
+    // if (moment(items[0][sortField], ['YYYY-MM-DD', 'DD/MM/YYYY']) instanceof moment) {
+    const isDate = moment(items[0][sortField], ['YYYY-MM-DD', 'DD/MM/YYYY']).isValid();
+
+
+    const sortedItems = items.sort((a, b) => {
+    // return items.sort((a, b) => {
+
+      if (isDate) {
+        return this.compareDate(
+          moment(a[sortField], ['YYYY-MM-DD', 'DD/MM/YYYY']),
+          moment(b[sortField], ['YYYY-MM-DD', 'DD/MM/YYYY']), isAsc);
       }
 
-      if (a[sortField] > b[sortField]) {
-        return sortOrder === 'asc' ? 1 : -1;
-      }
+      return this.compare(a[sortField], b[sortField], isAsc);
 
-      return 0;
+      // if (a[sortField] < b[sortField]) {
+      //   return sortOrder === 'asc' ? -1 : 1;
+      // }
+
+      // if (a[sortField] > b[sortField]) {
+      //   return sortOrder === 'asc' ? 1 : -1;
+      // }
+
+      // return 0;
+
     });
 
-    return result;
+    return sortedItems;
+  }
+
+  compare(a: number | string, b: number | string, isAsc: boolean) {
+    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+  }
+
+  compareDate(a: Moment, b: Moment, isAsc: boolean) {
+    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
 
 
@@ -445,6 +397,85 @@ export class HttpUtilsService {
 
 
 
+
+
+
+
+
+
+
+  /**
+   * Client side filtering and sorting.
+   * ##################################################################
+   *
+   * @param items         The items (customers) array to be filtered and sorted.
+   * @param queryParams   The params for filtering, sorting, and paginating.
+   *
+   * @return queryResult  The filtered and sorted items array.
+   */
+
+  // filterAndSort(items: any[], queryParams: QueryParams): QueryResult {
+
+  //   let filteredItems: any[] = items.slice(); // [];
+  //   let sortedItems: any[] = items.slice(); // [];
+
+  //   // if (!queryParams.filter && !) {
+
+  //   let data: any[];
+
+
+  //   // ==================================================================
+  //   // (1) Filtering items.
+  //   // ==================================================================
+
+  //   if (queryParams.filter) {
+
+  //     filteredItems = this.filterItems(items, queryParams.filter);
+
+  //     // this.log(
+  //     //   `[filterAndSort()] filteredItems = \n ${JSON.stringify(filteredItems)}`
+  //     // );
+
+
+  //   }
+
+
+  //   // ================================================================
+  //   // (2) Sorting filtered items.
+  //   // ================================================================
+
+  //   if (queryParams.sortField) {
+
+  //     sortedItems = this.sortItems(filteredItems, queryParams.sortField, queryParams.sortOrder);
+
+  //   }
+
+
+  //   // ================================================================
+  //   // (3) Paginating filtered (and sorted) items.
+  //   // ================================================================
+
+  //   // const totalCount = filteredItems.length;
+  //   // const initialPos = queryParams.pageNumber * queryParams.pageSize;
+
+  //   // filteredItems = filteredItems.slice(initialPos, initialPos + queryParams.pageSize);
+
+
+  //   // ================================================================
+  //   // (4) Returning the queryResult.
+  //   // ================================================================
+
+  //   const queryResult = new QueryResult();
+
+  //   const initialPos = queryParams.pageNumber * queryParams.pageSize;
+
+  //   queryResult.items = filteredItems.slice(initialPos, initialPos + queryParams.pageSize);
+  //   queryResult.totalCount = filteredItems.length;
+
+  //   return queryResult;
+
+
+  // }
 
 
 

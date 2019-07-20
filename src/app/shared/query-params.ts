@@ -4,8 +4,8 @@ export class QueryParams {
   filter: any = ''; // = {};
   searchTerm = '';  // searching in all fields
 
-  sortOrder: 'asc' | 'desc' | '' = 'asc';
   sortField = 'id';
+  sortOrder: 'asc' | 'desc' | '' = 'asc';
 
   pageNumber = 0;
   pageSize = 10;

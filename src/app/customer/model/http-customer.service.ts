@@ -108,7 +108,7 @@ export class HttpCustomerService extends CustomerService {
 
 
   /**
-   * Deleting multiple customers with the specified ids.
+   * Deleting multiple customers with the selected ids.
    * ##################################################################
    * Returns an empty object.
    *
@@ -165,11 +165,14 @@ export class HttpCustomerService extends CustomerService {
    * @param queryParams   The filter, sort, and page parameters.
    * @return queryResult  The filtered and sorted items (customer) array.
    *
-   * - This code emulates real server response by getting all customers
-   *   from the server and performing client-side filtering, sorting, and paginating.
+   * The server should perform filtering, sorting, and paginating
+   * and return the proper queryResult.
+   * This code emulates real server response by getting all customers from
+   * the server and performing client-side filtering, sorting, and paginating
+   * (done in the CustomerDatasource class).
    *
-   * - Note: getCustomers() returns a QueryResult Observable;
-   *         http.get()     returns a Customer[] Observable.
+   * Consequently: getCustomers() returns a QueryResult Observable;
+   *               http.get()     returns a Customer[] Observable.
    *
    * - mergeMap
    *   maps each value (Customer[]) emitted by the source observable
@@ -186,7 +189,9 @@ export class HttpCustomerService extends CustomerService {
     return this.http.get<Customer[]>(this.customersUrl)
       .pipe(
         switchMap(res => {
-          const queryResult = this.httpUtils.createQueryResult(res, queryParams);
+          const queryResult = new QueryResult();
+          queryResult.items = res;
+          queryResult.totalCount = res.length;
           return of(queryResult);
         }),
         catchError(this.handleError<QueryResult>('http.get in getCustomers(queryParams)'))

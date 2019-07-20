@@ -88,45 +88,52 @@ export class CustomerDataSource implements DataSource<any> {
 
     this.isLoading.next(true);
 
-    this.customerService.getCustomers(queryParams)
-      .pipe(
+    this.customerService.getCustomers(queryParams).pipe(
 
-        // new filter+sort handling in data source!
-        // removing form customer service
+      // new filter+sort handling in data source!
+      // removing form customer service
 
-        switchMap((res1: QueryResult) => {
+      switchMap((res1: QueryResult) => {
 
-          // if (!queryParams) { queryParams = new QueryParams(); }
+        // if (!queryParams) { queryParams = new QueryParams(); }
 
-          if (queryParams.searchTerm) {
+        if (queryParams.searchTerm) {
 
 
-            // TODO
+          // TODO
 
-          } else if (queryParams.filter) {
+        } else if (queryParams.filter) {
 
-            // ========================================================
-            // Client side filtering and sorting.
-            // Moved from http-customer.service
-            // ========================================================
+          // ========================================================
+          // Client side filtering and sorting.
+          // Moved from http-customer.service
+          // ========================================================
 
-            const filteredItems = this.httpUtils.filterItems(
-              res1.items, queryParams.filter);
+          const filteredItems = this.httpUtils.filterItems(
+            res1.items, queryParams.filter);
 
-            const sortedItems = this.httpUtils.sortItems(
-              filteredItems, queryParams.sortField, queryParams.sortOrder);
+          const sortedItems = this.httpUtils.sortItems(
+            filteredItems, queryParams.sortField, queryParams.sortOrder);
 
-            const queryResult = this.httpUtils.createQueryResult(
-              sortedItems, queryParams);
+          const queryResult = this.httpUtils.createQueryResult(
+            sortedItems, queryParams);
 
-            return of(queryResult);
+          return of(queryResult);
 
-          } else {
+        } else {
 
-            return of(res1);
-          }
+          // Sort in any case.
+          const sortedItems = this.httpUtils.sortItems(
+            res1.items, queryParams.sortField, queryParams.sortOrder);
 
-        }))
+          const queryResult = this.httpUtils.createQueryResult(
+            sortedItems, queryParams);
+
+          return of(queryResult);
+
+        }
+
+      }))
 
       // Customer service  returns a query result observable.
       .subscribe((res: QueryResult) => {
