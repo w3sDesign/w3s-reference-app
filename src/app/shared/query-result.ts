@@ -2,6 +2,8 @@ export class QueryResult {
   items: any[] = [];
   totalCount = 0;
   errorMessage = '';
+  /** Server-side or client-side filtering/sorting/paging. */
+  clientSideQuerying = false;
 }
 
 // export class QueryResult {

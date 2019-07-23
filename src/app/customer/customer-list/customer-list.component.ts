@@ -156,7 +156,8 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
     private httpUtils: HttpUtilsService,
   ) {
 
-    this.dataSource = new CustomerDataSource(this.customerService, this.httpUtils);
+    this.dataSource = new CustomerDataSource(
+      this.customerService, this.httpUtils, this.messageService);
     // this.filterTemplateQuestions = this.generateFilterTemplateQuestions();
 
     this.activatedQueryParams = new QueryParams();

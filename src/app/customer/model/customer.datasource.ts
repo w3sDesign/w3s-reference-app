@@ -9,6 +9,7 @@ import { CustomerService } from './customer.service';
 import { QueryParams } from '../../shared/query-params';
 import { QueryResult } from '../../shared/query-result';
 import { HttpUtilsService } from '../../shared/http-utils.service';
+import { MessageService } from '../../shared/message.service';
 
 
 /**
@@ -42,6 +43,7 @@ export class CustomerDataSource implements DataSource<any> {
   constructor(
     private customerService: CustomerService,
     private httpUtils: HttpUtilsService,
+    private messageService: MessageService,
   ) {
     this.totalNumberOfItems.subscribe(nr => (this.hasItems = nr > 0));
   }
@@ -67,6 +69,7 @@ export class CustomerDataSource implements DataSource<any> {
    * Disconnecting the data table.
    * ##################################################################
    */
+
   disconnect(collectionViewer: CollectionViewer): void {
     this.customersSubject.complete();
     this.isLoading.complete();
@@ -77,37 +80,85 @@ export class CustomerDataSource implements DataSource<any> {
   /**
    * Getting the customers.
    * ##################################################################
-   *
    * Implemented by delegating to the customer service.
-   * If the data arrives successfully, it is passed to the customers
-   * subject (by calling next(res.items)), which in turn emits the data
-   * to the connected (subscribed) data table for rendering.
+   * If the data arrives successfully, the new values (customers) are
+   * emitted by calling next() on the subjects.
+   * The connected (subscribed) data table renders the emitted values.
    */
 
   getCustomers(queryParams: QueryParams) {
 
+    // ? if (!queryParams) { queryParams = new QueryParams(); }
+
     this.isLoading.next(true);
+
+    // Delegating to the customer service.
 
     this.customerService.getCustomers(queryParams).pipe(
 
-      // new filter+sort handling in data source!
-      // removing form customer service
-
       switchMap((res1: QueryResult) => {
 
-        // if (!queryParams) { queryParams = new QueryParams(); }
+        // if (!res1.items || res1.items.length === 0) { return of(res1); }
+        if (!res1.items) { return of(res1); }
+
+
+        // Usually, the server is responsible for filtering/sorting/paging
+        // and returns the proper QueryResult.
+        // The customer service implementation sets clientSideQuerying to
+        // true or false (default = false).
+
+        if (!res1.clientSideQuerying) { return of(res1); }
+
+        // ============================================================
+        // Client side filtering/sorting/paging.
+        // ============================================================
 
         if (queryParams.searchTerm) {
 
+          // Searching/Sorting/Paging.
+          // ==========================================================
+
+          this.logMessage(
+            `[getCustomers(queryParams) 1/3 searchTerm] queryParams = \n ${JSON.stringify(queryParams)}`
+          );
 
           // TODO
 
+          // ===============================================================
+          //         // Client side searching (should be done server side).
+          //         // Remove this for real server implementation.
+          //         // ===============================================================
+          //         const queryResult = this.httpUtils.searchInAllFields(res, queryParams);
+          //         // ===============================================================
+          //         return of(queryResult);
+
+          const searchedItems = this.httpUtils.searchItems(
+            res1.items, queryParams.searchTerm);
+
+          const sortedItems = this.httpUtils.sortItems(
+            searchedItems, queryParams.sortField, queryParams.sortOrder);
+
+          const queryResult = this.httpUtils.createQueryResult(
+            sortedItems, queryParams);
+
+          return of(queryResult);
+
+
+
+
+
+
         } else if (queryParams.filter) {
 
-          // ========================================================
-          // Client side filtering and sorting.
-          // Moved from http-customer.service
-          // ========================================================
+          // Filtering/Sorting/Paging
+          // ==========================================================
+
+          this.logMessage(
+            `[getCustomers(queryParams) 2/3 filter] queryParams = \n ${JSON.stringify(queryParams)}`
+          );
+          this.logMessage(
+            `[getCustomers(queryParams) 2/3 filter] res1.items = \n ${JSON.stringify(res1.items)}`
+          );
 
           const filteredItems = this.httpUtils.filterItems(
             res1.items, queryParams.filter);
@@ -122,32 +173,53 @@ export class CustomerDataSource implements DataSource<any> {
 
         } else {
 
-          // Sort in any case.
+          // Sorting/Paging (no searchTerm/filters).
+          // ==========================================================
+
+          this.logMessage(
+            `[getCustomers(queryParams) 3/3 sort] queryParams = \n ${JSON.stringify(queryParams)}`
+          );
+
           const sortedItems = this.httpUtils.sortItems(
             res1.items, queryParams.sortField, queryParams.sortOrder);
 
-          const queryResult = this.httpUtils.createQueryResult(
-            sortedItems, queryParams);
+            const queryResult = this.httpUtils.createQueryResult(
+              sortedItems, queryParams);
 
-          return of(queryResult);
+              return of(queryResult);
 
+            }
+
+          }))
+
+          // ==============================================================
+          // Emitting the new values for rendering.
+          // ==============================================================
+          // Customer service returns a QueryResult observable.
+
+          .subscribe((res: QueryResult) => {
+
+            this.logMessage(
+              `[subscibe] res.items = \n ${JSON.stringify(res.items)}`
+            );
+
+        // if (res.items || res.items.length > 0) {
+        if (res.items) {
+
+          this.customersSubject.next(res.items);
+
+          this.totalNumberOfItems.next(res.totalCount);
+
+          this.isLoading.next(false);
         }
-
-      }))
-
-      // Customer service  returns a query result observable.
-      .subscribe((res: QueryResult) => {
-
-        // Emitting the customers.
-        this.customersSubject.next(res.items);
-
-        this.totalNumberOfItems.next(res.totalCount);
-
-        this.isLoading.next(false);
 
       });
 
   }
 
+  /** Logging message to console. */
+  private logMessage(message: string) {
+    return this.messageService.logMessage('[########## customer.datasource.ts ##########] ' + message);
+  }
 
 }

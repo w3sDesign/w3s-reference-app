@@ -167,17 +167,19 @@ export class HttpCustomerService extends CustomerService {
    *
    * The server should perform filtering, sorting, and paginating
    * and return the proper queryResult.
+   *
    * This code emulates real server response by getting all customers from
    * the server and performing client-side filtering, sorting, and paginating
    * (done in the CustomerDatasource class).
+   * Change this for real server implementation.
    *
-   * Consequently: getCustomers() returns a QueryResult Observable;
-   *               http.get()     returns a Customer[] Observable.
+   *
+   * getCustomers() returns a QueryResult Observable;
+   * http.get()     returns a Customer[] Observable.
    *
    * - mergeMap
    *   maps each value (Customer[]) emitted by the source observable
    *   to a new observable (queryResult) which is merged in the output observable.
-   *
    * - switchMap
    *   maps the *most recent*  value (Customer[]) emitted by source observable
    *   to a new observable (queryResult) which is merged in the output observable.
@@ -186,12 +188,19 @@ export class HttpCustomerService extends CustomerService {
 
   getCustomers(queryParams?: QueryParams): Observable<QueryResult> {
 
+    // Getting all customers.
     return this.http.get<Customer[]>(this.customersUrl)
       .pipe(
         switchMap(res => {
           const queryResult = new QueryResult();
           queryResult.items = res;
           queryResult.totalCount = res.length;
+
+          // Setting client-side querying
+          // (searching/filtering/sorting/paging).
+          // ==========================================================
+          queryResult.clientSideQuerying = true;
+
           return of(queryResult);
         }),
         catchError(this.handleError<QueryResult>('http.get in getCustomers(queryParams)'))

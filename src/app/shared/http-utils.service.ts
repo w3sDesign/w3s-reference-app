@@ -60,100 +60,168 @@ export class HttpUtilsService {
 
 
   /**
-   * ##################################################################
    * Filtering routine.
    * ##################################################################
    * For example:
-   * itemObj  : { "id"      : "20018",  "name"      : "XY Foundation" }
+   * items    :[{ "id"      : 20018,  "name"      : "XY Foundation" }, ...]
+   * itemObj  : { "id"      : 20018,  "name"      : "XY Foundation" }
+   * filters =
    * filterObj: { "idFilter": ">20010", "nameFilter": "Foundation" }
    */
 
-  filterItems(items: any[], filters: any): any[] {
+  filterItems(items: any[], filterObj: any): any[] {
 
-    const filterObj = filters;
+    if (!items || items.length === 0 || !filterObj) { return items; }
+
+    this.logMessage(
+      `[filterItems()] items[0] = \n ${JSON.stringify(items[0])}`
+    );
 
 
-    // ################################################################
-    // JS array.filter(...) method
-    // ################################################################
+
+    // const filterObj = filters;
+
+
+    // ================================================================
+    // JS array.filter() method that
+    // returns an array of items that passed all filter tests
+    // If a test fails -> return false.
+    // ================================================================
 
     const filteredItems = items.filter(itemObj => {
 
+      // LOOP1: For each itemObj (customer)
+      // ==============================================================
 
+      // Not needed? (filter testFailed === false). break instead!
       let testFailed = false;
 
 
-      // ==============================================================
-      // For each itemObj in the items array *and*
-      // for each filterKey in the filterObj:
-      // ==============================================================
+      // forEach no break possible
+      // Object.keys(filterObj).forEach(filterKey => {
 
-      Object.keys(filterObj).forEach(filterKey => { // 'idFilter', 'nameFilter'
+      for (const filterKey of Object.keys(filterObj)) {
+
+        // LOOP2: For each filterKey of the filterObj
+        // ==============================================================
+        // ('idFilter', 'nameFilter')
 
         const itemKey = filterKey.replace('Filter', ''); // 'id', 'name'
 
         const itemValue = itemObj[itemKey];
 
-        // if (!itemValue) { console.error('##########no itemValue! itemValue = ' + itemValue); }
+        if (!itemValue) { console.error('##########no itemValue! itemValue = ' + itemValue); }
         // console.log('#########itemKey: ' + itemKey);
         // console.log('#########itemValue: ' + JSON.stringify(itemValue));
+
+        // TO DO TEST
+        // if (!itemValue) { return false; }
+
+        // If no filter continue LOOP2 with next filter ( in LOOP2).
+        if (!filterObj[filterKey]) { continue; }
 
         const filterValue = filterObj[filterKey].trim().toLowerCase();
 
 
-        if (filterValue && !testFailed) {
+        // if (filterValue && testFailed === false) {
 
-          ///////////
-          // Tests  //
-          ///////////
 
-          if (typeof (itemValue) === 'string') {
+        if (typeof (itemValue) === 'string' &&
+          moment(itemValue, ['YYYY-MM-DD', 'DD/MM/YYYY']).isValid()) {
 
-            // no itemValue.
-            if (!itemValue) { testFailed = true; }
+          // Date Filter Tests
+          // ==========================================================
 
-            // filterValue does not exist.
-            if (itemValue.toLowerCase().indexOf(filterValue) === -1) {
-              testFailed = true;
-            }
+          const itemDate = moment(itemValue, ['YYYY-MM-DD', 'DD/MM/YYYY']);
+          // if (filterValue.substring(1) =)
+          const filterDate = moment(filterValue, ['L', 'YYYY-MM-DD']);
+
+          // console.log('#########itemDate: ' + itemDate);
+          // console.log('#########filterDate: ' + filterDate);
+
+          // switch (filterValue.substring(0, 1)) {
+          //   case '>':
+          //     if (itemDate < filterDate) { return false; }
+          //     break;
+          //   case '<':
+          //     if (itemDate > filterDate) { return false; }
+          //     break;
+          //   case '=':
+          //     if (itemDate !== filterDate) { return false; }
+          //     break;
+
+          //   // other tests ...
+
+          //   default:
+          // const filterDate0 = moment(filterValue, ['YYYY-MM-DD', 'DD/MM/YYYY']);
+
+          // if (itemDate !== filterDate) { testFailed = true; break; }
+          if (itemDate < filterDate || itemDate > filterDate) { testFailed = true; break; }
+          // }
+
+
+        } else if (typeof (itemValue) === 'string') {
+
+
+          // String Filter Tests
+          // ==========================================================
+
+
+          // no itemValue.?
+          // if (!itemValue) { testFailed = true; }
+          if (!itemValue) { testFailed = true; break; }
+
+          // filterValue does not exist.
+          if (itemValue.toLowerCase().indexOf(filterValue) === -1) {
+            testFailed = true;
+            break;
+          }
+
+          // other tests ...
+
+
+        } else if (typeof (itemValue) === 'number') {
+
+
+          // Number Filter Tests
+          // ==========================================================
+
+          // ?
+          if (!itemValue && itemValue !== 0) { testFailed = true; break; }
+
+          switch (filterValue.substring(0, 1)) {
+            case '>':
+              if (itemValue <= +filterValue.substring(1)) { testFailed = true; }
+              break;
+            case '<':
+              if (itemValue >= +filterValue.substring(1)) { testFailed = true; }
+              break;
+            case '=':
+              if (itemValue !== +filterValue.substring(1)) { testFailed = true; }
+              break;
 
             // other tests ...
 
+            default:
+              if (itemValue !== +filterValue) { testFailed = true; }
           }
+          if (testFailed) { break; } // break LOOP2
+
+        } else {
+
+          console.log('######### empty else: ');
+
+        }
+
+        // Only string and numbers!!
+        // customers AdditionalAddresses have itemValue = object array!
+        // error => server returned undefined
 
 
-          if (typeof (itemValue) === 'number') {
-
-            if (!itemValue && itemValue !== 0) { testFailed = true; }
-
-            switch (filterValue.substring(0, 1)) {
-              case '>':
-                if (itemValue <= +filterValue.substring(1)) { testFailed = true; }
-                break;
-              case '<':
-                if (itemValue >= +filterValue.substring(1)) { testFailed = true; }
-                break;
-              case '=':
-                if (itemValue !== +filterValue.substring(1)) { testFailed = true; }
-                break;
-
-              // other tests ...
-
-              default:
-                if (itemValue !== +filterValue) { testFailed = true; }
-            }
-
-          }
-
-          // Only string and numbers!!
-          // customers AdditionalAddresses have itemValue = object array!
-          // error => server returned undefined
+        // } // End of LOOP2  // End of tests
 
 
-        } // End of tests
-
-
-      }); // ==============================================================
+      } // End of LOOP2 ==============================================================
 
 
       // If an itemObj has passed all tests (not failed) return true
@@ -162,11 +230,12 @@ export class HttpUtilsService {
       return !testFailed;
 
 
+
     }); // ################################################################
 
 
 
-    // this.log(
+    // this.logMessage(
     //   `[filterItems()] filteredItems = \n ${JSON.stringify(filteredItems)}`
     // );
 
@@ -184,17 +253,27 @@ export class HttpUtilsService {
 
   sortItems(data: any[], sortField: string, sortOrder: string): any[] {
 
+    if (!data || data.length === 0 || !sortField) { return data; }
+
+
     const items = data.slice();
     const isAsc = sortOrder === 'asc';
 
-    if (!sortField) { return items; }
 
     // if (moment(items[0][sortField], ['YYYY-MM-DD', 'DD/MM/YYYY']) instanceof moment) {
-    const isDate = moment(items[0][sortField], ['YYYY-MM-DD', 'DD/MM/YYYY']).isValid();
 
+    this.logMessage(
+      `[sortItems()] items[0] = \n ${JSON.stringify(items[0])}`
+    );
+
+
+    const isDate = (typeof items[0][sortField] === 'string' &&
+      moment(items[0][sortField], ['YYYY-MM-DD', 'DD/MM/YYYY']).isValid());
+
+    // moment(items[0][sortField], ['YYYY-MM-DD', 'DD/MM/YYYY']).isValid();
 
     const sortedItems = items.sort((a, b) => {
-    // return items.sort((a, b) => {
+      // return items.sort((a, b) => {
 
       if (isDate) {
         return this.compareDate(
@@ -241,61 +320,61 @@ export class HttpUtilsService {
    * @return queryResult  The searched items array.
    */
 
-  searchInAllFields(items: any[], queryParams: QueryParams): QueryResult {
+  // searchInAllFields(items: any[], queryParams: QueryParams): QueryResult {
 
-    let searchedItems: any[] = items; // [];
-
-
-    // ==================================================================
-    // (1) Searching items.
-    // ==================================================================
-
-    if (queryParams.searchTerm) {
-
-      searchedItems = this.searchItems(items, queryParams.searchTerm);
-
-      this.log(
-        `[searchInAllFields()] searchedItems = \n ${JSON.stringify(searchedItems)}`
-      );
+  //   let searchedItems: any[] = items; // [];
 
 
-    }
+  //   // ==================================================================
+  //   // (1) Searching items.
+  //   // ==================================================================
+
+  //   if (queryParams.searchTerm) {
+
+  //     searchedItems = this.searchItems(items, queryParams.searchTerm);
+
+  //     this.logMessage(
+  //       `[searchInAllFields()] searchedItems = \n ${JSON.stringify(searchedItems)}`
+  //     );
 
 
-    // ================================================================
-    // (2) Sorting searched items.
-    // ================================================================
-
-    if (queryParams.sortField) {
-
-      searchedItems = this.sortItems(searchedItems, queryParams.sortField, queryParams.sortOrder);
-
-    }
+  //   }
 
 
-    // ================================================================
-    // (3) Paginating searched (and sorted) items.
-    // ================================================================
+  //   // ================================================================
+  //   // (2) Sorting searched items.
+  //   // ================================================================
 
-    const totalCount = searchedItems.length;
-    const initialPos = queryParams.pageNumber * queryParams.pageSize;
+  //   if (queryParams.sortField) {
 
-    searchedItems = searchedItems.slice(initialPos, initialPos + queryParams.pageSize);
+  //     searchedItems = this.sortItems(searchedItems, queryParams.sortField, queryParams.sortOrder);
 
-
-    // ================================================================
-    // (4) Returning the queryResult.
-    // ================================================================
-
-    const queryResult = new QueryResult();
-
-    queryResult.items = searchedItems;
-    queryResult.totalCount = totalCount;
-
-    return queryResult;
+  //   }
 
 
-  }
+  //   // ================================================================
+  //   // (3) Paginating searched (and sorted) items.
+  //   // ================================================================
+
+  //   const totalCount = searchedItems.length;
+  //   const initialPos = queryParams.pageNumber * queryParams.pageSize;
+
+  //   searchedItems = searchedItems.slice(initialPos, initialPos + queryParams.pageSize);
+
+
+  //   // ================================================================
+  //   // (4) Returning the queryResult.
+  //   // ================================================================
+
+  //   const queryResult = new QueryResult();
+
+  //   queryResult.items = searchedItems;
+  //   queryResult.totalCount = totalCount;
+
+  //   return queryResult;
+
+
+  // }
 
 
 
@@ -370,7 +449,7 @@ export class HttpUtilsService {
 
     // ################################################################
 
-    this.log(
+    this.logMessage(
       `[searchedItems()] searchedItems = \n ${JSON.stringify(searchedItems)}`
     );
 
@@ -387,11 +466,11 @@ export class HttpUtilsService {
   // Helpers
   // ##################################################################
 
-  /** Logging error message to console. */
-  private log(message: string) {
+
+  /** Logging message to console. */
+  private logMessage(message: string) {
     return this.messageService.logMessage('[http-utils.service.ts] ' + message);
   }
-
 
 }
 
@@ -404,15 +483,15 @@ export class HttpUtilsService {
 
 
 
-  /**
-   * Client side filtering and sorting.
-   * ##################################################################
-   *
-   * @param items         The items (customers) array to be filtered and sorted.
-   * @param queryParams   The params for filtering, sorting, and paginating.
-   *
-   * @return queryResult  The filtered and sorted items array.
-   */
+/**
+ * Client side filtering and sorting.
+ * ##################################################################
+ *
+ * @param items         The items (customers) array to be filtered and sorted.
+ * @param queryParams   The params for filtering, sorting, and paginating.
+ *
+ * @return queryResult  The filtered and sorted items array.
+ */
 
   // filterAndSort(items: any[], queryParams: QueryParams): QueryResult {
 
@@ -432,7 +511,7 @@ export class HttpUtilsService {
 
   //     filteredItems = this.filterItems(items, queryParams.filter);
 
-  //     // this.log(
+  //     // this.logMessage(
   //     //   `[filterAndSort()] filteredItems = \n ${JSON.stringify(filteredItems)}`
   //     // );
 
