@@ -10,7 +10,7 @@ import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { HttpCustomerService } from '../model/http-customer.service';
+import { HttpCustomerService } from '../http-customer.service';
 import { HttpErrorHandler } from '../../shared/http-error-handler.service';
 
 import { TypesUtilsService } from '../../shared/types-utils.service';

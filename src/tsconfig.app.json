@@ -8,15 +8,7 @@
   "exclude": [
     "test.ts",
     "**/*.spec.ts",
-
-    "**/*.save.ts",
-    "**/*.save1.ts",
-    "**/*.save2.ts",
-    "**/*.save3.ts",
-
-    "**/*.orig.ts",
-    "**/*.orig1.ts",
-    "**/*.orig2.ts",
-    "**/*.orig3.ts",
+    "**/*save*",
+    "**/*orig*",
   ]
 }

@@ -13,7 +13,7 @@ import { fromEvent, merge, Observable, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap, switchMap } from 'rxjs/operators';
 
 import { Customer } from '../model/customer';
-import { CustomerDataSource } from '../model/customer.datasource';
+import { CustomerDataSource } from '../customer.datasource';
 
 import { DynamicFormGroupService } from '../../shared/dynamic-form/dynamic-form-group.service';
 import { QueryParams } from '../../shared/query-params';
@@ -29,7 +29,7 @@ import { DynamicFormQuestionComponent } from '../../shared/dynamic-form/dynamic-
 import { FormGroup } from '@angular/forms';
 
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
-import { mockCustomerQuestions } from '../model/mock-customer-questions';
+import { mockCustomerQuestions } from '../model/customer-questions';
 
 import { CustomerFilterTemplate } from '../model/customer-filter-template';
 
@@ -39,14 +39,14 @@ import { DynamicFormOptions } from '../../shared/dynamic-form/dynamic-form-optio
 import { mockCustomers } from '../model/mock-customers';
 
 
-import { CustomerService } from '../model/customer.service';
-import { HttpCustomerService } from '../model/http-customer.service';
+import { CustomerService } from '../customer.service';
+import { HttpCustomerService } from '../http-customer.service';
 import { MessageService } from '../../shared/message.service';
 // import { FocusMonitor } from '@angular/cdk/a11y';
 
 import * as moment from 'moment';
 import { MomentDatePipe } from '../../shared/pipes/momentDate.pipe';
-import { HttpUtilsService } from '../../shared/http-utils.service';
+import { UtilsService } from '../../shared/utils.service';
 
 
 
@@ -153,7 +153,7 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
     private formGroupService: DynamicFormGroupService,
     private dialog: MatDialog,
     private messageService: MessageService,
-    private httpUtils: HttpUtilsService,
+    private httpUtils: UtilsService,
   ) {
 
     this.dataSource = new CustomerDataSource(

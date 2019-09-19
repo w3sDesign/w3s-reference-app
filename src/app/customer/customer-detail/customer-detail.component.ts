@@ -13,7 +13,7 @@ import { FormBuilder, FormGroup, Validators, FormArray, FormControl } from '@ang
 import { Observable, of } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 
-import { CustomerService } from '../model/customer.service';
+import { CustomerService } from '../customer.service';
 // import { HttpCustomerService } from '../model/http-customer.service';
 import { HttpErrorHandler } from '../../shared/http-error-handler.service';
 
@@ -23,7 +23,7 @@ import { countries } from '../../shared/countries';
 
 import { DynamicFormComponent } from '../../shared/dynamic-form/dynamic-form.component';
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
-import { mockCustomerQuestions } from '../model/mock-customer-questions';
+import { mockCustomerQuestions } from '../model/customer-questions';
 import { DynamicFormGroupService } from '../../shared/dynamic-form/dynamic-form-group.service';
 import { DynamicFormOptions } from '../../shared/dynamic-form/dynamic-form-options';
 // import { questionsConfig } from '../model/customer.config';

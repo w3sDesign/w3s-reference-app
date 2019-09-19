@@ -20,13 +20,13 @@ import { fromEvent, merge, Observable } from 'rxjs';
 //
 import { debounceTime, distinctUntilChanged, tap, switchMap } from 'rxjs/operators';
 
-import { CustomerDataSource } from '../model/customer.datasource';
+import { CustomerDataSource } from '../customer.datasource';
 import { MessageDialogComponent } from '../../shared/message-dialog/message-dialog.component';
 //
 import { Customer } from '../model/customer';
 import { QueryParams } from '../../shared/query-params';
 
-import { CustomerService } from '../model/http-customer.service';
+import { CustomerService } from '../http-customer.service';
 import { HttpErrorHandler } from '../../shared/http-error-handler.service';
 
 import { CustomerDetailDialogComponent } from '../customer-detail/customer-detail.component';
@@ -39,7 +39,7 @@ import { DynamicFormQuestionComponent } from '../../shared/dynamic-form/dynamic-
 import { FormGroup } from '@angular/forms';
 
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
-import { mockCustomerQuestions } from '../model/mock-customer-questions';
+import { mockCustomerQuestions } from '../model/customer-questions';
 
 import { CustomerFilterTemplate } from '../model/customer-filter-template';
 

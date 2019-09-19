@@ -14,7 +14,7 @@ import { MessageSnackBarComponent } from './message-snack-bar/message-snack-bar.
 import { InputDialogComponent } from './input-dialog/input-dialog.component';
 
 import { HttpErrorHandler } from './http-error-handler.service';
-import { HttpUtilsService } from './http-utils.service';
+import { UtilsService } from './utils.service';
 import { MessageService } from './message.service';
 
 import { SharedMaterialModule } from './shared-material.module';
@@ -57,7 +57,7 @@ registerLocaleData(localeDe, 'de');
     DynamicFormGroupService,
 
     HttpErrorHandler,
-    HttpUtilsService,
+    UtilsService,
     MessageService,
   ],
 

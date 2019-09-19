@@ -7,16 +7,19 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 // import { LayoutModule } from '@angular/cdk/layout';
 
 
-
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 
-// CustomerModule is the default feature module and therefore loaded directly.
-// Other feature modules are loaded lazily.
-import { CustomerModule } from './customer/customer.module';
-import { CustomerRoutingModule } from './customer/customer-routing.module';
+////////////
+// No import (load) of feature modules! They are loaded lazily.
+
+// import { CustomerModule } from './customer/customer.module';
+// import { CustomerRoutingModule } from './customer/customer-routing.module';
+
+// import { ProductModule } from './product/product.module';
+// import { ProductRoutingModule } from './product/product-routing.module';
+//////////
 
 // Moved to SharedModule!
 import { MessageDialogComponent } from './shared/message-dialog/message-dialog.component';
@@ -25,10 +28,11 @@ import { InputDialogComponent } from './shared/input-dialog/input-dialog.compone
 
 // Moved to SharedModule!
 import { HttpErrorHandler } from './shared/http-error-handler.service';
-import { HttpUtilsService } from './shared/http-utils.service';
+import { UtilsService } from './shared/utils.service';
 import { MessageService } from './shared/message.service';
 
 import { SharedModule } from './shared/shared.module';
+import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
 
 
 @NgModule({
@@ -40,16 +44,19 @@ import { SharedModule } from './shared/shared.module';
     // ReactiveFormsModule,
     // LayoutModule,
     SharedModule,
-    CustomerModule,
+    // CustomerModule,
+    // ProductModule,
     // MatSnackBarModule,
     // Each routing module augments the route configuration in the order of import.
-    CustomerRoutingModule,
+    // CustomerRoutingModule,
+    // ProductRoutingModule,
     AppRoutingModule, // must be the last
   ],
 
   declarations: [
     AppComponent,
     HomeComponent,
+    PageNotFoundComponent,
     // MessageDialogComponent,
     // MessageSnackBarComponent,
     // InputDialogComponent,

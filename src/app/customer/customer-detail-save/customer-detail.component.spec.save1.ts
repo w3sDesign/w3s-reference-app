@@ -11,7 +11,7 @@ import { CustomerModule } from '../customer.module';
 import { CustomerRoutingModule } from '../customer-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { CustomerService, HttpCustomerService } from '../model/http-customer.service';
+import { CustomerService, HttpCustomerService } from '../http-customer.service';
 import { HttpErrorHandler } from 'src/app/shared/http-error-handler.service';
 
 

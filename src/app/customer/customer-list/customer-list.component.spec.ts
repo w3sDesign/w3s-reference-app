@@ -8,10 +8,10 @@ import {
 
 import { CustomerModule } from '../customer.module';
 import { CustomerListComponent } from './customer-list.component';
-import { CustomerService } from '../model/customer.service';
+import { CustomerService } from '../customer.service';
 
 import { mockCustomers } from '../model/mock-customers';
-import { MockCustomerService } from '../model/mock-customer.service';
+import { MockCustomerService } from '../model-save/mock-customer.service';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
