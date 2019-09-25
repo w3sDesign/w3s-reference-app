@@ -69,7 +69,7 @@ export class UtilsService {
    * filterObj: { "idFilter": ">20010", "nameFilter": "Foundation" }
    */
 
-  filterItems(items: any[], filterObj: any): any[] {
+  filterItems(items: {}[], filterObj: {}): {}[] {
 
     if (!items || items.length === 0 || !filterObj) { return items; }
 
@@ -78,33 +78,27 @@ export class UtilsService {
     );
 
 
-
-    // const filterObj = filters;
-
-
-    // ================================================================
-    // JS array.filter() method that
-    // returns an array of items that passed all filter tests
-    // If a test fails -> return false.
-    // ================================================================
+    // =====================================================================
+    // Item LOOP1: For each itemObj (customer) in the items array.
+    // =====================================================================
+    // array.filter() method
 
     const filteredItems = items.filter(itemObj => {
 
-      // LOOP1: For each itemObj (customer)
-      // ==============================================================
 
       // Not needed? (filter testFailed === false). break instead!
       let testFailed = false;
 
 
-      // forEach no break possible
+      // ===================================================================
+      // Filter LOOP2: For each filterKey of the filterObj.
+      // ===================================================================
+      // ('idFilter', 'nameFilter')
       // Object.keys(filterObj).forEach(filterKey => {
+      // forEach no break possible
 
       for (const filterKey of Object.keys(filterObj)) {
 
-        // LOOP2: For each filterKey of the filterObj
-        // ==============================================================
-        // ('idFilter', 'nameFilter')
 
         const itemKey = filterKey.replace('Filter', ''); // 'id', 'name'
 
@@ -117,10 +111,12 @@ export class UtilsService {
         // TO DO TEST
         // if (!itemValue) { return false; }
 
-        // If no filter continue LOOP2 with next filter ( in LOOP2).
-        if (!filterObj[filterKey]) { continue; }
+        // If no filter continue LOOP2 with next filter.
+        // if (!filterObj[filterKey]) { continue; }
 
-        const filterValue = filterObj[filterKey].trim().toLowerCase();
+        const filterValue = typeof (filterObj[filterKey]) === 'string' ?
+          filterObj[filterKey].trim().toLowerCase() :
+          filterObj[filterKey];
 
 
         // if (filterValue && testFailed === false) {
@@ -169,12 +165,13 @@ export class UtilsService {
 
           // no itemValue.?
           // if (!itemValue) { testFailed = true; }
-          if (!itemValue) { testFailed = true; break; }
+          // if (!itemValue) { testFailed = true; break; }
 
           // filterValue does not exist.
           if (itemValue.toLowerCase().indexOf(filterValue) === -1) {
-            testFailed = true;
-            break;
+            // testFailed = true;
+            // break;
+            return false;
           }
 
           // other tests ...
@@ -187,57 +184,57 @@ export class UtilsService {
           // ==========================================================
 
           // ?
-          if (!itemValue && itemValue !== 0) { testFailed = true; break; }
+          // if (!itemValue && itemValue !== 0) { testFailed = true; break; }
 
           switch (filterValue.substring(0, 1)) {
             case '>':
-              if (itemValue <= +filterValue.substring(1)) { testFailed = true; }
+              if (itemValue <= +filterValue.substring(1)) { return false; }
               break;
             case '<':
-              if (itemValue >= +filterValue.substring(1)) { testFailed = true; }
+              if (itemValue >= +filterValue.substring(1)) { return false; }
               break;
             case '=':
-              if (itemValue !== +filterValue.substring(1)) { testFailed = true; }
+              if (itemValue !== +filterValue.substring(1)) { return false; }
               break;
 
             // other tests ...
 
             default:
-              if (itemValue !== +filterValue) { testFailed = true; }
+              if (itemValue !== +filterValue) { return false; }
           }
-          if (testFailed) { break; } // break LOOP2
+
+          // if (testFailed) { break; } // break LOOP2
+
 
         } else {
 
+          // Other tests? Only string and numbers tested!
+          // customers AdditionalAddresses have itemValue = object array!
+          // error => server returned undefined
           console.log('######### empty else: ');
 
         }
 
-        // Only string and numbers!!
-        // customers AdditionalAddresses have itemValue = object array!
-        // error => server returned undefined
+        // next filterKey ...
 
+      }
 
-        // } // End of LOOP2  // End of tests
-
-
-      } // End of LOOP2 ==============================================================
-
+      // ===================================================================
+      // End Filter LOOP2.
+      // ===================================================================
 
       // If an itemObj has passed all tests (not failed) return true
       // to the items.filter(...) method; else return false.
 
-      return !testFailed;
+      // return !testFailed;
+      return true;
+
+    });
 
 
-
-    }); // ################################################################
-
-
-
-    // this.logMessage(
-    //   `[filterItems()] filteredItems = \n ${JSON.stringify(filteredItems)}`
-    // );
+    // =====================================================================
+    // End Item LOOP1.
+    // =====================================================================
 
     return filteredItems;
 

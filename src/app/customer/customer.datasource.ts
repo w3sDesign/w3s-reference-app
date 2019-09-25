@@ -183,25 +183,25 @@ export class CustomerDataSource implements DataSource<any> {
           const sortedItems = this.utils.sortItems(
             res1.items, queryParams.sortField, queryParams.sortOrder);
 
-            const queryResult = this.utils.createQueryResult(
-              sortedItems, queryParams);
+          const queryResult = this.utils.createQueryResult(
+            sortedItems, queryParams);
 
-              return of(queryResult);
+          return of(queryResult);
 
-            }
+        }
 
-          }))
+      }))
 
-          // ==============================================================
-          // Emitting the new values for rendering.
-          // ==============================================================
-          // Customer service returns a QueryResult observable.
+      // ==============================================================
+      // Emitting the new values for rendering.
+      // ==============================================================
+      // Customer service returns a QueryResult observable.
 
-          .subscribe((res: QueryResult) => {
+      .subscribe((res: QueryResult) => {
 
-            this.logMessage(
-              `[subscibe] res.items = \n ${JSON.stringify(res.items)}`
-            );
+        this.logMessage(
+          `[subscibe] res.items = \n ${JSON.stringify(res.items)}`
+        );
 
         // if (res.items || res.items.length > 0) {
         if (res.items) {

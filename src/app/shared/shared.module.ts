@@ -25,6 +25,7 @@ import { registerLocaleData } from '@angular/common';
 import localeDe from '@angular/common/locales/de';
 
 import { MomentDatePipe } from './pipes/momentDate.pipe';
+import { FirstLetterCasePipe } from './pipes/first-letter-case.pipe';
 
 registerLocaleData(localeDe, 'de');
 
@@ -40,7 +41,7 @@ registerLocaleData(localeDe, 'de');
   declarations: [
     DynamicFormComponent, DynamicFormQuestionComponent,
     HighlightDirective,
-    MomentDatePipe,
+    MomentDatePipe, FirstLetterCasePipe,
 
     MessageDialogComponent,
     MessageSnackBarComponent,
@@ -68,7 +69,7 @@ registerLocaleData(localeDe, 'de');
 
     DynamicFormComponent, DynamicFormQuestionComponent,
     HighlightDirective,
-    MomentDatePipe,
+    MomentDatePipe, FirstLetterCasePipe,
 
     MessageDialogComponent,
     MessageSnackBarComponent,

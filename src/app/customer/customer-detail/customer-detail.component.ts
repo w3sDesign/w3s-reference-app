@@ -23,7 +23,7 @@ import { countries } from '../../shared/countries';
 
 import { DynamicFormComponent } from '../../shared/dynamic-form/dynamic-form.component';
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
-import { mockCustomerQuestions } from '../model/customer-questions';
+import { customerQuestions } from '../model/customer.questions';
 import { DynamicFormGroupService } from '../../shared/dynamic-form/dynamic-form-group.service';
 import { DynamicFormOptions } from '../../shared/dynamic-form/dynamic-form-options';
 // import { questionsConfig } from '../model/customer.config';
@@ -79,7 +79,7 @@ export class CustomerDetailComponent implements OnInit, AfterViewInit {
 
   /** Questions for generating the dynamic form. */
   // TODO? Loading from server must be before app! APP-INITIALIZE?
-  customerQuestions: QuestionBase[] = mockCustomerQuestions;
+  customerQuestions: QuestionBase[] = customerQuestions;
 
   /** Data group names (e.g. 'Basic Data', 'Addresses'). */
   dataGroupNames: string[] = [];

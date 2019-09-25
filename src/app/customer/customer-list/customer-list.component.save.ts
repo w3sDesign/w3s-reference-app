@@ -39,7 +39,7 @@ import { DynamicFormQuestionComponent } from '../../shared/dynamic-form/dynamic-
 import { FormGroup } from '@angular/forms';
 
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
-import { mockCustomerQuestions } from '../model/customer-questions';
+import { mockCustomerQuestions } from '../model/customer.questions';
 
 import { CustomerFilterTemplate } from '../model/customer-filter-template';
 

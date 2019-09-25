@@ -20,7 +20,7 @@
         <div class="special-font">
 
           {{activatedFiltersMessage}}
-          <span class="comma" *ngFor="let afn of activatedFilterNames">{{(afn.replace('Filter', '') | titlecase)}}</span>
+          <span class="comma" *ngFor="let afn of activatedFilterNames">{{(afn.replace('Filter', '') | firstLetterCase)}}</span>
 
         </div>
 
@@ -56,7 +56,7 @@
 
       </div>
 
-      <button mat-raised-button matTooltip="Clear all filters." (click)="searchInputModel=''; onFilterTemplateSelectionChange(''); emitQueryParamsChange();">
+      <button mat-raised-button matTooltip="Clear all filters." (click)="searchInputModel=''; activatedQueryParams.filterTemplateId=0; onFilterTemplateSelectionChange(); emitQueryParamsChange();">
         Clear
       </button>
 
@@ -142,7 +142,7 @@
               </th>
 
               <!-- row (=filterName) from dataSource -->
-              <td mat-cell *matCellDef="let row; let i = index">{{availableFilterLabels[i] | titlecase}}
+              <td mat-cell *matCellDef="let row; let i = index">{{availableFilterLabels[i] | firstLetterCase}}
               </td>
 
             </ng-container>

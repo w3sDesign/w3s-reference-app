@@ -7,7 +7,7 @@ import * as moment from 'moment';
 moment.locale('de');
 ////////////////////
 
-export const mockCustomerQuestions: QuestionBase[] = [
+export const customerQuestions: QuestionBase[] = [
 
   // Group 1: Basic Data
 
@@ -38,7 +38,7 @@ export const mockCustomerQuestions: QuestionBase[] = [
     order: 120,
     isRequired: true,
 
-    // Validators array.
+    // Validator array.
     validators: [
       Validators.required,
     ],

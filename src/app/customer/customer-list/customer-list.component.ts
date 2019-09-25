@@ -29,7 +29,7 @@ import { DynamicFormQuestionComponent } from '../../shared/dynamic-form/dynamic-
 import { FormGroup } from '@angular/forms';
 
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
-import { mockCustomerQuestions } from '../model/customer-questions';
+import { customerQuestions } from '../model/customer.questions';
 
 import { CustomerFilterTemplate } from '../model/customer-filter-template';
 
@@ -44,8 +44,6 @@ import { HttpCustomerService } from '../http-customer.service';
 import { MessageService } from '../../shared/message.service';
 // import { FocusMonitor } from '@angular/cdk/a11y';
 
-import * as moment from 'moment';
-import { MomentDatePipe } from '../../shared/pipes/momentDate.pipe';
 import { UtilsService } from '../../shared/utils.service';
 
 
@@ -94,7 +92,7 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
   // routeCustomerId: number;
   // routeFilterTemplateId: number;
 
-  // customerQuestions: QuestionBase[] = mockCustomerQuestions.slice();
+  // customerQuestions: QuestionBase[] = customerQuestions.slice();
 
   /** All possible columns that can be displayed. */
   // TODO should be generated from questions

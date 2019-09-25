@@ -2,6 +2,8 @@
  * Customer filter template data definition.
  * ####################################################################
  * Includes all fields from `Customer`.
+ * A filterTemplate is a predefined set of filters, which can be created,
+ * retrieved, updated, and deleted.
  */
 
 export class CustomerFilterTemplate {
@@ -29,16 +31,4 @@ export class CustomerFilterTemplate {
   phoneFilter ?= '';
   emailFilter ?= '';
 }
-
-
-// export const customerFilterMap = {
-//   customerId: 'id',
-//   customerName: 'name',
-//   customerStreet: 'addresses[0].street',
-//   customerPostalCode: 'addresses[0].postalCode',
-//   customerCity: 'addresses[0].city',
-//   customerCountry: 'addresses[0].country',
-// };
-
-
 

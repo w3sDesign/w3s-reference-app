@@ -31,7 +31,8 @@ import { DynamicFormQuestionComponent } from '../../shared/dynamic-form/dynamic-
 import { FormGroup } from '@angular/forms';
 
 import { QuestionBase } from '../../shared/dynamic-form/question-base';
-import { mockCustomerQuestions } from '../model/customer-questions';
+import { customerQuestions } from '../model/customer.questions';
+import { customerFilterTemplateQuestions } from './customer-filter-template.questions';
 
 import { CustomerFilterTemplate } from '../model/customer-filter-template';
 
@@ -60,11 +61,18 @@ import { CustomerFilterTemplateService } from '../customer-filter-template.servi
 
 export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, OnChanges {
 
+// Component inputs and outputs.
+
+  /** Emitting a queryParamsChange event for which parent components can listen. */
+  @Output() queryParamsChange = new EventEmitter<any>();
+
+
+
+
+
+
   showTestValues = true;
   // consoleLogStyle = 'color: blue; font-weight: 500; line-height: 20px;';
-
-  /** Emitting a queryParamsChange event for which parents can listen. */
-  @Output() queryParamsChange = new EventEmitter<any>();
 
 
   /** All possible filters that can be displayed. */
@@ -82,11 +90,11 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
   /** = selected in the filterSelection table. */
   displayedFilterNames: string[] = [];
 
-  /** Displayed filters with user input. */
+  /** Displayed filters actually having an user input. */
   activatedFilterNames: string[] = [];
 
+  /** Showing the currently activated filters. */
   activatedFiltersMessage = '';
-  // activatedFiltersMessage = 'Currently no filters activated.';
 
 
   /**
@@ -108,6 +116,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
 
   /**
    * Automatically generated from existing customer questions.
+   * New:
    */
   filterTemplateQuestions: QuestionBase[];
 
@@ -383,6 +392,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
       this.searchInputModel = '';
     } else {
       // allFiltersEmpty()
+      this.activatedQueryParams.filter = '';
       this.activatedQueryParams.searchTerm = this.searchInputModel;
     }
 
@@ -407,51 +417,6 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
 
 
 
-  setActivatedFilterNames() {
-
-    // Setting activatedFilterNames (= enabled form controls having a value).
-
-    this.activatedFilterNames = [];
-
-    // Problems with form.value:
-    // Includes disabled controls (id, name) when no enabled controls exist!?
-    // { "id": 1, "name": "standard" }
-
-    // form.value =
-    // { "idFilter": ">20010", "nameFilter": "Foundation" }
-    // form.getRawValue() =
-    // { "id": 1, "name": "standard", "idFilter": ">20010", "nameFilter": "Foundation" }
-
-    const obj = this.filterTemplateForm.form.value;
-    // Object.keys(obj).forEach(key => {
-    for (const key in obj) {
-      if (key.includes('Filter') && obj[key]) {
-        this.activatedFilterNames.push(key);
-      }
-    }
-  }
-
-
-
-  setActivatedFiltersMessage() {
-
-    this.activatedFiltersMessage = 'Currently no filters activated.';
-
-    if (this.activatedQueryParams.searchTerm) {
-      this.activatedFiltersMessage = `Searching in all fields: "${this.activatedQueryParams.searchTerm}"`;
-    }
-
-    if (this.activatedQueryParams.filter) {
-      const nr = this.activatedFilterNames.length;
-      this.activatedFiltersMessage = (nr === 0) ? 'Currently no filters activated.'
-        : (nr === 1) ? 'Currently 1 filter activated: ' : `Currently ${nr} filters activated: `;
-    }
-
-  }
-
-
-
-
   /**
    * Generating filter template questions for displayedFilterNames
    * (from customer questions).
@@ -464,47 +429,53 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
     //   return {} as QuestionBase[];
     // }
 
-    const fromQuestions = mockCustomerQuestions.filter(q => {
-      return displayedFilterNames.includes(q.name + 'Filter');
+    return customerFilterTemplateQuestions.filter(q => {
+      return (q.name === 'id' || q.name === 'name' ||
+        displayedFilterNames.includes(q.name));
     });
 
-    // Questions without formArray questions.
-    const questions = [];
-    fromQuestions.forEach(q => {
-      if (q.controlType !== 'formArray') {
-        questions.push(q);
-      }
-    });
 
-    const filterTemplateQuestions = questions.map(q => {
+    // const fromQuestions = customerQuestions.filter(q => {
+    //   return displayedFilterNames.includes(q.name + 'Filter');
+    // });
 
-      const obj = {};
+    // // Questions without formArray questions.
+    // const questions = [];
+    // fromQuestions.forEach(q => {
+    //   if (q.controlType !== 'formArray') {
+    //     questions.push(q);
+    //   }
+    // });
 
-      obj['name'] = q.name + 'Filter';
-      obj['controlType'] = 'textbox';
-      // obj['inputType'] = 'textarea';
-      obj['inputType'] = 'text';
+    // const filterTemplateQuestions = questions.map(q => {
 
-      // obj['label'] = '';
-      obj['hint'] = 'Filter by ' + q.label;
-      // TODO
-      if (q.inputType === 'number') {
-        obj['toolTip'] = 'For example: 1000 (equal), <1000 (lower), >1000 (greater), 1000-2000 (between)';
-      } else {
-        obj['toolTip'] = '';
-      }
+    //   const obj = {};
 
-      return obj;
+    //   obj['name'] = q.name + 'Filter';
+    //   obj['controlType'] = 'textbox';
+    //   // obj['inputType'] = 'textarea';
+    //   obj['inputType'] = 'text';
 
-    });
+    //   // obj['label'] = '';
+    //   obj['hint'] = 'Filter by ' + q.label;
+    //   // TODO
+    //   if (q.inputType === 'number') {
+    //     obj['toolTip'] = 'For example: 1000 (equal), <1000 (lower), >1000 (greater), 1000-2000 (between)';
+    //   } else {
+    //     obj['toolTip'] = '';
+    //   }
 
-    const obj1 = { name: 'id', controlType: 'textbox', inputType: 'number', isDisabled: true };
-    const obj2 = { name: 'name', controlType: 'textbox', inputType: 'string', isDisabled: true };
+    //   return obj;
 
-    filterTemplateQuestions.unshift(obj1, obj2); // add to the beginning
+    // });
+
+    // const obj1 = { name: 'id', controlType: 'textbox', inputType: 'number', isDisabled: true };
+    // const obj2 = { name: 'name', controlType: 'textbox', inputType: 'string', isDisabled: true };
+
+    // filterTemplateQuestions.unshift(obj1, obj2); // add to the beginning
 
 
-    return filterTemplateQuestions as QuestionBase[];
+    // return filterTemplateQuestions as QuestionBase[];
   }
 
 
@@ -605,6 +576,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
 
   onFilterTemplateSelectionChange() {
 
+
     if (this.activatedQueryParams.filterTemplateId > 0) {
       this.searchInputModel = '';
     }
@@ -658,6 +630,51 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
     this.emitQueryParamsChange();
 
   }
+
+
+  setActivatedFilterNames() {
+
+    // Setting activatedFilterNames (= enabled form controls having a value).
+
+    this.activatedFilterNames = [];
+
+    // Problems with form.value:
+    // Includes disabled controls (id, name) when no enabled controls exist!?
+    // { "id": 1, "name": "standard" }
+
+    // form.value =
+    // { "idFilter": ">20010", "nameFilter": "Foundation" }
+    // form.getRawValue() =
+    // { "id": 1, "name": "standard", "idFilter": ">20010", "nameFilter": "Foundation" }
+
+    const obj = this.filterTemplateForm.form.value;
+    // Object.keys(obj).forEach(key => {
+    for (const key in obj) {
+      if (key.includes('Filter') && obj[key]) {
+        this.activatedFilterNames.push(key);
+      }
+    }
+  }
+
+
+
+  setActivatedFiltersMessage() {
+
+    this.activatedFiltersMessage = 'Currently no filters activated.';
+
+    if (this.activatedQueryParams.searchTerm) {
+      this.activatedFiltersMessage = `Searching in all fields: "${this.activatedQueryParams.searchTerm}"`;
+    }
+
+    if (this.activatedQueryParams.filter) {
+      const nr = this.activatedFilterNames.length;
+      this.activatedFiltersMessage = (nr === 0) ? 'Currently no filters activated.'
+        : (nr === 1) ? 'Currently 1 filter activated: ' : `Currently ${nr} filters activated: `;
+    }
+
+  }
+
+
 
 
   /**
