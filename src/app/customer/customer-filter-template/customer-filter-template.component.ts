@@ -61,7 +61,9 @@ import { CustomerFilterTemplateService } from '../customer-filter-template.servi
 
 export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, OnChanges {
 
-// Component inputs and outputs.
+  ////////////////////////////////
+  // Component inputs and outputs.
+  ////////////////////////////////
 
   /** Emitting a queryParamsChange event for which parent components can listen. */
   @Output() queryParamsChange = new EventEmitter<any>();
@@ -76,6 +78,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
 
 
   /** All possible filters that can be displayed. */
+  // TODO should be generated from customerFTQuestions
   availableFilterNames: string[] =
     [
       'idFilter', 'nameFilter',
@@ -101,7 +104,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
    * Reference to the filter template form.
    * Not set before AfterViewInit.
    */
-  @ViewChild('filterTemplateForm', {static: false})
+  @ViewChild('filterTemplateForm', { static: false })
   filterTemplateForm: DynamicFormComponent;
 
   // filterTemplateFormValue: any = {};
@@ -141,7 +144,7 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
   filterSelection = new SelectionModel<string>(true, this.displayedFilterNames);
 
   /** Table for filter selection. */
-  @ViewChild('filterSelectionTable', {static: false})
+  @ViewChild('filterSelectionTable', { static: false })
   filterSelectionTable: MatTable<string[]>;
 
 
@@ -389,6 +392,19 @@ export class CustomerFilterTemplateComponent implements OnInit, AfterViewInit, O
 
     if (this.activatedFilterNames.length !== 0) {
       this.activatedQueryParams.filter = this.filterTemplateForm.form.value;
+      // NEW
+      // const typeObj = customerQuestions.map(q => {
+
+      // const typeObj = customerQuestions.map(q => {
+        const typeObj = Object.keys(this.activatedQueryParams.filter).map(f => {
+          const cq = customerQuestions.find(q => q.name + 'Filter' === f['name']);
+        const obj = {};
+        obj['name'] = cq.name;
+        obj['inputType'] = cq.inputType;
+        return obj;
+      });
+      this.activatedQueryParams.questions = customerQuestions;
+
       this.searchInputModel = '';
     } else {
       // allFiltersEmpty()

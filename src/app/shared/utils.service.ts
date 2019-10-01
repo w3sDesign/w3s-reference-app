@@ -69,7 +69,7 @@ export class UtilsService {
    * filterObj: { "idFilter": ">20010", "nameFilter": "Foundation" }
    */
 
-  filterItems(items: {}[], filterObj: {}): {}[] {
+  filterItems(items: {}[], filterObj: {}, questions: {}[]): {}[] {
 
     if (!items || items.length === 0 || !filterObj) { return items; }
 
@@ -104,7 +104,7 @@ export class UtilsService {
 
         const itemValue = itemObj[itemKey];
 
-        if (!itemValue) { console.error('##########no itemValue! itemValue = ' + itemValue); }
+        if (!itemValue) { console.error('########## No itemValue!'); return false; }
         // console.log('#########itemKey: ' + itemKey);
         // console.log('#########itemValue: ' + JSON.stringify(itemValue));
 
@@ -115,14 +115,20 @@ export class UtilsService {
         // if (!filterObj[filterKey]) { continue; }
 
         const filterValue = typeof (filterObj[filterKey]) === 'string' ?
-          filterObj[filterKey].trim().toLowerCase() :
-          filterObj[filterKey];
+        filterObj[filterKey].trim().toLowerCase() :
+        filterObj[filterKey];
 
+
+        Object.keys(filterObj).map
 
         // if (filterValue && testFailed === false) {
+          const itemQuestion = questions.find(q => q['name'] === itemKey);
+          if (questions.length === 0) { console.error('########## No questions!'); return false; }
+          if (!itemQuestion) { console.error('########## No ItemQuestions!'); return false; }
 
 
-        if (typeof (itemValue) === 'string' &&
+        // if (typeof (itemValue) === 'string' &&
+        if (itemQuestion['inputType'] === 'date' &&
           moment(itemValue, ['YYYY-MM-DD', 'DD/MM/YYYY']).isValid()) {
 
           // Date Filter Tests
@@ -156,7 +162,8 @@ export class UtilsService {
           // }
 
 
-        } else if (typeof (itemValue) === 'string') {
+        } else if (itemQuestion['inputType'] === 'text' ||
+          itemQuestion['inputType'] === 'textarea') {
 
 
           // String Filter Tests
@@ -177,7 +184,7 @@ export class UtilsService {
           // other tests ...
 
 
-        } else if (typeof (itemValue) === 'number') {
+        } else if (itemQuestion['inputType'] === 'number') {
 
 
           // Number Filter Tests
