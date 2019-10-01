@@ -9,6 +9,8 @@ export class QueryParams {
 
   pageNumber = 0;
   pageSize = 10;
+
+  questions: {}[] = [];
 }
 
 // export class QueryParams {

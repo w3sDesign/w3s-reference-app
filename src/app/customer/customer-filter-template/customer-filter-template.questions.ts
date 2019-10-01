@@ -49,7 +49,7 @@ export const customerFilterTemplateQuestions: QuestionBase[] = [
   {
     name: 'typeFilter',
     controlType: 'dropdown',
-    inputType: '',
+    inputType: 'text',
     label: '',
     hint: 'Filter by Type',
     options: [
@@ -61,7 +61,7 @@ export const customerFilterTemplateQuestions: QuestionBase[] = [
   {
     name: 'statusFilter',
     controlType: 'dropdown',
-    inputType: '',
+    inputType: 'text',
     label: '',
     hint: 'Filter by Status',
     options: [

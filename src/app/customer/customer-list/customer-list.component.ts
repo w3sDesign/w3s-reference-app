@@ -95,7 +95,7 @@ export class CustomerListComponent implements OnInit, AfterViewInit, OnChanges {
   // customerQuestions: QuestionBase[] = customerQuestions.slice();
 
   /** All possible columns that can be displayed. */
-  // TODO should be generated from questions
+  // TODO should be generated from customerQuestions
   availableColumns: string[] = [
     'select', 'id', 'name', 'type', 'status', 'comment', 'creationDate',
     'country', 'postalCode', 'city', 'street',

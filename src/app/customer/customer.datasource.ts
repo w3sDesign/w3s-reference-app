@@ -161,7 +161,7 @@ export class CustomerDataSource implements DataSource<any> {
           );
 
           const filteredItems = this.utils.filterItems(
-            res1.items, queryParams.filter);
+            res1.items, queryParams.filter, queryParams.questions);
 
           const sortedItems = this.utils.sortItems(
             filteredItems, queryParams.sortField, queryParams.sortOrder);

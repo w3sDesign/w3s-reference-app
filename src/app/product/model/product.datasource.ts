@@ -161,7 +161,7 @@ export class ProductDataSource implements DataSource<any> {
           );
 
           const filteredItems = this.httpUtils.filterItems(
-            res1.items, queryParams.filter);
+            res1.items, queryParams.filter, queryParams.questions);
 
           const sortedItems = this.httpUtils.sortItems(
             filteredItems, queryParams.sortField, queryParams.sortOrder);
