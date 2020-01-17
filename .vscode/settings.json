@@ -1,3 +1,7 @@
+////////////////////////
+// Workspace Settings //
+////////////////////////
+
 {
     "terminal.integrated.inheritEnv": false
 }

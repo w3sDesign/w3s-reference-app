@@ -8,6 +8,7 @@ import { DynamicFormComponent } from './dynamic-form/dynamic-form.component';
 import { DynamicFormQuestionComponent } from './dynamic-form/dynamic-form-question.component';
 import { DynamicFormGroupService } from './dynamic-form/dynamic-form-group.service';
 
+import { MessageListComponent } from './message-list/message-list.component';
 // Moved from AppModule!
 import { MessageDialogComponent } from './message-dialog/message-dialog.component';
 import { MessageSnackBarComponent } from './message-snack-bar/message-snack-bar.component';
@@ -43,6 +44,7 @@ registerLocaleData(localeDe, 'de');
     HighlightDirective,
     MomentDatePipe, FirstLetterCasePipe,
 
+    MessageListComponent,
     MessageDialogComponent,
     MessageSnackBarComponent,
     InputDialogComponent,

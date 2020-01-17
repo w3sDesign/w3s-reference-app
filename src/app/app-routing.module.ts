@@ -21,11 +21,12 @@ const appRoutes: Routes = [
     // loadChildren: '../src/app/customer/customer.module#CustomerModule'
     // loadChildren: () => CustomerModule
   },
-  {
-    path: 'products',
-    loadChildren: () => import('./product/product.module')
-      .then(mod => mod.ProductModule),
-  },
+  
+  // {
+  //   path: 'products',
+  //   loadChildren: () => import('./product/product.module')
+  //     .then(mod => mod.ProductModule),
+  // },
 
 
   {

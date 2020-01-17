@@ -11,7 +11,8 @@ import { MessageSnackBarComponent } from './message-snack-bar/message-snack-bar.
  @Injectable({ providedIn: 'root' })
 export class MessageService {
 
-  // messages: string[] = [];
+  messages: string[] = [];
+  
   nextId = 1;
 
   constructor(
